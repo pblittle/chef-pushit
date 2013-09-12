@@ -1,0 +1,22 @@
+.vagrant
+*~
+*#
+.#*
+\#*#
+.*.sw[a-z]
+*.un~
+cookbooks/
+*data_bags/
+files/*
+.kitchen
+.tailor
+*.box
+
+# Bundler
+bin/*
+.bundle/*
+.kitchen/
+.kitchen.local.yml
+
+# Misc
+.DS_Store

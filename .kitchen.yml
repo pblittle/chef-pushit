@@ -1,0 +1,85 @@
+---
+driver_plugin: vagrant
+
+driver_config:
+  require_chef_omnibus: true
+  customize:
+    cpus: 2
+    memory: 1536
+    cpuexecutioncap: 75
+
+platforms:
+- name: ubuntu-12.04
+  driver_config:
+    box: opscode-ubuntu-12.04
+    box_url: https://opscode-vm-bento.s3.amazonaws.com/vagrant/opscode_ubuntu-12.04_provisionerless.box
+  run_list:
+  - recipe[apt]
+  attributes:
+    mysql:
+      bind_address: 'localhost'
+      remove_anonymous_users: true,
+      remove_test_database: true,
+      server_debian_password: 'password'
+      server_repl_password: 'password'
+      server_root_password: 'password'
+      tunable:
+        lower_case_table_names: 1
+
+suites:
+- name: user
+  run_list:
+    - recipe[minitest-handler]
+    - recipe[pushit_test::user]
+  data_bags_path:
+    'test/data_bags'
+  encrypted_data_bag_secret_key_path:
+    'test/encrypted_data_bag_secret'
+- name: webserver
+  run_list:
+    - recipe[minitest-handler]
+    - recipe[pushit_test::webserver]
+  data_bags_path:
+    'test/data_bags'
+  encrypted_data_bag_secret_key_path:
+    'test/encrypted_data_bag_secret'
+  attributes:
+    nginx:
+      default_site_enabled: false
+      dir: '/opt/nginx'
+      install_method: 'source'
+      source:
+        conf_path: '/opt/nginx/nginx.conf'
+        prefix: '/opt/nginx'
+      version: '1.4.2'
+- name: dependency
+  run_list:
+    - recipe[minitest-handler]
+    - recipe[pushit_test::dependency]
+  data_bags_path:
+    'test/data_bags'
+- name: nodejs
+  run_list:
+    - recipe[minitest-handler]
+    - recipe[pushit_test::nodejs]
+  data_bags_path:
+    'test/data_bags'
+  encrypted_data_bag_secret_key_path:
+    'test/encrypted_data_bag_secret'
+- name: rails
+  run_list:
+    - recipe[minitest-handler]
+    - recipe[mysql::server]
+    - recipe[pushit_test::rails]
+  data_bags_path:
+    'test/data_bags'
+  encrypted_data_bag_secret_key_path:
+    'test/encrypted_data_bag_secret'
+- name: ruby
+  run_list:
+    - recipe[minitest-handler]
+    - recipe[pushit_test::ruby]
+  data_bags_path:
+    'test/data_bags'
+  encrypted_data_bag_secret_key_path:
+    'test/encrypted_data_bag_secret'
