@@ -226,6 +226,7 @@ class Chef
         upstart_config.mode '0644'
         upstart_config.variables(
           :instance => new_resource.name,
+          :env_path => ruby.bin_path,
           :app_path => app.release_path,
           :log_file => ::File.join(app.release_path, 'log', 'upstart.log'),
           :pid_file => ::File.join(app.release_path, 'tmp', 'pids', 'upstart.pid'),

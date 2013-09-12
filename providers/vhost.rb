@@ -88,7 +88,7 @@ action :create do
     mode '0644'
     variables(
       :app_name => new_resource.app_name,
-      :root => "/opt/pushit/#{new_resource.name}/current/public",
+      :root => "#{Pushit::App.apps_path}/#{new_resource.name}/current/public",
       :server_name => new_resource.server_name,
       :listen_port => new_resource.http_port,
       :use_ssl => new_resource.use_ssl,

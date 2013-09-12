@@ -44,13 +44,17 @@ class Pushit
       initialize_pushit
     end
 
+    def self.apps_path
+      ::File.join(Pushit.pushit_path, 'apps')
+    end
+
     def config
       data_bag_item = Chef::DataBagItem.load(DATA_BAG, @app['id'])
       data_bag_item || {}
     end
 
     def path
-      ::File.join(Pushit.pushit_path, @app['id'])
+      ::File.join(Pushit::App.apps_path, @app['id'])
     end
 
     def current_path
@@ -66,7 +70,7 @@ class Pushit
     end
 
     def root
-      ::File.join(path, 'current', 'public')
+      ::File.join(current_path, 'public')
     end
 
     def version

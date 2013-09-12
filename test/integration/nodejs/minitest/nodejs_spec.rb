@@ -5,7 +5,7 @@ require 'minitest/spec'
 
 describe 'pushit_test::nodejs' do
 
-  let(:pushit_path) { ::File.join('', 'opt', 'pushit') }
+  let(:pushit_path) { ::File.join('', 'opt', 'pushit', 'apps') }
   let(:pushit_app_path) { ::File.join(pushit_path, 'nodejs-example') }
   let(:pushit_pid_path) do
     ::File.join(pushit_app_path, 'current', 'pids', 'upstart.pid')

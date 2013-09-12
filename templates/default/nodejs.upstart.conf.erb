@@ -3,7 +3,9 @@
 
 description "Pushit NodeJS Application Server"
 
-start on runlevel [2345]
+export PATH="<%= @env_path %>:$PATH"
+
+start on (local-filesystems and runlevel [2345])
 stop on runlevel [06]
 
 respawn
@@ -11,9 +13,6 @@ respawn
 <% @env.each do |key, value| -%>
 env <%= key %>="<%= value %>"
 <% end -%>
-
-setuid <%= @user %>
-setgid <%= @group %>
 
 chdir <%= @app_path %>
 exec start-stop-daemon \

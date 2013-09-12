@@ -106,6 +106,7 @@ class Chef
         upstart_config.mode '0644'
         upstart_config.variables(
           :instance => new_resource.name,
+          :env_path => Pushit::Nodejs.bin_path,
           :app_path => app.release_path,
           :log_path => "#{app.shared_path}/log/upstart.log",
           :pid_path => "#{app.shared_path}/pids/upstart.pid",
