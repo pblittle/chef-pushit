@@ -6,7 +6,9 @@ require 'minitest/spec'
 describe 'pushit_test::rails' do
 
   let(:pushit_path) { ::File.join('', 'opt', 'pushit') }
-  let(:pushit_app_path) { ::File.join(pushit_path, 'rails-example') }
+
+  let(:pushit_app_path) { ::File.join(pushit_path, 'apps', 'rails-example') }
+
   let(:pushit_pid_path) do
     ::File.join(pushit_app_path, 'current', 'tmp', 'pids', 'upstart.pid')
   end
@@ -52,12 +54,6 @@ describe 'pushit_test::rails' do
   it 'has created a service config' do
     assert File.file?(
       ::File.join('', 'etc', 'init', 'rails-example.conf')
-    )
-  end
-
-  it 'starts the rails-example service after converge' do
-    assert system(
-      "service rails-example status | grep -e $(cat #{pushit_pid_path})"
     )
   end
 end
