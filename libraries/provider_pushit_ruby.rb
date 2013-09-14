@@ -19,10 +19,7 @@
 
 class Chef
   class Provider
-
     class PushitRuby < Chef::Provider
-
-      # attr_accessor :ruby, :prefix_path, :bin_path
 
       def initialize(new_resource, run_context = nil)
         @new_resource = new_resource
@@ -63,14 +60,14 @@ class Chef
           cookbook 'pushit'
           mode '0755'
           variables(
-            :ruby_build_bin_path => @bin_path
+            :ruby_build_bin_path => ruby.bin_path
           )
           notifies :run, "bash[source_ruby]", :immediately
         end
 
         bash 'source_ruby' do
           code <<-EOF
-          echo 'source /etc/profile.d/pushit_ruby.sh' >> .bashrc
+          echo 'source /etc/profile.d/pushit_ruby.sh' > .bashrc
           chmod +x /etc/profile.d/pushit_ruby.sh
           EOF
           cwd Pushit::User.home_path

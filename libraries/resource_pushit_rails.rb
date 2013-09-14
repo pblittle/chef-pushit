@@ -31,7 +31,7 @@ class Chef
         @action = :create
         @allowed_actions = [:create]
 
-        @framework = nil
+        @framework = 'rails'
         @bundle_binary = nil
         @unicorn_binary = nil
       end

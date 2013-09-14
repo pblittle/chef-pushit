@@ -30,7 +30,6 @@ class Chef
 
       def initialize(new_resource, run_context = nil)
         @app = Pushit::App.new(new_resource.name)
-
         @config = nil
 
         super(new_resource, run_context)
@@ -46,7 +45,7 @@ class Chef
         install_app_dependencies
         create_app_directories
 
-        if @framework == 'rails'
+        if new_resource.framework == 'rails'
           create_shared_directories
           create_dotenv
           create_dotruby
