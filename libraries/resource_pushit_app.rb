@@ -81,6 +81,7 @@ class Chef
           :environment,
           arg,
           :kind_of => [String],
+          :required => true,
           :default => 'development'
         )
       end

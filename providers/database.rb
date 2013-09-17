@@ -36,33 +36,45 @@ end
 
 action :create do
   app_name = @current_resource.app_name
-  app = Chef::Pushit.app_data_bag(app_name)
+  app = Chef::Pushit::App.new(app_name)
+
+  config = app.config
+  environment = config['environment']
+
+  if environment && config['database'].has_key?(environment)
+    database = config['database'][environment]
+  else
+    database = config['database']
+  end
 
   connection_details = {
-    :host => app['database']['host'],
-    :port => app['database']['port'],
-    :username => app['database']['username'],
-    :password => app['database']['password']
+    :host => database['host'],
+    :port => database['port'],
+    :username => database['username'],
+    :password => database['password']
   }
 
-  if app['database']['host'] == 'localhost'
-    run_context.node.set_unless['mysql']['server_debian_password'] = 'Lk3rqke1j82'
-    run_context.node.set_unless['mysql']['server_root_password'] = 'Lk3rqke1j82'
-    run_context.node.set_unless['mysql']['server_repl_password'] = 'Lk3rqke1j82'
+  if database['host'] == 'localhost'
+    run_context.node.set_unless['mysql']['server_debian_password'] =
+      database['root_password']
+    run_context.node.set_unless['mysql']['server_root_password'] =
+      database['root_password']
+    run_context.node.set_unless['mysql']['server_repl_password'] =
+      database['root_password']
     run_context.include_recipe 'mysql::server'
   end
 
-  mysql_database_user app['database']['root_username'] do
+  mysql_database_user database['root_username'] do
     connection connection_details
-    password app['database']['password']
-    database_name app['database']['name']
+    password database['password']
+    database_name database['name']
     action :grant
     only_if do
-      app['database']['host'] == 'localhost'
+      database['host'] == 'localhost'
     end
   end
 
-  mysql_database app['database']['name'] do
+  mysql_database database['name'] do
     connection connection_details
     action :create
   end

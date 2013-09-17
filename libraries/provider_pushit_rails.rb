@@ -186,6 +186,14 @@ class Chef
       def create_database_yaml
         Chef::Log.debug("Creating database.yml for #{new_resource.name}")
 
+        environment = new_resource.environment
+
+        if environment && config['database'].has_key?(environment)
+          database = config['database'][environment]
+        else
+          database = config['database']
+        end
+
         db_yaml = Chef::Resource::Template.new(
           ::File.join(app.shared_path, 'config', 'database.yml'),
           run_context
@@ -197,14 +205,14 @@ class Chef
         db_yaml.mode '0644'
         db_yaml.variables(
           :database => {
-            :adapter => config['database']['adapter'],
-            :database => config['database']['name'],
-            :encoding => config['database']['encoding'],
-            :host => config['database']['host'],
-            :username => config['database']['username'],
-            :password => config['database']['password'],
-            :options => config['database']['options'],
-            :reconnect => config['database']['reconnect']
+            :adapter => database['adapter'],
+            :database => database['name'],
+            :encoding => database['encoding'],
+            :host => database['host'],
+            :username => database['username'],
+            :password => database['password'],
+            :options => database['options'] || [],
+            :reconnect => database['reconnect']
           },
           :environment => new_resource.environment
         )

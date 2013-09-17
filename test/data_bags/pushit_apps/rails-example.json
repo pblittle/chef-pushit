@@ -15,15 +15,17 @@
     "ssl_certificate_key": ""
   },
   "database": {
-    "host": "localhost",
-    "adapter": "mysql2",
-    "name": "rails-example",
-    "username": "root",
-    "password": "password",
-    "port": 3306,
-    "options": [],
-    "root_username": "root",
-    "root_password": "password"
+    "development": {
+      "host": "localhost",
+      "adapter": "mysql2",
+      "name": "rails-example",
+      "username": "root",
+      "password": "password",
+      "port": 3306,
+      "options": [],
+      "root_username": "root",
+      "root_password": "password"
+    }
   },
   "env": {
     "RACK_ENV": "development",
