@@ -12,9 +12,6 @@
     "mysql": {
       "locked_version": "3.0.2"
     },
-    "jrs": {
-      "path": "../chef-jrs"
-    },
     "pushit_test": {
       "path": "./test/cookbooks/pushit_test"
     },
@@ -79,48 +76,6 @@
     },
     "partial_search": {
       "locked_version": "1.0.2"
-    },
-    "annoyances": {
-      "locked_version": "0.4.1"
-    },
-    "curl": {
-      "locked_version": "1.1.0"
-    },
-    "imagemagick": {
-      "locked_version": "0.2.2"
-    },
-    "newrelic": {
-      "locked_version": "0.5.3"
-    },
-    "php": {
-      "locked_version": "1.2.2"
-    },
-    "xml": {
-      "locked_version": "1.1.2"
-    },
-    "python": {
-      "locked_version": "1.3.6"
-    },
-    "ms_dotnet4": {
-      "locked_version": "1.0.1"
-    },
-    "ntp": {
-      "locked_version": "1.3.2"
-    },
-    "timezone": {
-      "locked_version": "0.0.1"
-    },
-    "java": {
-      "locked_version": "1.12.0"
-    },
-    "couchdb": {
-      "locked_version": "2.4.0"
-    },
-    "erlang": {
-      "locked_version": "1.3.0"
-    },
-    "memcached": {
-      "locked_version": "1.4.0"
     }
   }
 }
