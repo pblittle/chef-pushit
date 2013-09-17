@@ -1,0 +1,19 @@
+{
+  "id": "deploy",
+  "action": [ "create" ],
+  "password": "$1$TH7ylsS8$zCpG/8Q/8Nzdbpotevh0y/",
+  "home": "/opt/pushit",
+  "groups": [
+    "deploy"
+  ],
+  "comment": "Application Deployment",
+  "ssh_deploy_keys": [
+    {
+      "name": "id_rsa_rails-example",
+      "data": "-----BEGIN RSA PRIVATE KEY-----\n=rails-example-deploy-key\n-----END RSA PRIVATE KEY-----"
+    }
+  ],
+  "ssh_keys": [
+    "-----BEGIN RSA PRIVATE KEY-----\n=deploy-user-private-key\n-----END RSA PRIVATE KEY-----"
+  ]
+}

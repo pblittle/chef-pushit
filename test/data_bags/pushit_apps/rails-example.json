@@ -1,0 +1,32 @@
+{
+  "id": "rails-example",
+  "owner": "deploy",
+  "group": "deploy",
+  "repo": "https://github.com/openshift/rails-example.git",
+  "revision": "master",
+  "environment": "development",
+  "deploy_key": "",
+  "framework": "rails",
+  "ruby": "1.9.3-p392",
+  "webserver": {
+    "type": "nginx",
+    "server_name": "rails-example",
+    "ssl_certificate": "",
+    "ssl_certificate_key": ""
+  },
+  "database": {
+    "host": "localhost",
+    "adapter": "mysql2",
+    "name": "rails-example",
+    "username": "root",
+    "password": "password",
+    "port": 3306,
+    "options": [],
+    "root_username": "root",
+    "root_password": "password"
+  },
+  "env": {
+    "RACK_ENV": "development",
+    "RAILS_ENV": "development"
+  }
+}
