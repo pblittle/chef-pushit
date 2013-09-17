@@ -41,9 +41,26 @@ action :create do
   connection_details = {
     :host => app['database']['host'],
     :port => app['database']['port'],
-    :username => app['database']['root_username'],
-    :password => app['database']['root_password']
+    :username => app['database']['username'],
+    :password => app['database']['password']
   }
+
+  if app['database']['host'] == 'localhost'
+    run_context.node.set_unless['mysql']['server_debian_password'] = 'Lk3rqke1j82'
+    run_context.node.set_unless['mysql']['server_root_password'] = 'Lk3rqke1j82'
+    run_context.node.set_unless['mysql']['server_repl_password'] = 'Lk3rqke1j82'
+    run_context.include_recipe 'mysql::server'
+  end
+
+  mysql_database_user app['database']['root_username'] do
+    connection connection_details
+    password app['database']['password']
+    database_name app['database']['name']
+    action :grant
+    only_if do
+      app['database']['host'] == 'localhost'
+    end
+  end
 
   mysql_database app['database']['name'] do
     connection connection_details

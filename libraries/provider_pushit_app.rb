@@ -42,13 +42,13 @@ class Chef
       end
 
       def action_create
-        install_app_dependencies
-        create_app_directories
+        install_dependencies
+        create_directories
 
         if new_resource.framework == 'rails'
           create_shared_directories
           create_dotenv
-          create_dotruby
+          create_ruby_version
           create_database_yaml
         end
 
@@ -89,13 +89,13 @@ class Chef
         service.run_action(:start)
       end
 
-      def install_app_dependencies
+      def install_dependencies
         recipe_eval do
           Pushit::App::Dependency.new(new_resource, run_context)
         end
       end
 
-      def create_app_directories
+      def create_directories
         Chef::Log.debug("Creating app directories for #{new_resource.name}")
 
         [app.path, app.shared_path].each do |app_dir|

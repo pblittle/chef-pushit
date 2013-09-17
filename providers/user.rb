@@ -38,6 +38,8 @@ action :create do
 
   create_group
   create_user
+  change_home_owner
+
   setup_deploy_keys
 
   new_resource.updated_by_last_action(true)
@@ -56,6 +58,8 @@ def create_group
   )
   group.append true
   group.run_action(:create)
+
+  new_resource.updated_by_last_action(true) if group.updated_by_last_action?
 end
 
 def create_user
@@ -67,9 +71,12 @@ def create_user
   user.password new_resource.password
   user.home new_resource.home
   user.supports :manage_home => true
-  user.system true
-  user.group Etc.getgrnam(new_resource.group).gid
+  user.system false
+  user.uid Etc.getgrnam(new_resource.username).gid
+  user.gid Etc.getgrnam(new_resource.group).gid
   user.run_action(:create)
+
+  new_resource.updated_by_last_action(true) if user.updated_by_last_action?
 end
 
 def create_deploy_key_directory
@@ -82,6 +89,12 @@ def create_deploy_key_directory
   dir.mode '0700'
   dir.recursive true
   dir.run_action(:create)
+
+  new_resource.updated_by_last_action(true) if dir.updated_by_last_action?
+end
+
+def change_home_owner
+  FileUtils.chown_R('deploy', 'deploy', Pushit.pushit_path)
 end
 
 def setup_deploy_keys
@@ -106,6 +119,8 @@ def create_deploy_key(key)
     :ssh_key_data => key['data']
   })
   deploy_key.run_action(:create)
+
+  new_resource.updated_by_last_action(true) if deploy_key.updated_by_last_action?
 end
 
 def create_deploy_wrapper(key)
@@ -123,6 +138,8 @@ def create_deploy_wrapper(key)
     :ssh_key_name => key['name']
   })
   wrapper.run_action(:create)
+
+  new_resource.updated_by_last_action(true) if wrapper.updated_by_last_action?
 end
 
 def deploy_key_directory

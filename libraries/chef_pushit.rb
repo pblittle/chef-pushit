@@ -84,7 +84,7 @@ class Pushit
     end
 
     def initialize_pushit
-      FileUtils.mkdir_p(Pushit.pushit_path, mode: 0755)
+      FileUtils.mkdir_p(Pushit.pushit_path, :mode => 0755)
     end
   end
 
@@ -116,20 +116,28 @@ class Pushit
   class Ruby < Pushit::App
 
     attr_accessor :version
+    attr_accessor :rubies_path
     attr_accessor :prefix_path
     attr_accessor :bin_path
     attr_accessor :ruby_binary
     attr_accessor :gem_path
 
     def initialize(version = nil)
+      initialize_pushit
+
       @version = version
+      @rubies_path = rubies_path
       @prefix_path = prefix_path
       @bin_path = bin_path
       @ruby_binary = ruby_binary
     end
 
+    def rubies_path
+      ::File.join(Pushit.pushit_path, 'rubies')
+    end
+
     def prefix_path
-      ::File.join(Pushit.pushit_path, 'rubies', @version)
+      ::File.join(@rubies_path, @version)
     end
 
     def bin_path
@@ -150,12 +158,20 @@ class Pushit
       initialize_pushit
     end
 
+    def self.user
+      'deploy'
+    end
+
+    def self.group
+      'deploy'
+    end
+
     def self.home_path
       ::File.join(Pushit.pushit_path)
     end
   end
 
-  class << self
+  class<< self
 
     # We should have a dryer way to build configs
     def create_config(file, attrs); end

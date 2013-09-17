@@ -77,6 +77,12 @@
     "ohai": {
       "locked_version": "1.1.10"
     },
+    "ssh_known_hosts": {
+      "locked_version": "1.0.0"
+    },
+    "partial_search": {
+      "locked_version": "1.0.2"
+    },
     "annoyances": {
       "locked_version": "0.4.1"
     },
@@ -118,12 +124,6 @@
     },
     "memcached": {
       "locked_version": "1.4.0"
-    },
-    "ssh_known_hosts": {
-      "locked_version": "1.0.0"
-    },
-    "partial_search": {
-      "locked_version": "1.0.2"
     }
   }
 }

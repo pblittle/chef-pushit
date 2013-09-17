@@ -49,8 +49,6 @@ class Chef
 
       def create_deploy_revision
 
-        Chef::Log.warn new_resource
-
         Chef::Log.debug("Creating deploy revision for #{new_resource.name}")
 
         deploy = Chef::Resource::DeployRevision.new(
@@ -147,22 +145,24 @@ class Chef
         deploy.run_action(new_resource.deploy_action)
       end
 
-      def create_dotruby
+      def create_ruby_version
         Chef::Log.debug("Creating .ruby-version for #{new_resource.name}")
 
-        dotruby = Chef::Resource::Template.new(
+        ruby_version = Chef::Resource::Template.new(
           ::File.join(app.shared_path, 'ruby-version'),
           run_context
         )
-        dotruby.source 'ruby-version.erb'
-        dotruby.cookbook 'pushit'
-        dotruby.owner config['owner']
-        dotruby.group config['group']
-        dotruby.mode '0644'
-        dotruby.variables(
+        ruby_version.source 'ruby-version.erb'
+        ruby_version.cookbook 'pushit'
+        ruby_version.owner config['owner']
+        ruby_version.group config['group']
+        ruby_version.mode '0644'
+        ruby_version.variables(
           :ruby_version => config['ruby']
         )
-        dotruby.run_action(:create)
+        ruby_version.run_action(:create)
+
+        new_resource.updated_by_last_action(true) if ruby_version.updated_by_last_action?
       end
 
       def create_dotenv

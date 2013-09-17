@@ -27,6 +27,8 @@ class Chef
 
         @run_context.include_recipe 'ruby_build'
 
+        @dependencies = [ 'git::default' ]
+
         super(new_resource, run_context)
       end
 
@@ -42,6 +44,8 @@ class Chef
 
       def action_create
         ruby_build_ruby new_resource.name do
+          user 'deploy'
+          group 'deploy'
           prefix_path ruby.prefix_path
           environment(new_resource.environment)
           not_if do
@@ -55,27 +59,66 @@ class Chef
           end
         end
 
-        template '/etc/profile.d/pushit_ruby.sh' do
-          source 'pushit_ruby.sh.erb'
-          cookbook 'pushit'
-          mode '0755'
-          variables(
-            :ruby_build_bin_path => ruby.bin_path
-          )
-          notifies :run, "bash[source_ruby]", :immediately
-        end
-
-        bash 'source_ruby' do
-          code <<-EOF
-          echo 'source /etc/profile.d/pushit_ruby.sh' > .bashrc
-          chmod +x /etc/profile.d/pushit_ruby.sh
-          EOF
-          cwd Pushit::User.home_path
-          action :nothing
-          not_if "egrep '/etc/profile.d/pushit_ruby.sh' .bashrc"
-        end
+        install_dependencies
+        download_chruby
+        install_chruby
+        source_chruby
 
         new_resource.updated_by_last_action(true)
+      end
+
+      def install_dependencies
+        recipe_eval do
+          Pushit::App::Dependency.new(new_resource, run_context)
+        end
+      end
+
+      def download_chruby
+        ssh_known_hosts_entry 'github.com'
+
+        source = Chef::Resource::Git.new(
+          "#{Chef::Config[:file_cache_path]}/chruby",
+          run_context
+        )
+        source.repository 'https://github.com/postmodern/chruby.git'
+        source.reference 'v0.3.7'
+        source.user 'root'
+        source.group 'root'
+        source.run_action(:sync)
+
+        if source.updated_by_last_action?
+          new_resource.updated_by_last_action(true)
+        end
+      end
+
+      def install_chruby
+        installer = Chef::Resource::Execute.new(
+          'Install chruby',
+          run_context
+        )
+        installer.command 'make install'
+        installer.cwd "#{Chef::Config[:file_cache_path]}/chruby"
+        installer.user 'root'
+        # installer.environment({
+        #   'share_path' => '/opt/pushit/chruby'
+        # })
+        installer.run_action(:run)
+
+        if installer.updated_by_last_action?
+          new_resource.updated_by_last_action(true)
+        end
+      end
+
+      def source_chruby
+        template '/etc/profile.d/chruby.sh' do
+          source 'chruby.sh.erb'
+          cookbook 'pushit'
+          mode '0644'
+          variables(
+            :chruby_path => '/usr/local/share/chruby',
+            :rubies_path => ruby.rubies_path
+          )
+        end
       end
     end
   end

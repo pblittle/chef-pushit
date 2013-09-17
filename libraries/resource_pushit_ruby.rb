@@ -58,6 +58,17 @@ class Chef
         )
       end
 
+      def dependencies(arg = nil)
+        set_or_return(
+          :dependencies,
+          arg,
+          :kind_of => [Array],
+          :default => [
+            'git::default'
+          ]
+        )
+      end
+
       def prefix_path(arg = nil)
         set_or_return(
           :prefix_path,
