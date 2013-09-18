@@ -20,12 +20,11 @@ recipe 'pushit', 'push an app stack'
 
 depends 'git'
 depends 'logrotate'
-depends 'ruby_build'
 depends 'monit'
 depends 'nodejs'
-# depends 'npm', '0.1.2'
 depends 'database'
 depends 'nginx'
+depends 'ruby_build'
 depends 'runit'
 depends 'ssh_known_hosts'
 
