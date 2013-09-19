@@ -97,6 +97,10 @@ class Chef
             to "#{new_resource.shared_path}/config/database.yml"
           end
 
+          link "#{release_path}/config/unic0rn.rb" do
+            to "#{new_resource.shared_path}/config/unic0rn.rb"
+          end
+
           link "#{release_path}/vendor/bundle" do
             to "#{new_resource.shared_path}/vendor_bundle"
           end
@@ -219,6 +223,36 @@ class Chef
         db_yaml.run_action(:create)
       end
 
+      def create_unicorn_config
+        Chef::Log.debug("Creating unicorn config for #{new_resource.name}")
+
+        unicorn_config = Chef::Resource::Template.new(
+          ::File.join(app.shared_path, 'config', 'unic0rn.rb'),
+          run_context
+        )
+        unicorn_config.source "unicorn.rb.erb"
+        unicorn_config.cookbook 'pushit'
+        unicorn_config.user config['owner']
+        unicorn_config.group config['group']
+        unicorn_config.mode '0644'
+        unicorn_config.variables(
+          :enable_stats => new_resource.unicorn_enable_stats,
+          :listen_port => new_resource.unicorn_listen_port,
+          :listen_socket => new_resource.unicorn_listen_socket,
+          :pid => ::File.join(app.current_path, 'tmp', 'pids', 'unicorn.pid'),
+          :preload_app => new_resource.unicorn_preload_app,
+          :stderr_path => ::File.join(app.current_path, 'log', 'stderr.log'),
+          :stdout_path => ::File.join(app.current_path, 'log', 'stdout.log'),
+          :worker_timeout => new_resource.unicorn_worker_timeout,
+          :working_directory => app.current_path
+        )
+        unicorn_config.run_action(:create)
+
+        if unicorn_config.updated_by_last_action?
+          new_resource.updated_by_last_action(true)
+        end
+      end
+
       def create_service_config
         Chef::Log.debug("Creating service config for #{new_resource.name}")
 
@@ -237,8 +271,8 @@ class Chef
           :app_path => app.release_path,
           :log_file => ::File.join(app.release_path, 'log', 'upstart.log'),
           :pid_file => ::File.join(app.release_path, 'tmp', 'pids', 'upstart.pid'),
-          :config_file => ::File.join(app.release_path, 'config', 'unicorn.rb'),
-          :exec => ::File.join(app.release_path, 'bin', 'unicorn'),
+          :config_file => ::File.join(app.release_path, 'config', 'unic0rn.rb'),
+          :exec => @unicorn_binary,
           :user => config['owner'],
           :group => config['group'],
           :env => escape_env(config['env']),
@@ -250,6 +284,10 @@ class Chef
           "service[#{new_resource.name}]",
           :delayed
         )
+
+        if upstart_config.updated_by_last_action?
+          new_resource.updated_by_last_action(true)
+        end
       end
     end
   end

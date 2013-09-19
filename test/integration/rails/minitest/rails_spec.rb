@@ -56,4 +56,10 @@ describe 'pushit_test::rails' do
       ::File.join('', 'etc', 'init', 'rails-example.conf')
     )
   end
+
+  it 'starts the rails-example service after converge' do
+    assert system(
+      "service rails-example status | grep -e $(cat #{pushit_pid_path})"
+    )
+  end
 end

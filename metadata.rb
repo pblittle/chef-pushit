@@ -16,8 +16,6 @@ version '0.1.0'
 supports 'debian'
 supports 'ubuntu'
 
-recipe 'pushit', 'push an app stack'
-
 depends 'git'
 depends 'logrotate'
 depends 'monit'

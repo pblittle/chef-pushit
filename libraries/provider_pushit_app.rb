@@ -50,6 +50,7 @@ class Chef
           create_dotenv
           create_ruby_version
           create_database_yaml
+          create_unicorn_config
         end
 
         create_writable_directories

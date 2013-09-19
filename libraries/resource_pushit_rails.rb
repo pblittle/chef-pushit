@@ -44,20 +44,12 @@ class Chef
         )
       end
 
-      def unicorn_binary(arg = nil)
-        set_or_return(
-          :unicorn_binary,
-          arg,
-          :kind_of => [String]
-        )
-      end
-
       def gems(arg = nil)
         set_or_return(
           :gems,
           arg,
           :kind_of => [Array],
-          :default => %w{ bundler }
+          :default => %w{ bundler unicorn }
         )
       end
 
@@ -75,6 +67,59 @@ class Chef
           arg,
           :kind_of => [String],
           :default => 'assets:precompile'
+        )
+      end
+
+      def unicorn_binary(arg = nil)
+        set_or_return(
+          :unicorn_binary,
+          arg,
+          :kind_of => [String]
+        )
+      end
+
+      def unicorn_enable_stats(arg = nil)
+        set_or_return(
+          :unicorn_enable_stats,
+          arg,
+          :kind_of => [TrueClass, FalseClass],
+          :default => true
+        )
+      end
+
+      def unicorn_listen_port(arg = nil)
+        set_or_return(
+          :unicorn_listen_port,
+          arg,
+          :kind_of => [Integer],
+          :default => 8080
+        )
+      end
+
+      def unicorn_listen_socket(arg = nil)
+        set_or_return(
+          :unicorn_listen_socket,
+          arg,
+          :kind_of => [String],
+          :default => '/tmp/.sock'
+        )
+      end
+
+      def unicorn_preload_app(arg = nil)
+        set_or_return(
+          :unicorn_preload_app,
+          arg,
+          :kind_of => [TrueClass, FalseClass],
+          :default => true
+        )
+      end
+
+      def unicorn_worker_timeout(arg = nil)
+        set_or_return(
+          :unicorn_worker_timeout,
+          arg,
+          :kind_of => [Integer],
+          :default => 60
         )
       end
     end
