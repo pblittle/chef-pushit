@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 gem 'rake', '10.1.0'
 
 gem 'berkshelf' , '2.0.10'
-gem 'foodcritic', '2.2.0'
+gem 'foodcritic', '3.0.0'
 gem 'tailor', '1.2.1'
 
 group 'integration' do
