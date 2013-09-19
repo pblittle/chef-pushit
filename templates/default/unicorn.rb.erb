@@ -21,24 +21,24 @@ worker_processes ENV['UNICORN_WORKER_PROCESSES'].to_i
 
 # Help ensure your application will always spawn in the symlinked
 # "current" directory that Capistrano sets up.
-working_directory <%= @working_directory %>
+working_directory '<%= @working_directory %>'
 
 # listen on both a Unix domain socket and a TCP port,
 # we use a shorter backlog for quicker failover when busy
-listen <%= @listen_socket %>, :backlog => 64
-listen <%= @listen_port %>, :tcp_nopush => false
+listen '<%= @listen_socket %>', :backlog => 64
+listen '<%= @listen_port %>', :tcp_nopush => false
 
 # nuke workers after N seconds
 timeout <%= @worker_timeout %>
 
 # feel free to point this anywhere accessible on the filesystem
-pid <%= @pid %>
+pid '<%= @pid %>'
 
 # By default, the Unicorn logger will write to stderr.
 # Additionally, ome applications/frameworks log to stderr or stdout,
 # so prevent them from going to /dev/null when daemonized here:
-stderr_path <%= @stderr_path %>
-stdout_path <%= @stdout_path %>
+stderr_path '<%= @stderr_path %>'
+stdout_path '<%= @stdout_path %>'
 
 # combine Ruby 2.0.0dev or REE with "preload_app true" for memory savings
 # http://rubyenterpriseedition.com/faq.html#adapt_apps_for_cow
