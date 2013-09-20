@@ -223,6 +223,20 @@ class Chef
         db_yaml.run_action(:create)
       end
 
+      def worker_processes
+        if config['env'] && config['env']['UNICORN_WORKER_PROCESSES'].to_i > 0
+          worker_count = config['env']['UNICORN_WORKER_PROCESSES'].to_i
+        else
+          worker_count = new_resource.unicorn_worker_processes
+        end
+
+        unless worker_count && worker_count > 0
+          raise StandardError, "Unicorn worker count must be a positive integer"
+        end
+
+        worker_count
+      end
+
       def create_unicorn_config
         Chef::Log.debug("Creating unicorn config for #{new_resource.name}")
 
@@ -243,6 +257,7 @@ class Chef
           :preload_app => new_resource.unicorn_preload_app,
           :stderr_path => ::File.join(app.current_path, 'log', 'stderr.log'),
           :stdout_path => ::File.join(app.current_path, 'log', 'stdout.log'),
+          :worker_processes => worker_processes,
           :worker_timeout => new_resource.unicorn_worker_timeout,
           :working_directory => app.current_path
         )

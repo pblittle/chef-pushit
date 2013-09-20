@@ -114,6 +114,15 @@ class Chef
         )
       end
 
+      def unicorn_worker_processes(arg = nil)
+        set_or_return(
+          :unicorn_worker_processes,
+          arg,
+          :kind_of => [Integer],
+          :default => 1
+        )
+      end
+
       def unicorn_worker_timeout(arg = nil)
         set_or_return(
           :unicorn_worker_timeout,

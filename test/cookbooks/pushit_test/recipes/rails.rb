@@ -41,4 +41,5 @@ pushit_rails app do
   deploy_action 'deploy'
   environment 'development'
   precompile_assets true
+  unicorn_worker_processes 1
 end
