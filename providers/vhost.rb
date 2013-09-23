@@ -46,9 +46,7 @@ action :create do
     EOH
 
     not_if do
-      ::File.exists?(
-        ::File.join(new_resource.install_path, new_resource.ssl_certificate_key)
-      )
+      ::File.exists?(new_resource.ssl_certificate_key)
     end
   end
 
@@ -66,12 +64,8 @@ action :create do
     EOH
 
     not_if do
-      ::File.exists?(
-        ::File.join(new_resource.install_path, new_resource.ssl_certificate)
-      ) &&
-      ::File.exists?(
-        ::File.join(new_resource.install_path, new_resource.ssl_certificate_pem)
-      )
+      ::File.exists?(new_resource.ssl_certificate) &&
+        ::File.exists?(new_resource.ssl_certificate_pem)
     end
   end
 
