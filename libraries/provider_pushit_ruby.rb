@@ -116,7 +116,8 @@ class Chef
           mode '0644'
           variables(
             :chruby_path => '/usr/local/share/chruby',
-            :rubies_path => ruby.rubies_path
+            :rubies_path => ruby.rubies_path,
+            :default_ruby => new_resource.name
           )
         end
       end
