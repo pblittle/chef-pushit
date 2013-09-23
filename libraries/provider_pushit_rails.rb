@@ -287,7 +287,7 @@ class Chef
           :log_file => ::File.join(app.release_path, 'log', 'upstart.log'),
           :pid_file => ::File.join(app.release_path, 'tmp', 'pids', 'upstart.pid'),
           :config_file => ::File.join(app.release_path, 'config', 'unic0rn.rb'),
-          :exec => @unicorn_binary,
+          :exec => ::File.join(app.release_path, 'bin', 'unicorn'),
           :user => config['owner'],
           :group => config['group'],
           :env => escape_env(config['env']),
