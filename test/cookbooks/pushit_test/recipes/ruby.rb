@@ -28,4 +28,4 @@ pushit_ruby 'ree-1.8.7-2012.02' do
   })
 end
 
-pushit_ruby '1.9.3-p392'
+pushit_ruby '1.9.3-p448'

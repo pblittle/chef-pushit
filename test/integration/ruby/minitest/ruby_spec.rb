@@ -20,7 +20,7 @@ describe 'pushit_test::ruby' do
   it 'has created chruby.sh' do
     assert File.read(
       '/etc/profile.d/chruby.sh'
-    ).include?('1.9.3-p392')
+    ).include?('1.9.3-p448')
   end
 
   let(:rubies_path) { ::File.join('', 'opt', 'pushit', 'rubies') }
@@ -30,12 +30,12 @@ describe 'pushit_test::ruby' do
   end
 
   let(:mri_binary) do
-    ::File.join(rubies_path, '1.9.3-p392', 'bin', 'ruby')
+    ::File.join(rubies_path, '1.9.3-p448', 'bin', 'ruby')
   end
 
   it 'has successfully installed mri' do
     assert system(
-      "#{mri_binary} -v | grep -e '1.9.3p392'"
+      "#{mri_binary} -v | grep -e '1.9.3p448'"
     )
   end
 
