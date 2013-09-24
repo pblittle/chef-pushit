@@ -53,6 +53,15 @@ class Chef
         )
       end
 
+      def migrate(arg = nil)
+        set_or_return(
+          :migrate,
+          arg,
+          :kind_of => [TrueClass, FalseClass],
+          :default => true
+        )
+      end
+
       def precompile_assets(arg = nil)
         set_or_return(
           :precompile_assets,
