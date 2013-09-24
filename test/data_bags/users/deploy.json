@@ -1,12 +1,6 @@
 {
   "id": "deploy",
-  "action": [ "create" ],
-  "password": "$1$TH7ylsS8$zCpG/8Q/8Nzdbpotevh0y/",
-  "home": "/opt/pushit",
-  "groups": [
-    "deploy"
-  ],
-  "comment": "Application Deployment",
+  "comment": "Application Deployer",
   "ssh_deploy_keys": [
     {
       "name": "id_rsa_rails-example",

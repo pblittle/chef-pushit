@@ -68,7 +68,6 @@ def create_user
     @run_context
   )
   user.shell '/bin/bash'
-  user.password new_resource.password
   user.home new_resource.home
   user.supports :manage_home => true
   user.system false

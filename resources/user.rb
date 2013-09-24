@@ -24,6 +24,5 @@ actions :create
 default_action :create
 
 attribute :username, :kind_of => String, :name_attribute => true
-attribute :password, :kind_of => String, :default => '$1$TDFMkMMs$ZTqHYN5.Bn.OYUcC9a976.'
-attribute :group, :kind_of => String, :default => 'deploy'
+attribute :group, :kind_of => String, :default => Pushit::User.group
 attribute :home, :kind_of => String, :default => Pushit::User.home_path
