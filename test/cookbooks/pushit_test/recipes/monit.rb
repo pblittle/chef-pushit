@@ -25,8 +25,8 @@ include_recipe 'monit'
 pushit_monit 'nodejs-example' do
   check({
     :app_name => 'nodejs-example',
-    :pid_file => '',
-    :start_program => '',
-    :stop_program => ''
+    :pid_file => '/opt/pushit/apps/nodejs-example/shared/upstart.pid',
+    :start_program => 'sudo nodejs-example start',
+    :stop_program => 'sudo nodejs-example stop'
   })
 end

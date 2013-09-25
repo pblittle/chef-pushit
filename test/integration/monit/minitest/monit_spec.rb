@@ -35,4 +35,8 @@ describe 'pushit_test::monit' do
       ::File.join(monit_config_path, 'nodejs-example.monitrc')
     ).include?('nodejs-example')
   end
+
+  it 'starts monit web interface' do
+    assert system('netstat -an | grep 2812')
+  end
 end
