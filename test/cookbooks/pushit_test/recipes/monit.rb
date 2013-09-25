@@ -22,4 +22,11 @@
 
 include_recipe 'monit'
 
-pushit_monit 'nodejs-example'
+pushit_monit 'nodejs-example' do
+  check({
+    :app_name => 'nodejs-example',
+    :pid_file => '',
+    :start_program => '',
+    :stop_program => ''
+  })
+end

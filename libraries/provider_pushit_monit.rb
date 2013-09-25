@@ -35,7 +35,7 @@ class Chef
 
       def action_install
         monit_monitrc new_resource.name do
-          variables({})
+          variables(new_resource.check)
           template_source 'pushit_app.monitrc.erb'
           template_cookbook 'pushit'
         end

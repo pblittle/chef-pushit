@@ -1,3 +1,3 @@
-check process nodejs-example with pidfile /opt/pushit/apps/nodejs-example/shared/upstart.pid
-  start program = "nodejs-example start"
-  stop program = "nodejs-example stop"
+check process <%= @app_name %> with pidfile <%= @pid_file %>
+  start program = <%= @start_program %>
+  stop program = <%= @stop_program %>

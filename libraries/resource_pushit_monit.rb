@@ -41,6 +41,15 @@ class Chef
           :name_attribute => true
         )
       end
+
+      def check(arg = nil)
+        set_or_return(
+          :check,
+          arg,
+          :kind_of => [Hash],
+          :required => true
+        )
+      end
     end
   end
 end
