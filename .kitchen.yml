@@ -35,14 +35,13 @@ suites:
     'test/data_bags'
   encrypted_data_bag_secret_key_path:
     'test/encrypted_data_bag_secret'
+
 - name: webserver
   run_list:
     - recipe[minitest-handler]
     - recipe[pushit_test::webserver]
   data_bags_path:
     'test/data_bags'
-  encrypted_data_bag_secret_key_path:
-    'test/encrypted_data_bag_secret'
   attributes:
     nginx:
       default_site_enabled: false
@@ -52,12 +51,14 @@ suites:
         conf_path: '/opt/nginx/nginx.conf'
         prefix: '/opt/nginx'
       version: '1.4.2'
+
 - name: dependency
   run_list:
     - recipe[minitest-handler]
     - recipe[pushit_test::dependency]
   data_bags_path:
     'test/data_bags'
+
 - name: nodejs
   run_list:
     - recipe[minitest-handler]
@@ -66,6 +67,7 @@ suites:
     'test/data_bags'
   encrypted_data_bag_secret_key_path:
     'test/encrypted_data_bag_secret'
+
 - name: rails
   run_list:
     - recipe[minitest-handler]
@@ -75,11 +77,17 @@ suites:
     'test/data_bags'
   encrypted_data_bag_secret_key_path:
     'test/encrypted_data_bag_secret'
+
 - name: ruby
   run_list:
     - recipe[minitest-handler]
     - recipe[pushit_test::ruby]
   data_bags_path:
     'test/data_bags'
-  encrypted_data_bag_secret_key_path:
-    'test/encrypted_data_bag_secret'
+
+- name: monit
+  run_list:
+    - recipe[minitest-handler]
+    - recipe[pushit_test::monit]
+  data_bags_path:
+    'test/data_bags'

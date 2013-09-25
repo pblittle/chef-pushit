@@ -1,5 +1,7 @@
 site :opscode
 
+cookbook 'monit', :github => 'phlipper/chef-monit'
+
 metadata
 
 group :integration do
