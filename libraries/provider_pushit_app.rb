@@ -20,6 +20,8 @@
 require 'chef/mixin/command'
 require 'chef/provider'
 
+require File.expand_path('../resource_pushit_monit', __FILE__)
+
 class Chef
   class Provider
     class PushitApp < Chef::Provider
@@ -57,6 +59,7 @@ class Chef
         create_deploy_revision
 
         create_service_config
+        create_monit_check
         enable_and_start_service
 
         new_resource.updated_by_last_action(true)
@@ -143,6 +146,24 @@ class Chef
           dir.run_action(:create)
 
           execute "chmod -R 00755 #{::File.join(app.shared_path, shared_dir)}"
+        end
+      end
+
+      def create_monit_check
+        config = Chef::Resource::PushitMonit.new(
+          new_resource,
+          run_context
+        )
+        config.check({
+          :app_name => new_resource.name,
+          :pid_file => "#{app.shared_path}/pids/upstart.pid",
+          :start_program => "service #{new_resource.name} start",
+          :stop_program => "service #{new_resource.name} stop"
+        })
+        config.run_action(:install)
+
+        if config.updated_by_last_action?
+          new_resource.updated_by_last_action(true)
         end
       end
     end
