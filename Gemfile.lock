@@ -61,11 +61,11 @@ GEM
     faraday (0.8.8)
       multipart-post (~> 1.2.0)
     ffi (1.9.0)
-    foodcritic (3.0.0)
+    foodcritic (3.0.1)
       erubis
       gherkin (~> 2.11.7)
       nokogiri (~> 1.5.4)
-      rake (~> 10.1.0)
+      rake
       treetop (~> 1.4.10)
       yajl-ruby (~> 1.1.0)
     gherkin (2.11.8)
@@ -203,7 +203,7 @@ PLATFORMS
 
 DEPENDENCIES
   berkshelf (= 2.0.10)
-  foodcritic (= 3.0.0)
+  foodcritic (= 3.0.1)
   kitchen-vagrant (= 0.11.1)
   minitest-chef-handler (= 1.0.1)
   pry (= 0.9.12.2)
