@@ -20,7 +20,7 @@
 # limitations under the License.
 #
 
-include_recipe 'monit'
+include_recipe 'pushit_test::base'
 
 pushit_monit 'nodejs-example' do
   check({

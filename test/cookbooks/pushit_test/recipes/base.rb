@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
 # Cookbook Name:: pushit_test
-# Recipe:: nodejs
+# Recipe:: base
 #
 # Author:: P. Barrett Little (<barrett@barrettlittle.com>)
 #
@@ -20,10 +20,4 @@
 # limitations under the License.
 #
 
-include_recipe 'pushit_test::base'
-
-pushit_user 'deploy'
-
-pushit_nodejs 'nodejs-example' do
-  script_file 'server.js'
-end
+include_recipe 'monit::default'

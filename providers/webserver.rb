@@ -25,7 +25,6 @@ def load_current_resource
     new_resource.type
   )
 
-  run_context.include_recipe 'runit'
   run_context.include_recipe 'nginx::default'
 
   @current_resource
