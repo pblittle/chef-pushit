@@ -171,6 +171,16 @@ class Pushit
     end
   end
 
+  class Certs < Pushit::App
+    def initialize(name)
+      initialize(pushit)
+    end
+
+    def certs_path
+      ::File.join(Pushit.pushit_path, 'certs')
+    end
+  end
+
   class<< self
 
     # We should have a dryer way to build configs

@@ -7,6 +7,11 @@
   "environment": "development",
   "deploy_action": "deploy",
   "framework": "nodejs",
+  "ssl": {
+    "sslca": "test-ca.pem",
+    "sslcert": "test-cert.pem",
+    "sslkey": "test-key.pem"
+  },
   "env": {
     "FOO": "bar"
   }
