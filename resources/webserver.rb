@@ -30,4 +30,5 @@ attribute :config_cookbook, :kind_of => String, :default => 'pushit'
 attribute :config_path, :kind_of => String, :default => node['nginx']['dir']
 attribute :config_source, :kind_of => String, :default => 'nginx.conf.erb'
 
+attribute :pid_file, :kind_of => String, :default => node['nginx']['pid']
 attribute :log_path, :kind_of => String, :default => node['nginx']['log_dir']
