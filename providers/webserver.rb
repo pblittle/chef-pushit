@@ -43,7 +43,19 @@ action :create do
     group 'root'
     mode '0644'
     variables({
-      :log_path => new_resource.log_path
+      :log_path => new_resource.log_path,
+      :pid_file => new_resource.pid_file
+    })
+  end
+
+  pushit_monit 'nginx' do
+    check({
+      :name => 'nginx',
+      :pid_file => new_resource.pid_file,
+      :start_program => '/etc/init.d/nginx start',
+      :stop_program => '/etc/init.d/nginx stop',
+      :uid => 'root',
+      :gid => 'root'
     })
   end
 

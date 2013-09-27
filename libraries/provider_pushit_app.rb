@@ -91,6 +91,10 @@ class Chef
         service.supports :status => true, :restart => true
         service.run_action(:enable)
         service.run_action(:start)
+
+        if service.updated_by_last_action?
+          new_resource.updated_by_last_action(true)
+        end
       end
 
       def install_dependencies
@@ -112,6 +116,10 @@ class Chef
           dir.recursive true
           dir.mode 00755
           dir.run_action(:create)
+
+          if dir.updated_by_last_action?
+            new_resource.updated_by_last_action(true)
+          end
         end
       end
 
@@ -128,6 +136,10 @@ class Chef
           dir.recursive true
           dir.mode 00755
           dir.run_action(:create)
+
+          if dir.updated_by_last_action?
+            new_resource.updated_by_last_action(true)
+          end
         end
       end
 
@@ -145,20 +157,26 @@ class Chef
           dir.mode 00755
           dir.run_action(:create)
 
+          if dir.updated_by_last_action?
+            new_resource.updated_by_last_action(true)
+          end
+
           execute "chmod -R 00755 #{::File.join(app.shared_path, shared_dir)}"
         end
       end
 
       def create_monit_check
         config = Chef::Resource::PushitMonit.new(
-          new_resource,
+          new_resource.name,
           run_context
         )
         config.check({
-          :app_name => new_resource.name,
+          :name => new_resource.name,
           :pid_file => "#{app.shared_path}/pids/upstart.pid",
-          :start_program => "service #{new_resource.name} start",
-          :stop_program => "service #{new_resource.name} stop"
+          :start_program => "/sbin/start #{new_resource.name}",
+          :stop_program => "/sbin/stop #{new_resource.name}",
+          :uid => 'root',
+          :gid => 'root'
         })
         config.run_action(:install)
 
