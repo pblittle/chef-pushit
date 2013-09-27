@@ -9,6 +9,8 @@
 .tailor
 *.box
 
+files/*
+
 # Bundler
 bin/*
 .bundle/*
