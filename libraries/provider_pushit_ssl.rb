@@ -54,8 +54,8 @@ class Chef
           ::File.join(Pushit.pushit_path, 'certs'),
           run_context
         )
-        dir.owner 'root'
-        dir.group 'root'
+        dir.owner Etc.getpwnam(app.config['owner']).uid
+        dir.group Etc.getpwnam(app.config['group']).gid
         dir.recursive true
         dir.mode 00700
         dir.run_action(:create)
@@ -72,6 +72,8 @@ class Chef
             run_context
           )
           file.path ::File.join(Pushit.pushit_path, 'certs', value)
+          file.owner Etc.getpwnam(app.config['owner']).uid
+          file.group Etc.getpwnam(app.config['group']).gid
           file.mode 00600
           file.cookbook 'pushit'
           file.run_action(:create)
