@@ -20,6 +20,8 @@
 # limitations under the License.
 #
 
+include_recipe 'pushit_test::base'
+
 pushit_user 'deploy'
 
 pushit_ruby 'ree-1.8.7-2012.02' do

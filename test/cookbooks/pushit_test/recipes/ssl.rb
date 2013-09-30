@@ -20,4 +20,6 @@
 # limitations under the License.
 #
 
+include_recipe 'pushit_test::base'
+
 pushit_ssl 'nodejs-example'
