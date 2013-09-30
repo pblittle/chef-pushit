@@ -41,7 +41,6 @@ class Pushit
   class App
     def initialize(name)
       @app = Pushit.app_data_bag(name)
-      initialize_pushit
     end
 
     def self.apps_path
@@ -82,10 +81,6 @@ class Pushit
         end
       end
     end
-
-    def initialize_pushit
-      FileUtils.mkdir_p(Pushit.pushit_path, :mode => 0755)
-    end
   end
 
   class Rails < Pushit::App
@@ -95,6 +90,9 @@ class Pushit
   end
 
   class Nodejs < Pushit::App
+    def initialize(name)
+      super
+    end
 
     def self.prefix_path
       ::File.join('', 'usr','local')
@@ -123,8 +121,6 @@ class Pushit
     attr_accessor :gem_path
 
     def initialize(version = nil)
-      initialize_pushit
-
       @version = version
       @rubies_path = rubies_path
       @prefix_path = prefix_path
@@ -155,7 +151,6 @@ class Pushit
 
   class User < Pushit::App
     def initialize(name)
-      initialize_pushit
     end
 
     def self.user
@@ -173,7 +168,7 @@ class Pushit
 
   class Certs < Pushit::App
     def initialize(name)
-      initialize(pushit)
+      
     end
 
     def certs_path

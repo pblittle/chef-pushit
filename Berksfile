@@ -1,6 +1,7 @@
 site :opscode
 
 cookbook 'monit', :github => 'phlipper/chef-monit'
+cookbook 'sensu', :github => 'sensu/sensu-chef'
 
 metadata
 

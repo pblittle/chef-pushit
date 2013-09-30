@@ -5,6 +5,11 @@
       "git": "git://github.com/phlipper/chef-monit.git",
       "ref": "276c99ba08869ebd5117267d91a2ff6aa0d9fc6b"
     },
+    "sensu": {
+      "locked_version": "0.5.5",
+      "git": "git://github.com/sensu/sensu-chef.git",
+      "ref": "5b122778ad8b367f2aa2342cda467598624f4857"
+    },
     "pushit": {
       "path": "."
     },
@@ -25,20 +30,32 @@
       "git": "git://github.com/btm/minitest-handler-cookbook.git",
       "ref": "4891a2efa90d73472493a89c4b0f856e0454bd76"
     },
+    "windows": {
+      "locked_version": "1.10.0"
+    },
+    "chef_handler": {
+      "locked_version": "1.1.4"
+    },
+    "rabbitmq": {
+      "locked_version": "2.3.0"
+    },
+    "erlang": {
+      "locked_version": "1.3.2"
+    },
     "build-essential": {
       "locked_version": "1.4.2"
+    },
+    "redisio": {
+      "locked_version": "1.7.0"
+    },
+    "ulimit": {
+      "locked_version": "0.3.1"
     },
     "git": {
       "locked_version": "2.6.0"
     },
     "dmg": {
       "locked_version": "2.0.0"
-    },
-    "windows": {
-      "locked_version": "1.10.0"
-    },
-    "chef_handler": {
-      "locked_version": "1.1.4"
     },
     "runit": {
       "locked_version": "1.2.0"

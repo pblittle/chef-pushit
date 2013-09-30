@@ -18,15 +18,12 @@
 #
 
 require 'chef/mixin/command'
-require 'chef/provider'
 
-require File.expand_path('../resource_pushit_monit', __FILE__)
+require File.expand_path('../provider_pushit_base', __FILE__)
 
 class Chef
   class Provider
-    class PushitApp < Chef::Provider
-
-      include Chef::Mixin::ShellOut
+    class PushitApp < Chef::Provider::PushitBase
 
       attr_accessor :app, :config
 

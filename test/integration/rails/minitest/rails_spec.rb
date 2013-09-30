@@ -57,9 +57,11 @@ describe 'pushit_test::rails' do
     )
   end
 
-  it 'starts the rails-example service after converge' do
-    assert system(
-      "service rails-example status | grep -e $(cat #{pushit_pid_path})"
-    )
-  end
+  # This only works if Unicorn is in the app Gemfile
+  #
+  # it 'starts the rails-example service after converge' do
+  #   assert system(
+  #     "service rails-example status | grep -e $(cat #{pushit_pid_path})"
+  #   )
+  # end
 end
