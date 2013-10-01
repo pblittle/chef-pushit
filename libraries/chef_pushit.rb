@@ -41,7 +41,6 @@ class Pushit
   class App
     def initialize(name)
       @app = Pushit.app_data_bag(name)
-      initialize_pushit
     end
 
     def self.apps_path
@@ -82,10 +81,6 @@ class Pushit
         end
       end
     end
-
-    def initialize_pushit
-      FileUtils.mkdir_p(Pushit.pushit_path, :mode => 0755)
-    end
   end
 
   class Rails < Pushit::App
@@ -95,9 +90,12 @@ class Pushit
   end
 
   class Nodejs < Pushit::App
+    def initialize(name)
+      super
+    end
 
     def self.prefix_path
-      ::File.join('', 'usr','local')
+      ::File.join('', 'usr', 'local')
     end
 
     def self.bin_path
@@ -113,7 +111,7 @@ class Pushit
     end
   end
 
-  class Ruby < Pushit::App
+  class Ruby
 
     attr_accessor :version
     attr_accessor :rubies_path
@@ -123,8 +121,6 @@ class Pushit
     attr_accessor :gem_path
 
     def initialize(version = nil)
-      initialize_pushit
-
       @version = version
       @rubies_path = rubies_path
       @prefix_path = prefix_path
@@ -153,11 +149,7 @@ class Pushit
     end
   end
 
-  class User < Pushit::App
-    def initialize(name)
-      initialize_pushit
-    end
-
+  class User
     def self.user
       'deploy'
     end
@@ -173,7 +165,7 @@ class Pushit
 
   class Certs < Pushit::App
     def initialize(name)
-      initialize(pushit)
+      super
     end
 
     def certs_path
@@ -181,7 +173,7 @@ class Pushit
     end
   end
 
-  class<< self
+  class << self
 
     # We should have a dryer way to build configs
     def create_config(file, attrs); end

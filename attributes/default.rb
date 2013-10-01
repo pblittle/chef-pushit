@@ -23,8 +23,6 @@
 node.default[:build_essential][:compiletime] = true
 
 node.default['nginx']['install_method'] = 'source'
-# node.default['nginx']['user'] = 'deploy'
-# node.default['nginx']['group'] = 'deploy'
 node.default['nginx']['default_site_enabled'] = false
 node.default['nginx']['dir'] = '/opt/pushit/nginx'
 node.default['nginx']['log_dir'] = '/opt/pushit/nginx/log'

@@ -18,22 +18,14 @@
 #
 
 require 'chef/mixin/command'
-require 'chef/provider'
 
-require File.expand_path('../resource_pushit_monit', __FILE__)
+require File.expand_path('../provider_pushit_base', __FILE__)
 
 class Chef
   class Provider
-    class PushitApp < Chef::Provider
-
-      include Chef::Mixin::ShellOut
-
-      attr_accessor :app, :config
+    class PushitApp < Chef::Provider::PushitBase
 
       def initialize(new_resource, run_context = nil)
-        @app = Pushit::App.new(new_resource.name)
-        @config = nil
-
         super(new_resource, run_context)
       end
 
@@ -57,7 +49,6 @@ class Chef
 
         create_writable_directories
         create_deploy_revision
-
         create_service_config
         create_monit_check
         enable_and_start_service
@@ -77,7 +68,7 @@ class Chef
 
       def escape_env(vars = {})
         vars.inject({}) do |hash, (key, value)|
-          hash[key.upcase] = value.gsub(/"/){ %q(\") }
+          hash[key.upcase] = value.gsub(/"/) { %q(\") }
           hash
         end
       end

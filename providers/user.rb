@@ -25,8 +25,6 @@ def load_current_resource
     new_resource.name
   )
 
-  Pushit::User.new(new_resource.name)
-
   @current_resource
 end
 
@@ -46,10 +44,6 @@ action :create do
 end
 
 private
-
-def user
-  @user ||= Pushit::User.new(@new_resource.name)
-end
 
 def create_group
   group = Chef::Resource::Group.new(
@@ -75,7 +69,9 @@ def create_user
   user.gid Etc.getgrnam(new_resource.group).gid
   user.run_action(:create)
 
-  new_resource.updated_by_last_action(true) if user.updated_by_last_action?
+  if user.updated_by_last_action?
+    new_resource.updated_by_last_action(true)
+  end
 end
 
 def create_deploy_key_directory
@@ -89,11 +85,17 @@ def create_deploy_key_directory
   dir.recursive true
   dir.run_action(:create)
 
-  new_resource.updated_by_last_action(true) if dir.updated_by_last_action?
+  if dir.updated_by_last_action?
+    new_resource.updated_by_last_action(true)
+  end
 end
 
 def change_home_owner
-  FileUtils.chown_R('deploy', 'deploy', Pushit.pushit_path)
+  FileUtils.chown_R(
+    @new_resource.username,
+    @new_resource.group,
+    Pushit.pushit_path
+  )
 end
 
 def setup_deploy_keys
@@ -119,7 +121,9 @@ def create_deploy_key(key)
   })
   deploy_key.run_action(:create)
 
-  new_resource.updated_by_last_action(true) if deploy_key.updated_by_last_action?
+  if deploy_key.updated_by_last_action?
+    new_resource.updated_by_last_action(true)
+  end
 end
 
 def create_deploy_wrapper(key)
@@ -138,7 +142,9 @@ def create_deploy_wrapper(key)
   })
   wrapper.run_action(:create)
 
-  new_resource.updated_by_last_action(true) if wrapper.updated_by_last_action?
+  if wrapper.updated_by_last_action?
+    new_resource.updated_by_last_action(true)
+  end
 end
 
 def deploy_key_directory

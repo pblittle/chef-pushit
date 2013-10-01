@@ -1,8 +1,5 @@
 # encoding: utf-8
 #
-# Cookbook Name:: pushit_test
-# Recipe:: user
-#
 # Author:: P. Barrett Little (<barrett@barrettlittle.com>)
 #
 # Copyright 2013, P. Barrett Little
@@ -20,6 +17,13 @@
 # limitations under the License.
 #
 
-include_recipe 'pushit_test::base'
+class Chef
+  class Resource
+    class PushitBase < Chef::Resource
 
-pushit_user 'deploy'
+      def initialize(name, run_context = nil)
+        super
+      end
+    end
+  end
+end
