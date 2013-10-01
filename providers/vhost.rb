@@ -34,6 +34,14 @@ def whyrun_supported?
   true
 end
 
+def app
+  @app ||= Pushit::App.new(new_resource.name)
+end
+
+def config
+  @config ||= app.config
+end
+
 action :create do
 
   bash "Create SSL Key for #{new_resource.name}" do
@@ -74,7 +82,7 @@ action :create do
   )
 
   template "#{new_resource.app_name}.conf" do
-    source "nginx_#{new_resource.config_type}.conf.erb"
+    source "nginx_#{config['framework']}.conf.erb"
     path site_config
     cookbook new_resource.config_cookbook
     owner 'root'
@@ -82,7 +90,7 @@ action :create do
     mode '0644'
     variables(
       :app_name => new_resource.app_name,
-      :root => "#{Pushit::App.apps_path}/#{new_resource.name}/current/public",
+      :root => app.release_path,
       :server_name => new_resource.server_name,
       :listen_port => new_resource.http_port,
       :use_ssl => new_resource.use_ssl,
