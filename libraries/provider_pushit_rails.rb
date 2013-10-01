@@ -44,7 +44,7 @@ class Chef
       private
 
       def ruby
-        @ruby || Pushit::Ruby.new(config['ruby'])
+        @ruby ||= Pushit::Ruby.new(config['ruby'])
       end
 
       def create_deploy_revision
@@ -166,7 +166,9 @@ class Chef
         )
         ruby_version.run_action(:create)
 
-        new_resource.updated_by_last_action(true) if ruby_version.updated_by_last_action?
+        if ruby_version.updated_by_last_action?
+          new_resource.updated_by_last_action(true)
+        end
       end
 
       def create_dotenv
@@ -285,7 +287,9 @@ class Chef
           :env_path => ruby.bin_path,
           :app_path => app.release_path,
           :log_file => ::File.join(app.release_path, 'log', 'upstart.log'),
-          :pid_file => ::File.join(app.release_path, 'tmp', 'pids', 'upstart.pid'),
+          :pid_file => ::File.join(
+            app.release_path, 'tmp', 'pids', 'upstart.pid'
+          ),
           :config_file => ::File.join(app.release_path, 'config', 'unic0rn.rb'),
           :exec => ::File.join(app.release_path, 'bin', 'unicorn'),
           :user => config['owner'],

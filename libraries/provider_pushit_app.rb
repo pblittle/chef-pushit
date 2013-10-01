@@ -25,12 +25,7 @@ class Chef
   class Provider
     class PushitApp < Chef::Provider::PushitBase
 
-      attr_accessor :app, :config
-
       def initialize(new_resource, run_context = nil)
-        @app = Pushit::App.new(new_resource.name)
-        @config = nil
-
         super(new_resource, run_context)
       end
 
@@ -54,7 +49,6 @@ class Chef
 
         create_writable_directories
         create_deploy_revision
-
         create_service_config
         create_monit_check
         enable_and_start_service
@@ -74,7 +68,7 @@ class Chef
 
       def escape_env(vars = {})
         vars.inject({}) do |hash, (key, value)|
-          hash[key.upcase] = value.gsub(/"/){ %q(\") }
+          hash[key.upcase] = value.gsub(/"/) { %q(\") }
           hash
         end
       end

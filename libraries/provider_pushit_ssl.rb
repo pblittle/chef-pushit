@@ -27,8 +27,6 @@ class Chef
         @new_resource = new_resource
         @run_context = run_context
 
-        @app = app
-
         super(new_resource, run_context)
       end
 
@@ -46,7 +44,7 @@ class Chef
       private
 
       def app
-        @app || Pushit::App.new(new_resource.name)
+        @app ||= Pushit::App.new(new_resource.name)
       end
 
       def create_certs_directory

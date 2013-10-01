@@ -27,7 +27,6 @@ class Chef
 
       def initialize(new_resource, run_context = nil)
         initialize_filesystem
-        # initialize_user
 
         super(new_resource, run_context)
       end
@@ -48,7 +47,7 @@ class Chef
 
       def initialize_user
         @user = Chef::Resource::PushitUser.new(
-          'deploy',
+          Pushit::User.user,
           run_context
         )
         user.run_action(:create)

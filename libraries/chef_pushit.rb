@@ -95,7 +95,7 @@ class Pushit
     end
 
     def self.prefix_path
-      ::File.join('', 'usr','local')
+      ::File.join('', 'usr', 'local')
     end
 
     def self.bin_path
@@ -111,7 +111,7 @@ class Pushit
     end
   end
 
-  class Ruby < Pushit::App
+  class Ruby
 
     attr_accessor :version
     attr_accessor :rubies_path
@@ -149,10 +149,7 @@ class Pushit
     end
   end
 
-  class User < Pushit::App
-    def initialize(name)
-    end
-
+  class User
     def self.user
       'deploy'
     end
@@ -168,7 +165,7 @@ class Pushit
 
   class Certs < Pushit::App
     def initialize(name)
-      
+      super
     end
 
     def certs_path
@@ -176,7 +173,7 @@ class Pushit
     end
   end
 
-  class<< self
+  class << self
 
     # We should have a dryer way to build configs
     def create_config(file, attrs); end

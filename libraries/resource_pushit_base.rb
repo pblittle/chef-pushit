@@ -22,7 +22,6 @@ class Chef
     class PushitBase < Chef::Resource
 
       def initialize(name, run_context = nil)
-        # Pushit::Base.initialize_filesystem
         super
       end
     end
