@@ -1,4 +1,4 @@
-check process <%= @name %> with pidfile <%= @pid_file %>
+check process pushit-<%= @name %> with pidfile <%= @pid_file %>
   start program = "<%= @start_program %>"
   stop program = "<%= @stop_program %>"
   <% if @uid -%>as uid <%= @uid %><% end -%>
