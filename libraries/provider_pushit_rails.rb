@@ -31,21 +31,19 @@ class Chef
         @run_context = run_context
 
         @framework = 'rails'
-        @ruby = ruby
-
-        @bundle_binary = @ruby.gem_path('bundle')
-        @unicorn_binary = @ruby.gem_path('unicorn')
+        @bundle_binary = ruby.gem_path('bundle')
+        @unicorn_binary = ruby.gem_path('unicorn')
 
         super(new_resource, run_context)
       end
 
       def load_current_resource; end
 
-      private
-
       def ruby
         @ruby ||= Pushit::Ruby.new(config['ruby'])
       end
+
+      private
 
       def create_deploy_revision
 
@@ -78,7 +76,7 @@ class Chef
         deploy.migration_command "#{@bundle_binary} exec rake db:migrate"
 
         app_config = config
-        ruby_binary = @ruby.ruby_binary
+        ruby_binary = ruby.ruby_binary
         bundle_binary = @bundle_binary
 
         deploy.before_migrate do

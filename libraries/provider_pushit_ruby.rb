@@ -64,11 +64,11 @@ class Chef
         new_resource.updated_by_last_action(true)
       end
 
-      private
-
       def ruby
         @ruby ||= Pushit::Ruby.new(new_resource.name)
       end
+
+      private
 
       def install_dependencies
         recipe_eval do
