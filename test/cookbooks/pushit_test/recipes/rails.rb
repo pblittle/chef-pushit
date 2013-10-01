@@ -44,4 +44,5 @@ pushit_rails app do
   environment 'development'
   precompile_assets true
   unicorn_worker_processes 1
+  revision '6ef9abd80555951222dcfdaed65e7ed8ee5406a1'
 end
