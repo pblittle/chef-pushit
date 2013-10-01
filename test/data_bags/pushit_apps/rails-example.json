@@ -3,11 +3,9 @@
   "owner": "deploy",
   "group": "deploy",
   "repo": "https://github.com/openshift/rails-example.git",
-  "revision": "master",
-  "environment": "development",
-  "deploy_key": "",
   "framework": "rails",
   "ruby": "1.9.3-p392",
+  "environment": "development",
   "webserver": {
     "type": "nginx",
     "server_name": "rails-example",

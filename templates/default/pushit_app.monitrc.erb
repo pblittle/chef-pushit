@@ -1,5 +1,6 @@
 check process <%= @name %> with pidfile <%= @pid_file %>
   start program = "<%= @start_program %>"
   stop program = "<%= @stop_program %>"
-  as uid <%= @uid %> and gid <%= @gid %>
+  <% if @uid -%>as uid <%= @uid %><% end -%>
+  <% if @gid -%>as gid <%= @gid %><% end -%>
   group Pushit

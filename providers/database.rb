@@ -34,12 +34,19 @@ def whyrun_supported?
   true
 end
 
-action :create do
-  app_name = @current_resource.app_name
-  app = Chef::Pushit::App.new(app_name)
+def app
+  @app ||= Chef::Pushit::App.new(new_resource.name)
+end
 
-  config = app.config
-  environment = config['environment']
+def config
+  @config ||= app.config
+end
+
+def environment
+  config['environment']
+end
+
+action :create do
 
   if environment && config['database'].has_key?(environment)
     database = config['database'][environment]

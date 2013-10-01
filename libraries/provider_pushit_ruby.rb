@@ -26,7 +26,7 @@ class Chef
         @run_context = run_context
         @run_context.include_recipe 'ruby_build'
 
-        @dependencies = [ 'git::default' ]
+        @dependencies = ['git::default']
 
         super(new_resource, run_context)
       end
@@ -37,16 +37,13 @@ class Chef
         Pushit.whyrun_enabled?
       end
 
-      def ruby
-        @ruby ||= Pushit::Ruby.new(new_resource.name)
-      end
-
       def action_create
         ruby_build_ruby new_resource.name do
-          user 'deploy'
-          group 'deploy'
+          user Pushit::User.user
+          group Pushit::User.group
           prefix_path ruby.prefix_path
           environment(new_resource.environment)
+
           not_if do
             ::File.exists?(::File.join(ruby.bin_path, 'ruby'))
           end
@@ -66,6 +63,12 @@ class Chef
 
         new_resource.updated_by_last_action(true)
       end
+
+      def ruby
+        @ruby ||= Pushit::Ruby.new(new_resource.name)
+      end
+
+      private
 
       def install_dependencies
         recipe_eval do

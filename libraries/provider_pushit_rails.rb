@@ -31,21 +31,19 @@ class Chef
         @run_context = run_context
 
         @framework = 'rails'
-        @ruby = ruby
-
-        @bundle_binary = @ruby.gem_path('bundle')
-        @unicorn_binary = @ruby.gem_path('unicorn')
+        @bundle_binary = ruby.gem_path('bundle')
+        @unicorn_binary = ruby.gem_path('unicorn')
 
         super(new_resource, run_context)
       end
 
       def load_current_resource; end
 
-      private
-
       def ruby
-        @ruby || Pushit::Ruby.new(config['ruby'])
+        @ruby ||= Pushit::Ruby.new(config['ruby'])
       end
+
+      private
 
       def create_deploy_revision
 
@@ -78,7 +76,7 @@ class Chef
         deploy.migration_command "#{@bundle_binary} exec rake db:migrate"
 
         app_config = config
-        ruby_binary = @ruby.ruby_binary
+        ruby_binary = ruby.ruby_binary
         bundle_binary = @bundle_binary
 
         deploy.before_migrate do
@@ -166,7 +164,9 @@ class Chef
         )
         ruby_version.run_action(:create)
 
-        new_resource.updated_by_last_action(true) if ruby_version.updated_by_last_action?
+        if ruby_version.updated_by_last_action?
+          new_resource.updated_by_last_action(true)
+        end
       end
 
       def create_dotenv
@@ -285,7 +285,9 @@ class Chef
           :env_path => ruby.bin_path,
           :app_path => app.release_path,
           :log_file => ::File.join(app.release_path, 'log', 'upstart.log'),
-          :pid_file => ::File.join(app.release_path, 'tmp', 'pids', 'upstart.pid'),
+          :pid_file => ::File.join(
+            app.release_path, 'tmp', 'pids', 'upstart.pid'
+          ),
           :config_file => ::File.join(app.release_path, 'config', 'unic0rn.rb'),
           :exec => ::File.join(app.release_path, 'bin', 'unicorn'),
           :user => config['owner'],
