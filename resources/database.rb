@@ -24,3 +24,5 @@ actions :create
 default_action :create
 
 attribute :app_name, :kind_of => String, :name_attribute => true
+
+attribute :pid_file, :kind_of => String, :default => node.default[:mysql][:pid_file]
