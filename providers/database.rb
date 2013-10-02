@@ -86,5 +86,21 @@ action :create do
     action :create
   end
 
+  pushit_monit 'mysql' do
+    check({
+      :name => 'mysql',
+      :host => database['host'],
+      :port => database['port'],
+      :pid_file => new_resource.pid_file,
+      :start_program => '/etc/init.d/mysql start',
+      :stop_program => '/etc/init.d/mysql stop',
+      :uid => 'root',
+      :gid => 'root'
+    })
+    only_if do
+      database['host'] == 'localhost'
+    end
+  end
+
   new_resource.updated_by_last_action(true)
 end
