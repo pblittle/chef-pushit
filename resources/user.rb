@@ -24,5 +24,5 @@ actions :create
 default_action :create
 
 attribute :username, :kind_of => String, :name_attribute => true
-attribute :group, :kind_of => String, :default => Pushit::User.group
-attribute :home, :kind_of => String, :default => Pushit::User.home_path
+attribute :group, :kind_of => String
+attribute :home, :kind_of => String
