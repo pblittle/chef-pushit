@@ -36,7 +36,6 @@ class Chef
       end
 
       def action_create
-        install_dependencies
         create_directories
 
         if new_resource.framework == 'rails'
@@ -85,12 +84,6 @@ class Chef
 
         if service.updated_by_last_action?
           new_resource.updated_by_last_action(true)
-        end
-      end
-
-      def install_dependencies
-        recipe_eval do
-          Pushit::App::Dependency.new(new_resource, run_context)
         end
       end
 
