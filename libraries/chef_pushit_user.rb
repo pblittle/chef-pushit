@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
 # Cookbook Name:: pushit
-# Library:: app_dependency
+# Library:: user
 #
 # Author:: P. Barrett Little (<barrett@barrettlittle.com>)
 #
@@ -20,12 +20,22 @@
 # limitations under the License.
 #
 
-class Pushit
-  class App
-    class Service
-      def initialize(new_resource, run_context = nil)
-        @new_resource = new_resource
-        @run_context = run_context
+require ::File.expand_path('../chef_pushit', __FILE__)
+
+module Pushit
+  class User
+    class << self
+
+      def user
+        'deploy'
+      end
+
+      def group
+        'deploy'
+      end
+
+      def home_path
+        Pushit.pushit_path
       end
     end
   end

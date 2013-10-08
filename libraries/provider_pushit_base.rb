@@ -19,7 +19,7 @@
 
 require 'chef/provider'
 
-require File.expand_path('../provider_pushit_monit', __FILE__)
+require File.expand_path('../chef_pushit', __FILE__)
 
 class Chef
   class Provider
@@ -27,29 +27,29 @@ class Chef
 
       def initialize(new_resource, run_context = nil)
         initialize_filesystem
-
-        super(new_resource, run_context)
+        initialize_user
       end
-
-      def load_current_resource; end
 
       def whyrun_supported?
         Pushit.whyrun_enabled?
       end
 
-      def action_create; end
-
       private
 
       def initialize_filesystem
-        FileUtils.mkdir_p(Pushit.pushit_path, :mode => 0755)
+        FileUtils.mkdir_p(
+          Pushit.pushit_path, :mode => 0755
+        )
       end
 
       def initialize_user
-        @user = Chef::Resource::PushitUser.new(
-          Pushit::User.user,
+        user = Chef::Resource::PushitUser.new(
+          Pushit.pushit_user,
           run_context
         )
+        user.name Pushit.pushit_user
+        user.group Pushit.pushit_group
+        user.home Pushit.pushit_path
         user.run_action(:create)
 
         if user.updated_by_last_action?

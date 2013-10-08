@@ -19,13 +19,18 @@
 
 require 'chef/mixin/command'
 
+require File.expand_path('../chef_pushit', __FILE__)
 require File.expand_path('../provider_pushit_base', __FILE__)
+require File.expand_path('../provider_pushit_monit', __FILE__)
 
 class Chef
   class Provider
     class PushitApp < Chef::Provider::PushitBase
 
       def initialize(new_resource, run_context = nil)
+        @new_resource = new_resource
+        @run_context = run_context
+
         super(new_resource, run_context)
       end
 

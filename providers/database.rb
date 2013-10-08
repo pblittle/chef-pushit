@@ -48,7 +48,7 @@ end
 
 action :create do
 
-  if environment && config['database'].has_key?(environment)
+  if environment && config['database'].key?(environment)
     database = config['database'][environment]
   else
     database = config['database']

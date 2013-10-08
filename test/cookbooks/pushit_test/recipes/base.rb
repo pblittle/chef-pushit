@@ -20,4 +20,5 @@
 # limitations under the License.
 #
 
+include_recipe 'git::default'
 include_recipe 'monit::default'

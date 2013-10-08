@@ -26,6 +26,7 @@
     }
   },
   "env": {
+    "FOO": "bar",
     "RACK_ENV": "development",
     "RAILS_ENV": "development"
   }

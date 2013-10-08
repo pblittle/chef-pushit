@@ -37,10 +37,6 @@ class Chef
 
       def load_current_resource; end
 
-      def whyrun_supported?
-        Pushit.whyrun_enabled?
-      end
-
       private
 
       def create_deploy_revision

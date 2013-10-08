@@ -31,7 +31,7 @@ def load_current_resource
 end
 
 def whyrun_supported?
-  false
+  true
 end
 
 action :create do
