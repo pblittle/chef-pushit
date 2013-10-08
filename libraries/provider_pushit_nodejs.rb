@@ -74,7 +74,7 @@ class Chef
         )
 
         deploy.symlinks(
-          { "log" => "log", "pids" => "pids" }
+          { 'log' => 'log', 'pids' => 'pids' }
         )
 
         deploy.before_migrate do
