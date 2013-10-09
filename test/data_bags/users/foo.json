@@ -1,0 +1,13 @@
+{
+  "id": "foo",
+  "comment": "Application Foobarer",
+  "ssh_deploy_keys": [
+    {
+      "name": "id_rsa_rails-example",
+      "data": "-----BEGIN RSA PRIVATE KEY-----\n=foo rails-example-deploy-key\n-----END RSA PRIVATE KEY-----"
+    }
+  ],
+  "ssh_keys": [
+    "-----BEGIN RSA PRIVATE KEY-----\n=foo deploy-user-private-key\n-----END RSA PRIVATE KEY-----"
+  ]
+}

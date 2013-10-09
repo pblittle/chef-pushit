@@ -22,6 +22,4 @@
 
 include_recipe 'pushit_test::base'
 
-pushit_user 'deploy'
-
 pushit_ssl 'nodejs-example'

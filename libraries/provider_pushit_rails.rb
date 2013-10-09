@@ -192,7 +192,7 @@ class Chef
 
         environment = new_resource.environment
 
-        if environment && config['database'].has_key?(environment)
+        if environment && config['database'].key?(environment)
           database = config['database'][environment]
         else
           database = config['database']
@@ -231,7 +231,7 @@ class Chef
         end
 
         unless worker_count && worker_count > 0
-          raise StandardError, "Unicorn worker count must be a positive integer"
+          raise StandardError, 'Unicorn worker count must be a positive integer'
         end
 
         worker_count
@@ -244,7 +244,7 @@ class Chef
           ::File.join(app.shared_path, 'config', 'unic0rn.rb'),
           run_context
         )
-        unicorn_config.source "unicorn.rb.erb"
+        unicorn_config.source 'unicorn.rb.erb'
         unicorn_config.cookbook 'pushit'
         unicorn_config.user config['owner']
         unicorn_config.group config['group']

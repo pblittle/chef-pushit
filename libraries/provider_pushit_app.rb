@@ -19,13 +19,18 @@
 
 require 'chef/mixin/command'
 
+require File.expand_path('../chef_pushit', __FILE__)
 require File.expand_path('../provider_pushit_base', __FILE__)
+require File.expand_path('../provider_pushit_monit', __FILE__)
 
 class Chef
   class Provider
     class PushitApp < Chef::Provider::PushitBase
 
       def initialize(new_resource, run_context = nil)
+        @new_resource = new_resource
+        @run_context = run_context
+
         super(new_resource, run_context)
       end
 
@@ -36,7 +41,6 @@ class Chef
       end
 
       def action_create
-        install_dependencies
         create_directories
 
         if new_resource.framework == 'rails'
@@ -85,12 +89,6 @@ class Chef
 
         if service.updated_by_last_action?
           new_resource.updated_by_last_action(true)
-        end
-      end
-
-      def install_dependencies
-        recipe_eval do
-          Pushit::App::Dependency.new(new_resource, run_context)
         end
       end
 
