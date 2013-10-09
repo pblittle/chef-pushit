@@ -52,13 +52,6 @@ suites:
         prefix: '/opt/nginx'
       version: '1.4.2'
 
-- name: dependency
-  run_list:
-    - recipe[minitest-handler]
-    - recipe[pushit_test::dependency]
-  data_bags_path:
-    'test/data_bags'
-
 - name: nodejs
   run_list:
     - recipe[minitest-handler]

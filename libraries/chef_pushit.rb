@@ -22,13 +22,24 @@
 
 require 'fileutils'
 
-class Pushit
+require ::File.expand_path('../chef_pushit_app', __FILE__)
+
+module Pushit
 
   DATA_BAG = 'pushit_apps'.freeze
   PUSHIT_PATH = '/opt/pushit'.freeze
   WHYRUN_ENABLED = false
 
   class << self
+
+    def pushit_user(user = 'deploy')
+      user
+    end
+
+    def pushit_group(group = 'deploy')
+      group
+    end
+
     def pushit_path
       @pushit_path || PUSHIT_PATH
     end
@@ -36,63 +47,15 @@ class Pushit
     def whyrun_enabled?
       @whyrun_enabled || WHYRUN_ENABLED
     end
-  end
 
-  class App
-    def initialize(name)
-      @app = Pushit.app_data_bag(name)
-    end
-
-    def self.apps_path
-      ::File.join(Pushit.pushit_path, 'apps')
-    end
-
-    def config
-      data_bag_item = Chef::DataBagItem.load(DATA_BAG, @app['id'])
+    # This should be an encrypted data bag
+    def app_data_bag(name)
+      data_bag_item = Chef::DataBagItem.load(DATA_BAG, name)
       data_bag_item || {}
     end
-
-    def path
-      ::File.join(Pushit::App.apps_path, @app['id'])
-    end
-
-    def current_path
-      ::File.join(path, 'current')
-    end
-
-    def release_path
-      ::File.join(path, 'releases', version)
-    end
-
-    def shared_path
-      ::File.join(path, 'shared')
-    end
-
-    def root
-      ::File.join(current_path, 'public')
-    end
-
-    def version
-      cached_copy_dir = ::File.join(shared_path, 'cached-copy')
-
-      if ::File.directory?(::File.join(cached_copy_dir, '.git'))
-        Dir.chdir(cached_copy_dir) do
-          `git rev-parse HEAD`.chomp
-        end
-      end
-    end
   end
 
-  class Rails < Pushit::App
-    def initialize(name)
-      super
-    end
-  end
-
-  class Nodejs < Pushit::App
-    def initialize(name)
-      super
-    end
+  class Nodejs
 
     def self.prefix_path
       ::File.join('', 'usr', 'local')
@@ -149,42 +112,10 @@ class Pushit
     end
   end
 
-  class User
-    def self.user
-      'deploy'
-    end
+  class Certs
 
-    def self.group
-      'deploy'
-    end
-
-    def self.home_path
-      ::File.join(Pushit.pushit_path)
-    end
-  end
-
-  class Certs < Pushit::App
-    def initialize(name)
-      super
-    end
-
-    def certs_path
+    def self.certs_path
       ::File.join(Pushit.pushit_path, 'certs')
-    end
-  end
-
-  class << self
-
-    # We should have a dryer way to build configs
-    def create_config(file, attrs); end
-
-    # We need to dry up the rails definition env
-    def app_environment(app); end
-
-    # This should be an encrypted data bag
-    def app_data_bag(name)
-      data_bag_item = Chef::DataBagItem.load(DATA_BAG, name)
-      data_bag_item || {}
     end
   end
 end

@@ -17,11 +17,12 @@
 # limitations under the License.
 #
 
-require 'chef/provider'
+require File.expand_path('../chef_pushit', __FILE__)
+require File.expand_path('../provider_pushit_base', __FILE__)
 
 class Chef
   class Provider
-    class PushitSsl < Chef::Provider
+    class PushitSsl < Chef::Provider::PushitBase
 
       def initialize(new_resource, run_context = nil)
         @new_resource = new_resource

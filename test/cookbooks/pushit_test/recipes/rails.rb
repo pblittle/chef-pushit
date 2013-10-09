@@ -21,15 +21,23 @@
 #
 
 include_recipe 'pushit_test::base'
+include_recipe 'nodejs::install_from_source'
 
-pushit_user 'deploy'
 pushit_webserver 'nginx'
-
-app = 'rails-example'
 
 pushit_ruby '1.9.3-p392'
 
+app = 'rails-example'
+
 pushit_database app
+
+pushit_rails app do
+  deploy_action 'deploy'
+  environment 'development'
+  precompile_assets true
+  unicorn_worker_processes 1
+  revision '6ef9abd80555951222dcfdaed65e7ed8ee5406a1'
+end
 
 pushit_vhost app do
   config_type 'rails'
@@ -39,10 +47,3 @@ pushit_vhost app do
   use_ssl true
 end
 
-pushit_rails app do
-  deploy_action 'deploy'
-  environment 'development'
-  precompile_assets true
-  unicorn_worker_processes 1
-  revision '6ef9abd80555951222dcfdaed65e7ed8ee5406a1'
-end

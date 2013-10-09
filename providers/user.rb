@@ -33,23 +33,38 @@ def whyrun_supported?
 end
 
 action :create do
-
   create_group
   create_user
   change_home_owner
+  create_deploy_keys
 
-  setup_deploy_keys
+  ohai 'reload_passwd' do
+    action :nothing
+    plugin 'passwd'
+  end
+end
 
-  new_resource.updated_by_last_action(true)
+action :create_deploy_keys do
+  create_deploy_keys
 end
 
 private
 
+def deploy_key_directory
+  ::File.join(new_resource.home, '.ssh')
+end
+
+def deploy_keys
+  user = data_bag_item('users', new_resource.name)
+  user['ssh_deploy_keys'] || []
+end
+
 def create_group
   group = Chef::Resource::Group.new(
-    @new_resource.group,
-    @run_context
+    new_resource.group,
+    run_context
   )
+  group.group_name new_resource.group
   group.append true
   group.run_action(:create)
 
@@ -58,63 +73,59 @@ end
 
 def create_user
   user = Chef::Resource::User.new(
-    new_resource.username,
-    @run_context
+    new_resource.name,
+    run_context
   )
   user.shell '/bin/bash'
   user.home new_resource.home
   user.supports :manage_home => true
   user.system false
-  user.uid Etc.getgrnam(new_resource.username).gid
   user.gid Etc.getgrnam(new_resource.group).gid
   user.run_action(:create)
 
-  if user.updated_by_last_action?
-    new_resource.updated_by_last_action(true)
-  end
+  new_resource.updated_by_last_action(true) if user.updated_by_last_action?
 end
 
 def create_deploy_key_directory
   dir = Chef::Resource::Directory.new(
     deploy_key_directory,
-    @run_context
+    run_context
   )
-  dir.owner @new_resource.username
-  dir.group Etc.getpwnam(@new_resource.username).gid
+  dir.owner Etc.getpwnam(new_resource.name).uid
+  dir.group Etc.getgrnam(new_resource.group).gid
   dir.mode '0700'
   dir.recursive true
   dir.run_action(:create)
 
-  if dir.updated_by_last_action?
-    new_resource.updated_by_last_action(true)
-  end
+  new_resource.updated_by_last_action(true) if dir.updated_by_last_action?
 end
 
 def change_home_owner
   FileUtils.chown_R(
-    @new_resource.username,
-    @new_resource.group,
-    Pushit.pushit_path
+    new_resource.name,
+    new_resource.group,
+    new_resource.home
   )
 end
 
-def setup_deploy_keys
+def create_deploy_keys
   create_deploy_key_directory
   deploy_keys.each do |key|
     create_deploy_key(key)
     create_deploy_wrapper(key)
+    create_ssh_config(key)
   end
 end
 
 def create_deploy_key(key)
   deploy_key = Chef::Resource::Template.new(
     ::File.join(deploy_key_directory, key['name']),
-    @run_context
+    run_context
   )
   deploy_key.source 'ssh_deploy_key.erb'
   deploy_key.cookbook 'pushit'
-  deploy_key.owner @new_resource.username
-  deploy_key.group Etc.getpwnam(@new_resource.username).gid
+  deploy_key.owner new_resource.name
+  deploy_key.group Etc.getgrnam(new_resource.group).gid
   deploy_key.mode '0600'
   deploy_key.variables({
     :ssh_key_data => key['data']
@@ -129,12 +140,12 @@ end
 def create_deploy_wrapper(key)
   wrapper = Chef::Resource::Template.new(
     ::File.join(deploy_key_directory, "#{key['name']}_deploy_wrapper.sh"),
-    @run_context
+    run_context
   )
   wrapper.source 'ssh_wrapper.sh.erb'
   wrapper.cookbook 'pushit'
-  wrapper.owner @new_resource.username
-  wrapper.group Etc.getpwnam(@new_resource.username).gid
+  wrapper.owner new_resource.name
+  wrapper.group Etc.getgrnam(new_resource.group).gid
   wrapper.mode '0755'
   wrapper.variables({
     :ssh_key_dir => deploy_key_directory,
@@ -142,16 +153,22 @@ def create_deploy_wrapper(key)
   })
   wrapper.run_action(:create)
 
-  if wrapper.updated_by_last_action?
-    new_resource.updated_by_last_action(true)
+  new_resource.updated_by_last_action(true) if wrapper.updated_by_last_action?
+end
+
+def create_ssh_config(key)
+  key_name = key['name']
+  host_key_alias = key_name.gsub('id_rsa_', '')
+  host_name = 'github.com'
+  key_directory = ::File.join(new_resource.home, '.ssh')
+  identity_file = ::File.join(key_directory, key_name)
+  config_file = ::File.join(key_directory, 'config')
+
+  ssh_config host_key_alias do
+    options 'User' => 'git',
+      'HostName' => host_name,
+      'IdentityFile' => identity_file
+    user new_resource.name
+    path config_file
   end
-end
-
-def deploy_key_directory
-  ::File.join(@new_resource.home, '.ssh')
-end
-
-def deploy_keys
-  user = data_bag_item('users', @new_resource.username)
-  user['ssh_deploy_keys'] || []
 end

@@ -23,3 +23,8 @@
 include_recipe 'pushit_test::base'
 
 pushit_user 'deploy'
+
+pushit_user 'foo' do
+  group 'bar'
+  home '/home/foo'
+end

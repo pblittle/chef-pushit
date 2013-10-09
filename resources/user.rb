@@ -20,9 +20,12 @@
 # limitations under the License.
 #
 
-actions :create
+actions :create, :create_deploy_keys
 default_action :create
 
-attribute :username, :kind_of => String, :name_attribute => true
-attribute :group, :kind_of => String, :default => Pushit::User.group
-attribute :home, :kind_of => String, :default => Pushit::User.home_path
+attribute :username, :kind_of => String,
+  :default => Pushit.pushit_user, :name_attribute => true
+attribute :group, :kind_of => String,
+  :default => Pushit.pushit_group
+attribute :home, :kind_of => String,
+  :default => Pushit.pushit_path

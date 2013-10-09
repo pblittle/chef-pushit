@@ -17,16 +17,17 @@
 # limitations under the License.
 #
 
+require File.expand_path('../chef_pushit', __FILE__)
+require File.expand_path('../provider_pushit_base', __FILE__)
+
 class Chef
   class Provider
-    class PushitRuby < Chef::Provider
+    class PushitRuby < Chef::Provider::PushitBase
 
       def initialize(new_resource, run_context = nil)
         @new_resource = new_resource
         @run_context = run_context
         @run_context.include_recipe 'ruby_build'
-
-        @dependencies = ['git::default']
 
         super(new_resource, run_context)
       end
@@ -56,7 +57,6 @@ class Chef
           end
         end
 
-        install_dependencies
         download_chruby
         install_chruby
         source_chruby
@@ -69,12 +69,6 @@ class Chef
       end
 
       private
-
-      def install_dependencies
-        recipe_eval do
-          Pushit::App::Dependency.new(new_resource, run_context)
-        end
-      end
 
       def download_chruby
         ssh_known_hosts_entry 'github.com'

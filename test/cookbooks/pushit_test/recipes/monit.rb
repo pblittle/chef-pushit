@@ -22,8 +22,6 @@
 
 include_recipe 'pushit_test::base'
 
-pushit_user 'deploy'
-
 pushit_monit 'nodejs-example' do
   check({
     :app_name => 'nodejs-example',

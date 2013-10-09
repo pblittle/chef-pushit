@@ -21,8 +21,8 @@
 #
 
 include_recipe 'pushit_test::base'
-
-pushit_user 'deploy'
+include_recipe 'nodejs::install_from_source'
+include_recipe 'nodejs::npm'
 
 pushit_nodejs 'nodejs-example' do
   script_file 'server.js'

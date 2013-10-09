@@ -5,9 +5,7 @@ require 'minitest/spec'
 
 describe 'pushit_test::ssl' do
 
-  let(:certs_path) {
-    ::File.join('', 'opt', 'pushit', 'certs')
-  }
+  let(:certs_path) { ::File.join('', 'opt', 'pushit', 'certs') }
 
   let(:ca_path) { ::File.join(certs_path, 'test-ca.pem') }
   let(:cert_path) { ::File.join(certs_path, 'test-cert.pem') }

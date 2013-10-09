@@ -54,19 +54,6 @@ class Chef
         )
       end
 
-      def dependencies(arg = nil)
-        set_or_return(
-          :dependencies,
-          arg,
-          :kind_of => [Array],
-          :default => [
-            'git::default',
-            'nodejs::install_from_source',
-            'nodejs::npm'
-          ]
-        )
-      end
-
       def deploy_action(arg = nil)
         set_or_return(
           :deploy_action,
