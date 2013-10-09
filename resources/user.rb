@@ -20,7 +20,7 @@
 # limitations under the License.
 #
 
-actions :create
+actions :create, :create_deploy_keys
 default_action :create
 
 attribute :username, :kind_of => String,

@@ -23,6 +23,7 @@ depends 'nodejs'
 depends 'database'
 depends 'nginx'
 depends 'ruby_build'
+depends 'ssh'
 depends 'ssh_known_hosts'
 
 recommends 'apt'

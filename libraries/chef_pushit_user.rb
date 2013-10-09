@@ -27,11 +27,11 @@ module Pushit
     class << self
 
       def user
-        'deploy'
+        Pushit.pushit_user
       end
 
       def group
-        'deploy'
+        Pushit.pushit_group
       end
 
       def home_path

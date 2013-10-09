@@ -1,6 +1,7 @@
 site :opscode
 
 cookbook 'monit', :github => 'phlipper/chef-monit'
+cookbook 'ssh', :github => 'markolson/chef-ssh'
 
 metadata
 

@@ -37,9 +37,27 @@ action :create do
   create_user
   change_home_owner
   create_deploy_keys
+
+  ohai 'reload_passwd' do
+    action :nothing
+    plugin 'passwd'
+  end
+end
+
+action :create_deploy_keys do
+  create_deploy_keys
 end
 
 private
+
+def deploy_key_directory
+  ::File.join(new_resource.home, '.ssh')
+end
+
+def deploy_keys
+  user = data_bag_item('users', new_resource.name)
+  user['ssh_deploy_keys'] || []
+end
 
 def create_group
   group = Chef::Resource::Group.new(
@@ -95,6 +113,7 @@ def create_deploy_keys
   deploy_keys.each do |key|
     create_deploy_key(key)
     create_deploy_wrapper(key)
+    create_ssh_config(key)
   end
 end
 
@@ -137,11 +156,19 @@ def create_deploy_wrapper(key)
   new_resource.updated_by_last_action(true) if wrapper.updated_by_last_action?
 end
 
-def deploy_key_directory
-  ::File.join(new_resource.home, '.ssh')
-end
+def create_ssh_config(key)
+  key_name = key['name']
+  host_key_alias = key_name.gsub('id_rsa_', '')
+  host_name = 'github.com'
+  key_directory = ::File.join(new_resource.home, '.ssh')
+  identity_file = ::File.join(key_directory, key_name)
+  config_file = ::File.join(key_directory, 'config')
 
-def deploy_keys
-  user = data_bag_item('users', new_resource.name)
-  user['ssh_deploy_keys'] || []
+  ssh_config host_key_alias do
+    options 'User' => 'git',
+      'HostName' => host_name,
+      'IdentityFile' => identity_file
+    user new_resource.name
+    path config_file
+  end
 end
