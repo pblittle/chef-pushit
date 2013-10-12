@@ -46,7 +46,8 @@ server {
 
   location ~ ^/(images|javascripts|stylesheets)/ {
     gzip_static on;
-    break;
+    expires max;
+    add_header Cache-Control public;
   }
 
   location = /favicon.ico {
