@@ -90,7 +90,7 @@ action :create do
     mode '0644'
     variables(
       :app_name => new_resource.app_name,
-      :root => app.release_path,
+      :root => app.root,
       :server_name => new_resource.server_name,
       :listen_port => new_resource.http_port,
       :use_ssl => new_resource.use_ssl,
