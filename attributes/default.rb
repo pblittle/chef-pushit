@@ -29,10 +29,11 @@ node.default['nginx']['log_dir'] = '/opt/pushit/nginx/log'
 node.default['nginx']['binary'] = '/opt/pushit/nginx/sbin/nginx'
 node.default['nginx']['version'] = '1.4.2'
 node.default['nginx']['source']['modules'] = [
-  'http_gzip_static_module',
-  'http_ssl_module',
-  'http_stub_status_module'
+  'nginx::http_gzip_static_module',
+  'nginx::http_ssl_module',
+  'nginx::http_stub_status_module'
 ]
+node.default['nginx']['gzip_static'] = 'on'
 
 node.default[:nodejs][:version] = '0.10.20'
 node.default[:nodejs][:npm] = '1.3.11'
