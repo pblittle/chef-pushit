@@ -70,6 +70,14 @@ class Chef
         @config ||= app.config
       end
 
+      def user
+        @user ||= config[:owner]
+      end
+
+      def group
+        @group ||= config[:group]
+      end
+
       def escape_env(vars = {})
         vars.inject({}) do |hash, (key, value)|
           hash[key.upcase] = value.gsub(/"/) { %q(\") }

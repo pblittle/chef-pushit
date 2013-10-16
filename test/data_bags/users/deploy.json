@@ -8,6 +8,9 @@
     }
   ],
   "ssh_keys": [
-    "-----BEGIN RSA PRIVATE KEY-----\n=deploy-user-private-key\n-----END RSA PRIVATE KEY-----"
+    {
+      "name": "id_rsa_deploy",
+      "data": "-----BEGIN RSA PRIVATE KEY-----\n=deploy-user-private-key\n-----END RSA PRIVATE KEY-----"
+    }
   ]
 }

@@ -66,9 +66,6 @@ class Chef
       end
 
       def pushit_ssh_keys
-
-        Chef::Log.warn pushit_user.public_methods.sort
-
         @pushit_ssh_keys || pushit_user.ssh_keys
       end
 
@@ -112,9 +109,6 @@ class Chef
       end
 
       def change_home_owner
-
-        Chef::Log.warn new_resource
-
         FileUtils.chown_R(
           new_resource.username,
           pushit_group,

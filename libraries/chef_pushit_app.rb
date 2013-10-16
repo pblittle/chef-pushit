@@ -22,50 +22,56 @@
 
 require ::File.expand_path('../chef_pushit', __FILE__)
 
-module Pushit
-  class App
+class Chef
+  module Pushit
+    class App
 
-    DATA_BAG = 'pushit_apps'.freeze
+      DATA_BAG = 'pushit_apps'.freeze
 
-    def initialize(name)
-      @app = Pushit.app_data_bag(name)
-    end
+      def initialize(name)
+        @app = Pushit.app_data_bag(name)
+      end
 
-    def apps_path
-      ::File.join(Pushit.pushit_path, 'apps')
-    end
+      def apps_path
+        ::File.join(Pushit.pushit_path, 'apps')
+      end
 
-    def config
-      data_bag_item = Chef::DataBagItem.load(DATA_BAG, @app['id'])
-      data_bag_item || {}
-    end
+      def config
+        data_bag_item = Chef::DataBagItem.load(DATA_BAG, @app['id'])
+        data_bag_item || {}
+      end
 
-    def path
-      ::File.join(apps_path, @app['id'])
-    end
+      def user
+        @user ||= Pushit::User.new(@app['owner'])
+      end
 
-    def current_path
-      ::File.join(path, 'current')
-    end
+      def path
+        ::File.join(apps_path, @app['id'])
+      end
 
-    def release_path
-      ::File.join(path, 'releases', version)
-    end
+      def current_path
+        ::File.join(path, 'current')
+      end
 
-    def shared_path
-      ::File.join(path, 'shared')
-    end
+      def release_path
+        ::File.join(path, 'releases', version)
+      end
 
-    def root
-      ::File.join(current_path, 'public')
-    end
+      def shared_path
+        ::File.join(path, 'shared')
+      end
 
-    def version
-      cached_copy_dir = ::File.join(shared_path, 'cached-copy')
+      def root
+        ::File.join(current_path, 'public')
+      end
 
-      if ::File.directory?(::File.join(cached_copy_dir, '.git'))
-        Dir.chdir(cached_copy_dir) do
-          `git rev-parse HEAD`.chomp
+      def version
+        cached_copy_dir = ::File.join(shared_path, 'cached-copy')
+
+        if ::File.directory?(::File.join(cached_copy_dir, '.git'))
+          Dir.chdir(cached_copy_dir) do
+            `git rev-parse HEAD`.chomp
+          end
         end
       end
     end

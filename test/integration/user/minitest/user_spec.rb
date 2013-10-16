@@ -48,7 +48,7 @@ describe 'pushit_test::user' do
   end
 
   let(:pushit_user_2) { 'foo' }
-  let(:pushit_group_2) { 'bar' }
+  let(:pushit_group_2) { 'foo' }
   let(:pushit_home_2) { '/home/foo' }
 
   it 'creates a 2nd deploy group' do

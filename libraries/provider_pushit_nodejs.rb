@@ -52,7 +52,7 @@ class Chef
         deploy.repository config['repo']
         deploy.revision new_resource.revision
         deploy.shallow_clone true
-        deploy.ssh_wrapper "#{Pushit::User.home_path}/.ssh/#{config['deploy_key']}_deploy_wrapper.sh" do
+        deploy.ssh_wrapper "#{app.user.home}/.ssh/#{config['deploy_key']}_deploy_wrapper.sh" do
           only_if do
             config['deploy_key'] && !config['deploy_key'].empty?
           end

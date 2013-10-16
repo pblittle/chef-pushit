@@ -22,20 +22,46 @@
 
 require ::File.expand_path('../chef_pushit', __FILE__)
 
-module Pushit
-  class User
-    class << self
+class Chef
+  module Pushit
+    class User
 
-      def user
-        Pushit.pushit_user
+      attr_accessor :username, :config_data
+
+      def initialize(username = nil)
+        @username = username
+        @group = nil
+        @home = nil
+        @ssh_keys = []
+        @ssh_deploy_keys = []
+
+        @config_data = config_data
       end
 
       def group
         Pushit.pushit_group
       end
 
-      def home_path
+      def home
         Pushit.pushit_path
+      end
+
+      def ssh_keys
+        config_data['ssh_keys'] || []
+      end
+
+      def ssh_deploy_keys
+        config_data['ssh_deploy_keys'] || []
+      end
+
+      private
+
+      def config_data
+        begin
+          Chef::DataBagItem.load('users', username)
+        rescue Exception => ex
+          raise "Unable to locate the User data bag for #{username}"
+        end
       end
     end
   end
