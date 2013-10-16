@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 gem 'rake', '10.1.0'
 
 gem 'berkshelf' , '2.0.10'
-gem 'foodcritic', '3.0.1'
+gem 'foodcritic', '3.0.3'
 
 group 'integration' do
   gem 'kitchen-vagrant', '0.11.1'
