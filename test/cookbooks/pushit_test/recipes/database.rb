@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
-# Cookbook Name:: pushit
-# Resource:: user
+# Cookbook Name:: pushit_test
+# Recipe:: monit
 #
 # Author:: P. Barrett Little (<barrett@barrettlittle.com>)
 #
@@ -20,12 +20,6 @@
 # limitations under the License.
 #
 
-actions :create, :create_deploy_keys
-default_action :create
+include_recipe 'pushit_test::base'
 
-attribute :username, :kind_of => String,
-  :default => Pushit.pushit_user, :name_attribute => true
-attribute :group, :kind_of => String,
-  :default => Pushit.pushit_group
-attribute :home, :kind_of => String,
-  :default => Pushit.pushit_path
+pushit_database 'rails-example'
