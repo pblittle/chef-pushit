@@ -34,22 +34,30 @@ class Chef
         Pushit.whyrun_enabled?
       end
 
+      def pushit_user
+        @pushit_user ||= Pushit::User.new(Pushit.pushit_user)
+      end
+
       private
 
       def initialize_filesystem
+        return if Dir.exist?(pushit_user.home)
+
         FileUtils.mkdir_p(
-          Pushit.pushit_path, :mode => 0755
+          pushit_user.home, :mode => 0755
         )
       end
 
       def initialize_user
         user = Chef::Resource::PushitUser.new(
-          Pushit.pushit_user,
+          pushit_user.username,
           run_context
         )
-        user.name Pushit.pushit_user
-        user.group Pushit.pushit_group
-        user.home Pushit.pushit_path
+        user.name pushit_user.username
+        user.group pushit_user.group
+        user.home pushit_user.home
+        user.ssh_keys pushit_user.ssh_keys
+        user.ssh_deploy_keys pushit_user.ssh_deploy_keys
         user.run_action(:create)
 
         if user.updated_by_last_action?

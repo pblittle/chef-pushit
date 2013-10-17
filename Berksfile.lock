@@ -20,7 +20,7 @@
       "locked_version": "2.3.4"
     },
     "mysql": {
-      "locked_version": "3.0.10"
+      "locked_version": "3.0.12"
     },
     "pushit_test": {
       "path": "./test/cookbooks/pushit_test"

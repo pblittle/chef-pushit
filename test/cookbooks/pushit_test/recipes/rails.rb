@@ -23,11 +23,10 @@
 include_recipe 'pushit_test::base'
 include_recipe 'nodejs::install_from_source'
 
-pushit_webserver 'nginx'
-
-pushit_ruby '1.9.3-p392'
-
 app = 'rails-example'
+
+pushit_webserver 'nginx'
+pushit_ruby '1.9.3-p392'
 
 pushit_database app
 
@@ -46,4 +45,3 @@ pushit_vhost app do
   server_name 'localhost'
   use_ssl true
 end
-
