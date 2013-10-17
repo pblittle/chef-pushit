@@ -29,7 +29,7 @@ class Chef
         @resource_name = :pushit_user
         @provider = Chef::Provider::PushitUser
         @action = :create
-        @allowed_actions.push :create
+        @allowed_actions.push :create, :create_deploy_keys
 
         @username = name
         @group = nil
