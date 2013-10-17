@@ -68,7 +68,21 @@ action :create do
       database['root_password']
     run_context.node.set_unless['mysql']['server_repl_password'] =
       database['root_password']
+
     run_context.include_recipe 'mysql::server'
+
+    pushit_monit 'mysql' do
+      check({
+        :name => 'mysql',
+        :host => database['host'],
+        :port => database['port'],
+        :pid_file => new_resource.pid_file,
+        :start_program => '/sbin/start mysql',
+        :stop_program => '/sbin/stop mysql',
+        :uid => 'root',
+        :gid => 'root'
+      })
+    end
   end
 
   mysql_database_user database['root_username'] do
@@ -84,22 +98,6 @@ action :create do
   mysql_database database['name'] do
     connection connection_details
     action :create
-  end
-
-  pushit_monit 'mysql' do
-    check({
-      :name => 'mysql',
-      :host => database['host'],
-      :port => database['port'],
-      :pid_file => new_resource.pid_file,
-      :start_program => '/etc/init.d/mysql start',
-      :stop_program => '/etc/init.d/mysql stop',
-      :uid => 'root',
-      :gid => 'root'
-    })
-    only_if do
-      database['host'] == 'localhost'
-    end
   end
 
   new_resource.updated_by_last_action(true)
