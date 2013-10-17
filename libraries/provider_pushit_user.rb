@@ -51,6 +51,10 @@ class Chef
         create_deploy_keys
       end
 
+      def action_create_deploy_keys
+        create_deploy_keys
+      end
+
       private
 
       def pushit_user
