@@ -65,6 +65,10 @@ class Chef
         @new_resource.group || pushit_user.group
       end
 
+      def pushit_password
+        pushit_user.password
+      end
+
       def pushit_home
         @new_resource.home || pushit_user.home
       end
@@ -95,17 +99,18 @@ class Chef
         end
       end
 
-      def create_user
+      def create_user(action)
         user = Chef::Resource::User.new(
           new_resource.name,
           run_context
         )
         user.shell '/bin/bash'
+        user.password pushit_password
         user.home pushit_home
         user.supports :manage_home => true
         user.system false
         user.gid Etc.getgrnam(pushit_group).gid
-        user.run_action(:create)
+        user.run_action(action)
 
         if user.updated_by_last_action?
           new_resource.updated_by_last_action(true)

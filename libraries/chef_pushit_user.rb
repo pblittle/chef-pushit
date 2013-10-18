@@ -32,6 +32,7 @@ class Chef
         @username = username
         @group = nil
         @home = nil
+        @password = nil
         @ssh_keys = []
         @ssh_deploy_keys = []
 
@@ -44,6 +45,10 @@ class Chef
 
       def home
         Pushit.pushit_path
+      end
+
+      def password
+        config_data['password']
       end
 
       def ssh_keys
