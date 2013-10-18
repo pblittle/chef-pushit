@@ -85,7 +85,7 @@ class Chef
         set_or_return(
           :user_action,
           arg,
-          :kind_of => [String]
+          :kind_of => [Symbol]
         )
       end
     end
