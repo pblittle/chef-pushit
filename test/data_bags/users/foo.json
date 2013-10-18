@@ -1,6 +1,7 @@
 {
   "id": "foo",
   "comment": "Application Foobarer",
+  "password": "$1$X45DkDXT$kf44ir8cGHMTr3BOwnZ13/",
   "ssh_deploy_keys": [
     {
       "name": "id_rsa_rails-example",

@@ -21,6 +21,12 @@ describe 'pushit_test::user' do
     assert Etc.getpwnam(pushit_user).dir == pushit_home
   end
 
+  it 'does not create a password for the deploy user' do
+    assert File.read(
+      ::File.join('', 'etc', 'shadow')
+    ).match(/^deploy:[*|!]:/)
+  end
+
   it 'has created the deploy user in pushit base' do
     assert File.read('/etc/passwd').include?(pushit_home)
   end
@@ -63,7 +69,13 @@ describe 'pushit_test::user' do
     assert Etc.getpwnam(pushit_user_2).dir == pushit_home_2
   end
 
-  it 'has created the 2nd deploy user in /home/foo' do
+  it 'creates a password for the 2nd deploy user' do
+    refute File.read(
+      ::File.join('', 'etc', 'shadow')
+    ).match(/^foo:[*|!]:/)
+  end
+
+  it 'has created the 2nd deploy user in /opt/pushit' do
     assert File.read('/etc/passwd').include?(pushit_home_2)
   end
 

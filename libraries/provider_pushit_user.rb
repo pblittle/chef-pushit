@@ -45,7 +45,7 @@ class Chef
 
       def action_create
         create_group
-        create_user
+        create_user(new_resource.user_action)
         change_home_owner
         create_ssh_keys
         create_deploy_keys

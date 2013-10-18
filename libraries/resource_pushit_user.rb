@@ -29,13 +29,16 @@ class Chef
         @resource_name = :pushit_user
         @provider = Chef::Provider::PushitUser
         @action = :create
-        @allowed_actions.push :create, :create_deploy_keys
+        @allowed_actions.push :create, :create_deploy_keys, :modify
 
         @username = name
         @group = nil
         @home = nil
         @ssh_keys = []
         @ssh_deploy_keys = []
+
+        # TODO: This is BS. Make it better.
+        @user_action = :create
       end
 
       def username(arg = nil)
@@ -75,6 +78,14 @@ class Chef
           :ssh_deploy_keys,
           arg,
           :kind_of => [Array]
+        )
+      end
+
+      def user_action(arg = nil)
+        set_or_return(
+          :user_action,
+          arg,
+          :kind_of => [String]
         )
       end
     end
