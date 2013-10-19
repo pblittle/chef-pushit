@@ -45,7 +45,7 @@ class Chef
 
       def action_create
         create_group
-        create_user(new_resource.user_action)
+        create_user
         change_home_owner
         create_ssh_keys
         create_deploy_keys
@@ -99,7 +99,7 @@ class Chef
         end
       end
 
-      def create_user(action)
+      def create_user
         user = Chef::Resource::User.new(
           new_resource.name,
           run_context
@@ -110,7 +110,7 @@ class Chef
         user.supports :manage_home => true
         user.system false
         user.gid Etc.getgrnam(pushit_group).gid
-        user.run_action(action)
+        user.run_action(:create)
 
         if user.updated_by_last_action?
           new_resource.updated_by_last_action(true)
