@@ -74,7 +74,7 @@ class Chef
         deploy.symlink_before_migrate({})
 
         deploy.migrate new_resource.migrate
-        deploy.migration_command "#{@bundle_binary} exec rake db:migrate"
+        deploy.migration_command "#{@bundle_binary} exec ./bin/rake db:migrate"
 
         app_config = config
         ruby_binary = ruby.ruby_binary
