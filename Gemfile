@@ -10,6 +10,6 @@ group 'integration' do
   gem 'minitest-chef-handler', '1.0.1'
   gem 'pry', '0.9.12.2'
   gem 'tailor', '1.3.1'
-  gem 'test-kitchen', '1.0.0.beta.3'
+  gem 'test-kitchen', '1.0.0.beta.4'
   gem 'vagrant-wrapper', '1.2.1.1'
 end
