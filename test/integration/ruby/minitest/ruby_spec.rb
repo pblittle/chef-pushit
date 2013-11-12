@@ -20,7 +20,13 @@ describe 'pushit_test::ruby' do
   it 'has created chruby.sh' do
     assert File.read(
       '/etc/profile.d/chruby.sh'
-    ).include?('1.9.3-p448')
+    ).include?('ree-1.8.7-2012.02')
+  end
+
+  it 'has added env vars to chruby.sh' do
+    assert File.read(
+      '/etc/profile.d/chruby.sh'
+    ).include?('export RUBY_GC_MALLOC_LIMIT="50000000"')
   end
 
   let(:rubies_path) { ::File.join('', 'opt', 'pushit', 'rubies') }

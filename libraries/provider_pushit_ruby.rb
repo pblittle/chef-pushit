@@ -114,7 +114,8 @@ class Chef
           variables(
             :chruby_path => '/usr/local/share/chruby',
             :rubies_path => ruby.rubies_path,
-            :default_ruby => new_resource.name
+            :default_ruby => new_resource.name,
+            :chruby_environment => new_resource.chruby_environment
           )
         end
       end
