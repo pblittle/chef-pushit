@@ -93,6 +93,7 @@ class Chef
         service.provider Chef::Provider::Service::Upstart
         service.supports :status => true, :restart => true
         service.run_action(:enable)
+        service.run_action(:stop)
         service.run_action(:start)
 
         if service.updated_by_last_action?
