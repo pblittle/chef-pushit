@@ -108,10 +108,16 @@ class Chef
           :instance => new_resource.name,
           :env_path => Pushit::Nodejs.bin_path,
           :app_path => app.release_path,
-          :log_path => "#{app.shared_path}/log/upstart.log",
-          :pid_path => "#{app.shared_path}/pids/upstart.pid",
+          :log_path => ::File.join(
+            app.shared_path, 'log', 'upstart.log'
+          ),
+          :pid_path => ::File.join(
+            app.shared_path, 'pids', 'upstart.pid'
+          ),
           :exec => new_resource.node_binary,
-          :script_path => ::File.join(app.release_path, new_resource.script_file),
+          :script_path => ::File.join(
+            app.release_path, new_resource.script_file
+          ),
           :user => config['owner'],
           :group => config['group'],
           :env => escape_env(config['env'])
