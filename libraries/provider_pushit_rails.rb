@@ -96,6 +96,10 @@ class Chef
             to "#{new_resource.shared_path}/config/database.yml"
           end
 
+          link "#{release_path}/config/filestore.yml" do
+            to "#{new_resource.shared_path}/config/filestore.yml"
+          end
+
           link "#{release_path}/config/unic0rn.rb" do
             to "#{new_resource.shared_path}/config/unic0rn.rb"
           end
@@ -222,6 +226,28 @@ class Chef
           :environment => new_resource.environment
         )
         db_yaml.run_action(:create)
+
+        fs_yaml = Chef::Resource::Template.new(
+          ::File.join(app.shared_path, 'config', 'filestore.yml'),
+          run_context
+        )
+        fs_yaml.source 'filestore.yml.erb'
+        fs_yaml.cookbook 'pushit'
+        fs_yaml.owner config['owner']
+        fs_yaml.group config['group']
+        fs_yaml.mode '0644'
+        fs_yaml.variables(
+          :database => {
+            :adapter => database['adapter'],
+            :database => database['name'],
+            :host => database['host'],
+            :username => database['username'],
+            :password => database['password'],
+            :options => database['options'] || []
+          },
+          :environment => new_resource.environment
+        )
+        fs_yaml.run_action(:create)
       end
 
       def worker_processes
