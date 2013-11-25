@@ -2,7 +2,7 @@
   "id": "nodejs-example",
   "owner": "deploy",
   "group": "deploy",
-  "repo": "https://pblittle:BallTill1Fall@github.com/jackruss/erx-cloudq.git",
+  "repo": "git@github.com:twilson63/node-cloudq.git",
   "framework": "nodejs",
   "environment": "development",
   "ssl": {
