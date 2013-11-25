@@ -27,7 +27,7 @@ node.default['nginx']['default_site_enabled'] = false
 node.default['nginx']['dir'] = '/opt/pushit/nginx'
 node.default['nginx']['log_dir'] = '/opt/pushit/nginx/log'
 node.default['nginx']['binary'] = '/opt/pushit/nginx/sbin/nginx'
-node.default['nginx']['version'] = '1.4.2'
+node.default['nginx']['version'] = '1.4.4'
 node.default['nginx']['source']['modules'] = [
   'nginx::http_gzip_static_module',
   'nginx::http_ssl_module',

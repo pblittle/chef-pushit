@@ -25,17 +25,28 @@ include_recipe 'nodejs::install_from_source'
 
 app = 'rails-example'
 
-pushit_webserver 'nginx'
-pushit_ruby '1.9.3-p392'
+pushit_ruby 'ree-1.8.7-2012.02' do
+  environment({
+    'CONFIGURE_OPTS' => '--no-tcmalloc'
+  })
+  chruby_environment({
+    'RUBY_HEAP_MIN_SLOTS' => '500000',
+    'RUBY_HEAP_SLOTS_INCREMENT' => '250000',
+    'RUBY_HEAP_SLOTS_GROWTH_FACTOR' => '1',
+    'RUBY_GC_MALLOC_LIMIT' => '50000000'
+  })
+end
 
 pushit_database app
+
+pushit_webserver 'nginx'
 
 pushit_rails app do
   deploy_action 'deploy'
   environment 'development'
   precompile_assets true
   unicorn_worker_processes 1
-  revision '6ef9abd80555951222dcfdaed65e7ed8ee5406a1'
+  revision 'master'
 end
 
 pushit_vhost app do

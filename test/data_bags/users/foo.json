@@ -7,11 +7,5 @@
       "name": "id_rsa_rails-example",
       "data": "-----BEGIN RSA PRIVATE KEY-----\n=rails-example-deploy-key\n-----END RSA PRIVATE KEY-----"
     }
-  ],
-  "ssh_keys": [
-    {
-      "name": "id_rsa_foo",
-      "data": "-----BEGIN RSA PRIVATE KEY-----\n=foo-user-private-key\n-----END RSA PRIVATE KEY-----"
-    }
   ]
 }

@@ -40,8 +40,9 @@ class Chef
 
       def action_create
         ruby_build_ruby new_resource.name do
-          user pushit_user.username
-          group pushit_user.group
+          # user pushit_user.username
+          # group pushit_user.group
+          definition ruby.version
           prefix_path ruby.prefix_path
           environment(new_resource.environment)
 

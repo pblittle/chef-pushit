@@ -49,9 +49,8 @@ def create_monit_check
   })
   config.run_action(:install)
 
-  if config.updated_by_last_action?
+  config.updated_by_last_action? &&
     new_resource.updated_by_last_action(true)
-  end
 end
 
 def create_webserver_config

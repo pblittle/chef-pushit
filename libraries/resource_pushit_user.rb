@@ -29,20 +29,37 @@ class Chef
         @resource_name = :pushit_user
         @provider = Chef::Provider::PushitUser
         @action = :create
-        @allowed_actions.push :create, :create_deploy_keys, :modify
+        @allowed_actions.push :create, :create_deploy_keys, :create_ssh_keys
 
         @username = name
         @group = nil
         @home = nil
-        @ssh_keys = []
+        @password = nil
+        @ssh_public_key = nil
+        @ssh_private_key = nil
         @ssh_deploy_keys = []
+
+        @generate_ssh_keys = nil
+      end
+
+      def to_hash
+        {
+          :username => @username,
+          :group => @group,
+          :home => @home,
+          :password => @password,
+          :ssh_public_key => @ssh_public_key,
+          :ssh_private_key => @ssh_private_key,
+          :ssh_deploy_keys => @ssh_deploy_keys
+        }
       end
 
       def username(arg = nil)
         set_or_return(
           :username,
           arg,
-          :kind_of => [String]
+          :kind_of => [String],
+          :regex => /^[a-z0-9\-_]+$/
         )
       end
 
@@ -50,7 +67,8 @@ class Chef
         set_or_return(
           :group,
           arg,
-          :kind_of => [String]
+          :kind_of => [String],
+          :regex => /^[a-z0-9\-_]+$/
         )
       end
 
@@ -62,11 +80,27 @@ class Chef
         )
       end
 
-      def ssh_keys(arg = nil)
+      def password(arg = nil)
         set_or_return(
-          :ssh_keys,
+          :password,
           arg,
-          :kind_of => [Array]
+          :kind_of => [String]
+        )
+      end
+
+      def ssh_public_key(arg = nil)
+        set_or_return(
+          :ssh_public_key,
+          arg,
+          :kind_of => [String]
+        )
+      end
+
+      def ssh_private_key(arg = nil)
+        set_or_return(
+          :ssh_private_key,
+          arg,
+          :kind_of => [String]
         )
       end
 
@@ -75,6 +109,14 @@ class Chef
           :ssh_deploy_keys,
           arg,
           :kind_of => [Array]
+        )
+      end
+
+      def generate_ssh_keys(arg = nil)
+        set_or_return(
+          :generate_ssh_keys,
+          arg,
+          :kind_of => [TrueClass, FalseClass]
         )
       end
     end

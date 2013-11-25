@@ -40,7 +40,8 @@ class Chef
           arg,
           :kind_of => [String],
           :required => true,
-          :name_attribute => true
+          :name_attribute => true,
+          :regex => /^[a-z0-9\-_]+$/
         )
       end
 

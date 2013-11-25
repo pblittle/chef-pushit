@@ -1,7 +1,7 @@
 source <%= @chruby_path %>/chruby.sh
 
 <% @chruby_environment.each do |key, value| -%>
-export <%= key %>="<%= value %>"
+export <%= key %>=<%= value %>
 <% end -%>
 
 RUBIES=(<%= @rubies_path %>/*)

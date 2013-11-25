@@ -20,7 +20,9 @@
       "username": "root",
       "password": "password",
       "port": 3306,
-      "options": [],
+      "options": {
+        "foo": "bar"
+      },
       "root_username": "root",
       "root_password": "password"
     }

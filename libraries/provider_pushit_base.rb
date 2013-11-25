@@ -25,9 +25,11 @@ class Chef
   class Provider
     class PushitBase < Chef::Provider
 
+      attr_accessor :pushit_user
+
       def initialize(new_resource, run_context = nil)
-        initialize_filesystem
-        initialize_user
+        create_filesystem
+        create_user
       end
 
       def whyrun_supported?
@@ -35,12 +37,12 @@ class Chef
       end
 
       def pushit_user
-        @pushit_user ||= Pushit::User.new(Pushit.pushit_user)
+        @pushit_user ||= Pushit::User.new
       end
 
       private
 
-      def initialize_filesystem
+      def create_filesystem
         return if Dir.exist?(pushit_user.home)
 
         FileUtils.mkdir_p(
@@ -48,7 +50,7 @@ class Chef
         )
       end
 
-      def initialize_user
+      def create_user
         user = Chef::Resource::PushitUser.new(
           pushit_user.username,
           run_context
@@ -56,8 +58,9 @@ class Chef
         user.name pushit_user.username
         user.group pushit_user.group
         user.home pushit_user.home
-        user.ssh_keys pushit_user.ssh_keys
+        user.password pushit_user.password
         user.ssh_deploy_keys pushit_user.ssh_deploy_keys
+        user.generate_ssh_keys true
         user.run_action(:create)
 
         if user.updated_by_last_action?

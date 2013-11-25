@@ -13,6 +13,10 @@ describe 'pushit_test::rails' do
     ::File.join(pushit_app_path, 'current', 'tmp', 'pids', 'upstart.pid')
   end
 
+  let(:database_yaml_path) do
+    ::File.join(pushit_app_path, 'current', 'config', 'database.yml')
+  end
+
   it 'has created the base pushit directory' do
     assert File.directory?(pushit_path)
   end
@@ -40,15 +44,23 @@ describe 'pushit_test::rails' do
   end
 
   it 'has created database.yml' do
-    assert File.file?(
-      ::File.join(pushit_app_path, 'shared', 'config', 'database.yml')
-    )
+    assert File.file?(database_yaml_path)
   end
 
   it 'has symlinked database.yml to current' do
-    assert File.symlink?(
-      ::File.join(pushit_app_path, 'current', 'config', 'database.yml')
-    )
+    assert File.symlink?(database_yaml_path)
+  end
+
+  it 'has configured the database.yml host attribute' do
+    assert ::File.read(
+      database_yaml_path
+    ).include?('host: localhost')
+  end
+
+  it 'has configured the database.yml options attribute' do
+    assert ::File.read(
+      database_yaml_path
+    ).include?('foo: bar')
   end
 
   it 'has created a service config' do

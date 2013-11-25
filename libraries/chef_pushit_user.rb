@@ -26,33 +26,81 @@ class Chef
   module Pushit
     class User
 
-      attr_accessor :username, :config_data
+      attr_accessor :username, :group, :home, :password
+      attr_accessor :ssh_deploy_keys, :ssh_directory
 
-      def initialize(username = nil)
-        @username = username
-        @group = nil
-        @home = nil
-        @password = nil
-        @ssh_keys = []
-        @ssh_deploy_keys = []
+      def initialize(args = {})
+
+        Chef::Log.warn 'args 1'
+        Chef::Log.warn args
+
+        args = { username: args } if args.is_a?(String)
+
+        Chef::Log.warn 'args 2'
+        Chef::Log.warn args
+
+        @username = args[:username] || default_username
+        @group = args[:group] || username
+        @home = args[:home] || default_home
+
+        @ssh_directory = nil
+
+        @password = password
+        @ssh_public_key = args[:ssh_public_key] || ssh_public_key
+        @ssh_private_key = args[:ssh_private_key] || ssh_private_key
+        @ssh_deploy_keys = ssh_deploy_keys
+
+        Chef::Log.warn @ssh_public_key
+        Chef::Log.warn @ssh_private_key
 
         @config_data = config_data
       end
 
-      def group
-        Pushit.pushit_group
+      def default_username
+        Pushit.pushit_user
       end
 
-      def home
+      def default_home
         Pushit.pushit_path
       end
 
       def password
-        config_data['password']
+        config_data['password'] || nil
       end
 
-      def ssh_keys
-        config_data['ssh_keys'] || []
+      def ssh_directory
+        File.join(home, '.ssh')
+      end
+
+      def create_ssh_keys
+        # ssh_directory_exists?
+
+        Chef::Log.warn 'ssh_public_key'
+        Chef::Log.warn ssh_public_key
+
+        Chef::Log.warn 'ssh_public_key'
+        Chef::Log.warn ssh_public_key
+
+        unless ::File.exists?(ssh_public_key) &&
+            ::File.exists?(ssh_private_key)
+          `ssh-keygen -b 2048 -t rsa -f #{ssh_private_key} -P ''`
+        end
+      end
+
+      def ssh_directory_exists?
+        unless File.directory?(ssh_directory)
+          FileUtils.mkdir_p(
+            ssh_directory, :mode => 0700
+          )
+        end
+      end
+
+      def ssh_private_key
+        ::File.join(ssh_directory, 'id_rsa')
+      end
+
+      def ssh_public_key
+        "#{ssh_private_key}.pub"
       end
 
       def ssh_deploy_keys
@@ -62,11 +110,9 @@ class Chef
       private
 
       def config_data
-        begin
-          Chef::DataBagItem.load('users', username)
-        rescue Exception => ex
-          raise "Unable to locate the User data bag for #{username}"
-        end
+        Chef::DataBagItem.load('users', username)
+      rescue
+        {}
       end
     end
   end

@@ -28,3 +28,8 @@ pushit_user 'foo' do
   group 'foo'
   home '/home/foo'
 end
+
+pushit_user 'bar' do
+  home '/home/bar'
+  generate_ssh_keys true
+end

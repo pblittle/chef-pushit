@@ -71,11 +71,7 @@ class Chef
       end
 
       def user
-        @user ||= config[:owner]
-      end
-
-      def group
-        @group ||= config[:group]
+        @user ||= app.user
       end
 
       def escape_env(vars = {})
@@ -109,8 +105,8 @@ class Chef
             app_dir,
             run_context
           )
-          dir.owner Etc.getpwnam(config['owner']).uid
-          dir.group Etc.getpwnam(config['owner']).gid
+          dir.owner Etc.getpwnam(user.username).uid
+          dir.group Etc.getgrnam(user.group).gid
           dir.recursive true
           dir.mode 00755
           dir.run_action(:create)
@@ -129,8 +125,8 @@ class Chef
             ::File.join(app.shared_path, dir),
             run_context
           )
-          dir.owner Etc.getpwnam(config['owner']).uid
-          dir.group Etc.getgrnam(config['group']).gid
+          dir.owner Etc.getpwnam(user.username).uid
+          dir.group Etc.getgrnam(user.group).gid
           dir.recursive true
           dir.mode 00755
           dir.run_action(:create)
@@ -149,8 +145,8 @@ class Chef
             ::File.join(app.shared_path, shared_dir),
             run_context
           )
-          dir.owner Etc.getpwnam(config['owner']).uid
-          dir.group Etc.getgrnam(config['group']).gid
+          dir.owner Etc.getpwnam(user.username).uid
+          dir.group Etc.getgrnam(user.group).gid
           dir.recursive true
           dir.mode 00755
           dir.run_action(:create)
