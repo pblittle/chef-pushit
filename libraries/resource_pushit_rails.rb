@@ -109,8 +109,7 @@ class Chef
         set_or_return(
           :unicorn_listen_socket,
           arg,
-          :kind_of => [String],
-          :default => '/tmp/.sock'
+          :kind_of => [String]
         )
       end
 

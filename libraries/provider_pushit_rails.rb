@@ -143,8 +143,7 @@ class Chef
           precompile.cwd release_path
           precompile.user app_config['owner']
           precompile.environment new_resource.environment
-          precompile.run_action(:run)
-          precompile.only_if { precompile_assets }
+          precompile.run_action(:run) if precompile_assets
         end
 
         deploy.after_restart nil
@@ -267,6 +266,9 @@ class Chef
       def create_unicorn_config
         Chef::Log.debug("Creating unicorn config for #{new_resource.name}")
 
+        Chef::Log.warn "Pid: " + app.pid_path
+        Chef::Log.warn "Socket: " + app.socket_path
+
         unicorn_config = Chef::Resource::Template.new(
           ::File.join(app.shared_path, 'config', 'unic0rn.rb'),
           run_context
@@ -279,8 +281,8 @@ class Chef
         unicorn_config.variables(
           :enable_stats => new_resource.unicorn_enable_stats,
           :listen_port => new_resource.unicorn_listen_port,
-          :listen_socket => new_resource.unicorn_listen_socket,
-          :pid => ::File.join(app.current_path, 'tmp', 'pids', 'unicorn.pid'),
+          :listen_socket => ::File.join(app.socket_path, 'unicorn.sock'),
+          :pid => ::File.join(app.pid_path, 'upstart.pid'),
           :preload_app => new_resource.unicorn_preload_app,
           :stderr_path => ::File.join(app.current_path, 'log', 'stderr.log'),
           :stdout_path => ::File.join(app.current_path, 'log', 'stdout.log'),
@@ -313,7 +315,7 @@ class Chef
           :app_path => app.release_path,
           :log_file => ::File.join(app.release_path, 'log', 'upstart.log'),
           :pid_file => ::File.join(
-            app.release_path, 'tmp', 'pids', 'upstart.pid'
+            app.pid_path, 'upstart.pid'
           ),
           :config_file => ::File.join(app.release_path, 'config', 'unic0rn.rb'),
           :exec => ::File.join(app.release_path, 'bin', 'unicorn'),

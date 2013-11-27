@@ -61,6 +61,34 @@ class Chef
         ::File.join(path, 'shared')
       end
 
+      def pid_path
+        ::File.join(path, 'shared', 'pids')
+      end
+
+      def socket_path
+        ::File.join(path, 'shared', 'sockets')
+      end
+
+      # def pid_path
+
+      #   path = '/opt/pushit/apps/eirenerx-vagrant/shared/tmp/pids'
+
+      #   unless File.directory?(::File.join(path))
+      #     FileUtils.mkdir_p(path, :mode => 0700)
+      #   end
+      # end
+
+      # def socket_path
+
+      #   Chef::Log.warn shared_path
+
+      #   unless File.directory?(::File.join(shared_path, 'tmp', 'sockets'))
+      #     FileUtils.mkdir_p(
+      #       ::File.join(shared_path, 'tmp', 'sockets'), :mode => 0700
+      #     )
+      #   end
+      # end
+
       def root
         ::File.join(current_path, 'public')
       end

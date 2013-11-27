@@ -63,7 +63,8 @@ def create_webserver_config
     mode '0644'
     variables({
       :log_path => new_resource.log_path,
-      :pid_file => new_resource.pid_file
+      :pid_file => new_resource.pid_file,
+      :socket_path => '/opt/pushit/apps/eirenerx-vagrant/shared/tmp/sockets/unicorn.sock'
     })
   end
 end

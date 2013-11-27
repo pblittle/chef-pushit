@@ -140,7 +140,7 @@ class Chef
       def create_writable_directories
         Chef::Log.debug("Creating writable directories for #{new_resource.name}")
 
-        %w{ log pids }.each do |shared_dir|
+        %w{ log pids sockets }.each do |shared_dir|
           dir = Chef::Resource::Directory.new(
             ::File.join(app.shared_path, shared_dir),
             run_context
@@ -166,7 +166,7 @@ class Chef
         )
         config.check({
           :name => new_resource.name,
-          :pid_file => "#{app.shared_path}/pids/upstart.pid",
+          :pid_file => ::File.join(app.pid_path, 'upstart.pid'),
           :start_program => "/sbin/start #{new_resource.name}",
           :stop_program => "/sbin/stop #{new_resource.name}",
           :uid => 'root',

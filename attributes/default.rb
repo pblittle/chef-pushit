@@ -35,6 +35,6 @@ node.default['nginx']['source']['modules'] = [
 ]
 node.default['nginx']['gzip_static'] = 'on'
 
-node.default[:nodejs][:version] = '0.10.21'
-node.default[:nodejs][:npm] = '1.3.11'
+node.default[:nodejs][:version] = '0.10.22'
+node.default[:nodejs][:npm] = '1.3.15'
 # node.default[:nodejs][:dir] = Pushit::Nodejs.prefix_path
