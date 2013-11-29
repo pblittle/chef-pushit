@@ -1,7 +1,7 @@
 worker_processes auto;
 daemon off;
 
-user nobody nogroup;
+user <%= @user %> <%= @group %>;
 pid <%= @pid_file %>;
 
 events {
