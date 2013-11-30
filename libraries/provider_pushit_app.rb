@@ -54,6 +54,7 @@ class Chef
         create_writable_directories
         create_deploy_revision
         create_service_config
+        create_vhost_config
         create_monit_check
         enable_and_start_service
 
@@ -82,89 +83,91 @@ class Chef
       end
 
       def enable_and_start_service
-        service = Chef::Resource::Service.new(
+        r = Chef::Resource::Service.new(
           new_resource.name,
           run_context
         )
-        service.provider Chef::Provider::Service::Upstart
-        service.supports :status => true, :restart => true
-        service.run_action(:enable)
-        service.run_action(:stop)
-        service.run_action(:start)
+        r.provider Chef::Provider::Service::Upstart
+        r.supports :status => true, :restart => true
+        r.run_action(:enable)
+        r.run_action(:stop)
+        r.run_action(:start)
 
-        if service.updated_by_last_action?
-          new_resource.updated_by_last_action(true)
-        end
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def create_directories
-        Chef::Log.debug("Creating app directories for #{new_resource.name}")
-
-        [app.path, app.shared_path].each do |app_dir|
-          dir = Chef::Resource::Directory.new(
-            app_dir,
+        [app.path, app.shared_path].each do |dir|
+          r = Chef::Resource::Directory.new(
+            dir,
             run_context
           )
-          dir.owner Etc.getpwnam(user.username).uid
-          dir.group Etc.getgrnam(user.group).gid
-          dir.recursive true
-          dir.mode 00755
-          dir.run_action(:create)
+          r.owner Etc.getpwnam(user.username).uid
+          r.group Etc.getgrnam(user.group).gid
+          r.recursive true
+          r.mode 00755
+          r.run_action(:create)
 
-          if dir.updated_by_last_action?
-            new_resource.updated_by_last_action(true)
-          end
+          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
         end
       end
 
       def create_shared_directories
-        Chef::Log.debug("Creating shared directories for #{new_resource.name}")
-
         %w{ cached-copy config system vendor_bundle }.each do |dir|
-          dir = Chef::Resource::Directory.new(
+          r = Chef::Resource::Directory.new(
             ::File.join(app.shared_path, dir),
             run_context
           )
-          dir.owner Etc.getpwnam(user.username).uid
-          dir.group Etc.getgrnam(user.group).gid
-          dir.recursive true
-          dir.mode 00755
-          dir.run_action(:create)
+          r.owner Etc.getpwnam(user.username).uid
+          r.group Etc.getgrnam(user.group).gid
+          r.recursive true
+          r.mode 00755
+          r.run_action(:create)
 
-          if dir.updated_by_last_action?
-            new_resource.updated_by_last_action(true)
-          end
+          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
         end
       end
 
       def create_writable_directories
-        Chef::Log.debug("Creating writable directories for #{new_resource.name}")
-
-        %w{ log pids sockets }.each do |shared_dir|
-          dir = Chef::Resource::Directory.new(
-            ::File.join(app.shared_path, shared_dir),
+        %w{ log pids sockets }.each do |dir|
+          r = Chef::Resource::Directory.new(
+            ::File.join(app.shared_path, dir),
             run_context
           )
-          dir.owner Etc.getpwnam(user.username).uid
-          dir.group Etc.getgrnam(user.group).gid
-          dir.recursive true
-          dir.mode 00755
-          dir.run_action(:create)
+          r.owner Etc.getpwnam(user.username).uid
+          r.group Etc.getgrnam(user.group).gid
+          r.recursive true
+          r.mode 00755
+          r.run_action(:create)
 
-          if dir.updated_by_last_action?
-            new_resource.updated_by_last_action(true)
-          end
+          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
 
-          execute "chmod -R 00755 #{::File.join(app.shared_path, shared_dir)}"
+          execute "chmod -R 00755 #{::File.join(app.shared_path, dir)}"
         end
       end
 
-      def create_monit_check
-        config = Chef::Resource::PushitMonit.new(
+      def create_vhost_config
+        r = Chef::Resource::PushitVhost.new(
           new_resource.name,
           run_context
         )
-        config.check({
+        r.config_type new_resource.framework
+        r.http_port 80
+        r.server_name '_'
+        r.upstream_port 8080
+        r.upstream_socket app.socket_path
+        r.use_ssl true
+        r.run_action(:create)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      end
+
+      def create_monit_check
+        r = Chef::Resource::PushitMonit.new(
+          new_resource.name,
+          run_context
+        )
+        r.check({
           :name => new_resource.name,
           :pid_file => ::File.join(app.pid_path, 'upstart.pid'),
           :start_program => "/sbin/start #{new_resource.name}",
@@ -172,11 +175,9 @@ class Chef
           :uid => 'root',
           :gid => 'root'
         })
-        config.run_action(:install)
+        r.run_action(:install)
 
-        if config.updated_by_last_action?
-          new_resource.updated_by_last_action(true)
-        end
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
     end
   end

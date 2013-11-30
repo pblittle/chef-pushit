@@ -31,13 +31,7 @@ class Chef
 
       def initialize(args = {})
 
-        Chef::Log.warn 'args 1'
-        Chef::Log.warn args
-
         args = { username: args } if args.is_a?(String)
-
-        Chef::Log.warn 'args 2'
-        Chef::Log.warn args
 
         @username = args[:username] || default_username
         @group = args[:group] || username
@@ -46,12 +40,10 @@ class Chef
         @ssh_directory = nil
 
         @password = password
+
         @ssh_public_key = args[:ssh_public_key] || ssh_public_key
         @ssh_private_key = args[:ssh_private_key] || ssh_private_key
         @ssh_deploy_keys = ssh_deploy_keys
-
-        Chef::Log.warn @ssh_public_key
-        Chef::Log.warn @ssh_private_key
 
         @config_data = config_data
       end
@@ -74,12 +66,6 @@ class Chef
 
       def create_ssh_keys
         # ssh_directory_exists?
-
-        Chef::Log.warn 'ssh_public_key'
-        Chef::Log.warn ssh_public_key
-
-        Chef::Log.warn 'ssh_public_key'
-        Chef::Log.warn ssh_public_key
 
         unless ::File.exists?(ssh_public_key) &&
             ::File.exists?(ssh_private_key)

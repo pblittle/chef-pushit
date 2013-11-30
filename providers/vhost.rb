@@ -98,7 +98,8 @@ action :create do
       :ssl_certificate_key => new_resource.ssl_certificate_key,
       :ssl_listen_port => new_resource.https_port,
       :upstream_ip => new_resource.upstream_ip,
-      :upstream_port => new_resource.upstream_port
+      :upstream_port => new_resource.upstream_port,
+      :upstream_socket => new_resource.upstream_socket
     )
 
     notifies :reload, 'runit_service[nginx]' if ::File.symlink?(site_config)

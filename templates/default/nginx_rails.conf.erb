@@ -2,7 +2,7 @@
 # Local modifications will be overwritten.
 
 upstream <%= @app_name %> {
-  server unix:/opt/pushit/apps/eirenerx-vagrant/shared/sockets/unicorn.sock fail_timeout=0;
+  server unix:<%= @socket_path -%> fail_timeout=0;
 }
 
 server {

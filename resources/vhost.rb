@@ -40,6 +40,7 @@ attribute :https_port, :kind_of => Integer, :default => 443
 
 attribute :upstream_ip, :kind_of => String, :default => '0.0.0.0'
 attribute :upstream_port, :kind_of => Integer, :default => 3000
+attribute :upstream_socket, :kind_of => String, :default => nil
 
 attribute :use_ssl, :kind_of => [TrueClass, FalseClass], :default => false
 

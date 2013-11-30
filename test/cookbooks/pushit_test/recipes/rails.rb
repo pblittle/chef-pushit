@@ -25,10 +25,7 @@ include_recipe 'nodejs::install_from_source'
 
 app = 'rails-example'
 
-pushit_ruby 'ree-1.8.7-2012.02' do
-  environment({
-    'CONFIGURE_OPTS' => '--no-tcmalloc'
-  })
+pushit_ruby '1.9.3-p392' do
   chruby_environment({
     'RUBY_HEAP_MIN_SLOTS' => '500000',
     'RUBY_HEAP_SLOTS_INCREMENT' => '250000',

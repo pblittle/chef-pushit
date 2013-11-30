@@ -93,18 +93,16 @@ class Chef
       end
 
       def create_service_config
-        Chef::Log.debug("Creating service config for #{new_resource.name}")
-
-        upstart_config = Chef::Resource::Template.new(
+        r = Chef::Resource::Template.new(
           ::File.join('', 'etc', 'init', "#{new_resource.name}.conf"),
           run_context
         )
-        upstart_config.source "#{new_resource.framework}.upstart.conf.erb"
-        upstart_config.cookbook 'pushit'
-        upstart_config.user 'root'
-        upstart_config.group 'root'
-        upstart_config.mode '0644'
-        upstart_config.variables(
+        r.source "#{new_resource.framework}.upstart.conf.erb"
+        r.cookbook 'pushit'
+        r.user 'root'
+        r.group 'root'
+        r.mode '0644'
+        r.variables(
           :instance => new_resource.name,
           :env_path => Pushit::Nodejs.bin_path,
           :app_path => app.release_path,
@@ -122,8 +120,8 @@ class Chef
           :group => config['group'],
           :env => escape_env(config['env'])
         )
-        upstart_config.run_action(:create)
-        upstart_config.notifies(
+        r.run_action(:create)
+        r.notifies(
           :restart,
           "service[#{new_resource.name}]",
           :delayed

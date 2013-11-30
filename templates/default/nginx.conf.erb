@@ -20,7 +20,7 @@ http {
   server_tokens off;
 
   access_log off;
-  error_log <%= @log_path %>/access.log crit;
+  error_log <%= @log_path %>/access.log warn;
 
   sendfile on;
 
@@ -37,6 +37,6 @@ http {
   gzip_proxied any;
   gzip_types text/plain text/css application/x-javascript text/xml application/xml text/javascript application/javascript application/json;
 
-  include <%= node['nginx']['dir'] %>/conf.d/*.conf;
-  include <%= node['nginx']['dir'] %>/sites-enabled/*;
+  include <%= @config_path -%>/conf.d/*.conf;
+  include <%= @config_path -%>/sites-enabled/*;
 }

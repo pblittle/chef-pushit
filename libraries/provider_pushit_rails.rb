@@ -47,40 +47,37 @@ class Chef
       private
 
       def create_deploy_revision
-
-        Chef::Log.debug("Creating deploy revision for #{new_resource.name}")
-
-        deploy = Chef::Resource::DeployRevision.new(
+        r = Chef::Resource::DeployRevision.new(
           new_resource.name,
           run_context
         )
-        deploy.action new_resource.deploy_action
-        deploy.deploy_to app.path
+        r.action new_resource.deploy_action
+        r.deploy_to app.path
 
-        deploy.repository config['repo']
-        deploy.revision new_resource.revision
-        deploy.shallow_clone true
-        deploy.ssh_wrapper "#{app.user.ssh_directory}/#{config['deploy_key']}_deploy_wrapper.sh" do
+        r.repository config['repo']
+        r.revision new_resource.revision
+        r.shallow_clone true
+        r.ssh_wrapper "#{app.user.ssh_directory}/#{config['deploy_key']}_deploy_wrapper.sh" do
           only_if do
             config['deploy_key'] && !config['deploy_key'].empty?
           end
         end
 
-        deploy.environment new_resource.environment
+        r.environment new_resource.environment
 
-        deploy.user Etc.getpwnam(config['owner']).name
-        deploy.group Etc.getgrnam(config['group']).name
+        r.user Etc.getpwnam(config['owner']).name
+        r.group Etc.getgrnam(config['group']).name
 
-        deploy.symlink_before_migrate({})
+        r.symlink_before_migrate({})
 
-        deploy.migrate new_resource.migrate
-        deploy.migration_command "#{@bundle_binary} exec ./bin/rake db:migrate"
+        r.migrate new_resource.migrate
+        r.migration_command "#{@bundle_binary} exec ./bin/rake db:migrate"
 
         app_config = config
         ruby_binary = ruby.ruby_binary
         bundle_binary = @bundle_binary
 
-        deploy.before_migrate do
+        r.before_migrate do
 
           Chef::Log.debug("Symlinking files for #{new_resource.name}")
 
@@ -131,7 +128,7 @@ class Chef
         precompile_assets = new_resource.precompile_assets
         precompile_command = new_resource.precompile_command
 
-        deploy.before_restart do
+        r.before_restart do
 
           Chef::Log.debug("Precompiling assets for #{new_resource.name}")
 
@@ -146,49 +143,45 @@ class Chef
           precompile.run_action(:run) if precompile_assets
         end
 
-        deploy.after_restart nil
+        r.after_restart nil
 
-        deploy.run_action(new_resource.deploy_action)
+        r.run_action(new_resource.deploy_action)
       end
 
       def create_ruby_version
-        Chef::Log.debug("Creating .ruby-version for #{new_resource.name}")
-
-        ruby_version = Chef::Resource::Template.new(
+        r = Chef::Resource::Template.new(
           ::File.join(app.shared_path, 'ruby-version'),
           run_context
         )
-        ruby_version.source 'ruby-version.erb'
-        ruby_version.cookbook 'pushit'
-        ruby_version.owner config['owner']
-        ruby_version.group config['group']
-        ruby_version.mode '0644'
-        ruby_version.variables(
+        r.source 'ruby-version.erb'
+        r.cookbook 'pushit'
+        r.owner config['owner']
+        r.group config['group']
+        r.mode '0644'
+        r.variables(
           :ruby_version => config['ruby']
         )
-        ruby_version.run_action(:create)
+        r.run_action(:create)
 
-        if ruby_version.updated_by_last_action?
-          new_resource.updated_by_last_action(true)
-        end
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def create_dotenv
-        Chef::Log.debug("Creating .env for #{new_resource.name}")
-
-        dotenv = Chef::Resource::Template.new(
+        r = Chef::Resource::Template.new(
           ::File.join(app.shared_path, 'env'),
           run_context
         )
-        dotenv.source 'env.erb'
-        dotenv.cookbook 'pushit'
-        dotenv.owner config['owner']
-        dotenv.group config['group']
-        dotenv.mode '0644'
-        dotenv.variables(
+        r.source 'env.erb'
+        r.cookbook 'pushit'
+        r.owner config['owner']
+        r.group config['group']
+        r.mode '0644'
+        r.variables(
           :env => escape_env(config['env'])
         )
-        dotenv.run_action(:create)
+        r.run_action(:create)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def create_database_yaml
@@ -264,21 +257,16 @@ class Chef
       end
 
       def create_unicorn_config
-        Chef::Log.debug("Creating unicorn config for #{new_resource.name}")
-
-        Chef::Log.warn "Pid: " + app.pid_path
-        Chef::Log.warn "Socket: " + app.socket_path
-
-        unicorn_config = Chef::Resource::Template.new(
+        r = Chef::Resource::Template.new(
           ::File.join(app.shared_path, 'config', 'unic0rn.rb'),
           run_context
         )
-        unicorn_config.source 'unicorn.rb.erb'
-        unicorn_config.cookbook 'pushit'
-        unicorn_config.user config['owner']
-        unicorn_config.group config['group']
-        unicorn_config.mode '0644'
-        unicorn_config.variables(
+        r.source 'unicorn.rb.erb'
+        r.cookbook 'pushit'
+        r.user config['owner']
+        r.group config['group']
+        r.mode '0644'
+        r.variables(
           :enable_stats => new_resource.unicorn_enable_stats,
           :listen_port => new_resource.unicorn_listen_port,
           :listen_socket => ::File.join(app.socket_path, 'unicorn.sock'),
@@ -290,50 +278,55 @@ class Chef
           :worker_timeout => new_resource.unicorn_worker_timeout,
           :working_directory => app.current_path
         )
-        unicorn_config.run_action(:create)
+        r.run_action(:create)
 
-        if unicorn_config.updated_by_last_action?
-          new_resource.updated_by_last_action(true)
-        end
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def create_service_config
-        Chef::Log.debug("Creating service config for #{new_resource.name}")
 
-        upstart_config = Chef::Resource::Template.new(
-          ::File.join('', 'etc', 'init', "#{new_resource.name}.conf"),
+        service_config = ::File.join(
+          '', 'etc', 'init', "#{new_resource.name}.conf"
+        )
+
+        r = Chef::Resource::Template.new(
+          service_config,
           run_context
         )
-        upstart_config.source "#{@framework}.upstart.conf.erb"
-        upstart_config.cookbook 'pushit'
-        upstart_config.user config['owner']
-        upstart_config.group config['group']
-        upstart_config.mode '0644'
-        upstart_config.variables(
+        r.source "#{@framework}.upstart.conf.erb"
+        r.cookbook 'pushit'
+        r.user config['owner']
+        r.group config['group']
+        r.mode '0644'
+        r.variables(
           :instance => new_resource.name,
           :env_path => ruby.bin_path,
           :app_path => app.release_path,
-          :log_file => ::File.join(app.release_path, 'log', 'upstart.log'),
+          :log_file => ::File.join(
+            app.release_path, 'log', 'upstart.log'
+          ),
           :pid_file => ::File.join(
             app.pid_path, 'upstart.pid'
           ),
-          :config_file => ::File.join(app.release_path, 'config', 'unic0rn.rb'),
-          :exec => ::File.join(app.release_path, 'bin', 'unicorn'),
+          :config_file => ::File.join(
+            app.release_path, 'config', 'unic0rn.rb'
+          ),
+          :exec => ::File.join(
+            app.release_path, 'bin', 'unicorn'
+          ),
           :user => config['owner'],
           :group => config['group'],
           :env => escape_env(config['env']),
           :environment => escape_env(config['env'])['RACK_ENV']
         )
-        upstart_config.run_action(:create)
-        upstart_config.notifies(
+        r.run_action(:create)
+        r.notifies(
           :restart,
           "service[#{new_resource.name}]",
           :delayed
         )
 
-        if upstart_config.updated_by_last_action?
-          new_resource.updated_by_last_action(true)
-        end
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
     end
   end

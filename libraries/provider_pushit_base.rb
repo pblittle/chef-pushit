@@ -51,21 +51,19 @@ class Chef
       end
 
       def create_user
-        user = Chef::Resource::PushitUser.new(
+        r = Chef::Resource::PushitUser.new(
           pushit_user.username,
           run_context
         )
-        user.name pushit_user.username
-        user.group pushit_user.group
-        user.home pushit_user.home
-        user.password pushit_user.password
-        user.ssh_deploy_keys pushit_user.ssh_deploy_keys
-        user.generate_ssh_keys true
-        user.run_action(:create)
+        r.name pushit_user.username
+        r.group pushit_user.group
+        r.home pushit_user.home
+        r.password pushit_user.password
+        r.ssh_deploy_keys pushit_user.ssh_deploy_keys
+        r.generate_ssh_keys true
+        r.run_action(:create)
 
-        if user.updated_by_last_action?
-          new_resource.updated_by_last_action(true)
-        end
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
     end
   end
