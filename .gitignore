@@ -10,6 +10,7 @@
 *.box
 
 files/*
+vendor/*
 
 # Bundler
 bin/*
