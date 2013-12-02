@@ -2,15 +2,13 @@
   "id": "rails-example",
   "owner": "deploy",
   "group": "deploy",
-  "repo": "https://github.com/openshift/rails-example.git",
+  "repo": "https://github.com/heroku/ruby-rails-unicorn-sample.git",
   "framework": "rails",
   "ruby": "1.9.3-p392",
   "environment": "development",
   "webserver": {
     "type": "nginx",
-    "server_name": "rails-example",
-    "ssl_certificate": "",
-    "ssl_certificate_key": ""
+    "server_name": "rails-example"
   },
   "database": {
     "development": {
