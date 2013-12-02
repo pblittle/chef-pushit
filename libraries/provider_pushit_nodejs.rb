@@ -109,9 +109,7 @@ class Chef
           :log_path => ::File.join(
             app.shared_path, 'log', 'upstart.log'
           ),
-          :pid_path => ::File.join(
-            app.shared_path, 'pids', 'upstart.pid'
-          ),
+          :pid_path => app.upstart_pid,
           :exec => new_resource.node_binary,
           :script_path => ::File.join(
             app.release_path, new_resource.script_file

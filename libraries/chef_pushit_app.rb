@@ -61,12 +61,12 @@ class Chef
         ::File.join(path, 'shared')
       end
 
-      def pid_path
-        ::File.join(path, 'shared', 'pids')
+      def upstart_pid
+        ::File.join(path, 'shared', 'pids', 'upstart.pid')
       end
 
-      def socket_path
-        ::File.join(path, 'shared', 'sockets')
+      def upstream_socket
+        ::File.join(path, 'shared', 'sockets', 'unicorn.sock')
       end
 
       def root

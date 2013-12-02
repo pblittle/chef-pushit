@@ -155,7 +155,7 @@ class Chef
         r.http_port 80
         r.server_name '_'
         r.upstream_port 8080
-        r.upstream_socket app.socket_path
+        r.upstream_socket app.upstream_socket
         r.use_ssl true
         r.run_action(:create)
 
@@ -169,7 +169,7 @@ class Chef
         )
         r.check({
           :name => new_resource.name,
-          :pid_file => ::File.join(app.pid_path, 'upstart.pid'),
+          :pid_file => app.upstart_pid,
           :start_program => "/sbin/start #{new_resource.name}",
           :stop_program => "/sbin/stop #{new_resource.name}",
           :uid => 'root',

@@ -269,8 +269,8 @@ class Chef
         r.variables(
           :enable_stats => new_resource.unicorn_enable_stats,
           :listen_port => new_resource.unicorn_listen_port,
-          :listen_socket => ::File.join(app.socket_path, 'unicorn.sock'),
-          :pid => ::File.join(app.pid_path, 'upstart.pid'),
+          :listen_socket => app.upstream_socket,
+          :upstart_pid => app.upstart_pid,
           :preload_app => new_resource.unicorn_preload_app,
           :stderr_path => ::File.join(app.current_path, 'log', 'stderr.log'),
           :stdout_path => ::File.join(app.current_path, 'log', 'stdout.log'),
@@ -305,9 +305,7 @@ class Chef
           :log_file => ::File.join(
             app.release_path, 'log', 'upstart.log'
           ),
-          :pid_file => ::File.join(
-            app.pid_path, 'upstart.pid'
-          ),
+          :pid_file => app.upstart_pid,
           :config_file => ::File.join(
             app.release_path, 'config', 'unic0rn.rb'
           ),

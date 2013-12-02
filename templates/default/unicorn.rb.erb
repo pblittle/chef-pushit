@@ -7,7 +7,7 @@ listen '<%= @listen_port %>', :tcp_nopush => false
 
 timeout <%= @worker_timeout %>
 
-pid '<%= @pid %>'
+pid '<%= @upstart_pid %>'
 
 stderr_path '<%= @stderr_path %>'
 stdout_path '<%= @stdout_path %>'

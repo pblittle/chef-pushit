@@ -2,7 +2,7 @@
 # Local modifications will be overwritten.
 
 upstream <%= @app_name %> {
-  server unix:<%= @socket_path -%> fail_timeout=0;
+  server unix:<%= @upstream_socket -%> fail_timeout=0;
 }
 
 server {
