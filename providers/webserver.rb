@@ -35,11 +35,11 @@ def whyrun_supported?
 end
 
 def create_monit_check
-  config = Chef::Resource::PushitMonit.new(
+  r = Chef::Resource::PushitMonit.new(
     new_resource.name,
     run_context
   )
-  config.check({
+  r.check({
     :name => new_resource.name,
     :pid_file => new_resource.pid_file,
     :start_program => "/etc/init.d/#{new_resource.name} start",
@@ -47,14 +47,13 @@ def create_monit_check
     :uid => 'root',
     :gid => 'root'
   })
-  config.run_action(:install)
+  r.run_action(:install)
 
-  config.updated_by_last_action? &&
-    new_resource.updated_by_last_action(true)
+  new_resource.updated_by_last_action(true) if r.updated_by_last_action?
 end
 
 def create_webserver_config
-  template 'nginx.conf' do
+  r = template 'nginx.conf' do
     path "#{new_resource.config_path}/nginx.conf"
     cookbook new_resource.config_cookbook
     source new_resource.config_source
@@ -69,6 +68,8 @@ def create_webserver_config
       :config_path => new_resource.config_path
     })
   end
+
+  new_resource.updated_by_last_action(true) if r.updated_by_last_action?
 end
 
 action :create do
