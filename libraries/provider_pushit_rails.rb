@@ -31,7 +31,6 @@ class Chef
         @run_context = run_context
 
         @run_context.include_recipe 'mysql::ruby'
-        @run_context.include_recipe 'postgresql::ruby'
 
         @framework = 'rails'
         @bundle_binary = ruby.gem_path('bundle')
