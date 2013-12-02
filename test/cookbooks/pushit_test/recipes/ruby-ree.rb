@@ -26,10 +26,4 @@ pushit_ruby 'ree-1.8.7-2012.02' do
   environment({
     'CONFIGURE_OPTS' => '--no-tcmalloc'
   })
-  chruby_environment({
-    'RUBY_HEAP_MIN_SLOTS' => '500000',
-    'RUBY_HEAP_SLOTS_INCREMENT' => '1',
-    'RUBY_HEAP_SLOTS_GROWTH_FACTOR' => '1',
-    'RUBY_GC_MALLOC_LIMIT' => '60000000'
-  })
 end

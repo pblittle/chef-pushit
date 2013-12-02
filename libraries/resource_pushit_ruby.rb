@@ -80,15 +80,6 @@ class Chef
           :kind_of => [String]
         )
       end
-
-      def chruby_environment(arg = nil)
-        set_or_return(
-          :chruby_environment,
-          arg,
-          :kind_of => [Hash],
-          :default => {}
-        )
-      end
     end
   end
 end

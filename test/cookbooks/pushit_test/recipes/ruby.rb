@@ -28,7 +28,4 @@ pushit_ruby 'ree-1.8.7-2012.02' do
   environment({
     'CONFIGURE_OPTS' => '--no-tcmalloc'
   })
-  chruby_environment({
-    'RUBY_GC_MALLOC_LIMIT' => '50000000'
-  })
 end
