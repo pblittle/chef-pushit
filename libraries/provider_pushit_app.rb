@@ -49,12 +49,12 @@ class Chef
           create_ruby_version
           create_database_yaml
           create_unicorn_config
+          create_vhost_config
         end
 
         create_writable_directories
         create_deploy_revision
         create_service_config
-        create_vhost_config
         create_monit_check
         enable_and_start_service
 
