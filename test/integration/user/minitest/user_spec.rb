@@ -54,6 +54,24 @@ describe 'pushit_test::user' do
         ::File.join(pushit_home, '.ssh', 'id_rsa_rails-example_deploy_wrapper.sh')
       ).include?('id_rsa_rails-example')
     end
+
+    it 'has created a private rsa key' do
+      assert File.read(
+        ::File.join(pushit_home, '.ssh', 'id_rsa')
+      ).include?('-----BEGIN RSA PRIVATE KEY-----')
+    end
+
+    it 'has created a public rsa key' do
+      assert File.read(
+        ::File.join(pushit_home, '.ssh', 'id_rsa.pub')
+      ).include?('ssh-rsa')
+    end
+
+    it 'has created authorized_users' do
+      assert File.read(
+        ::File.join(pushit_home, '.ssh', 'authorized_keys')
+      ).include?('ssh-rsa == foo')
+    end
   end
 
   describe 'custom pushit user' do
@@ -105,22 +123,17 @@ describe 'pushit_test::user' do
         ::File.join(pushit_home, '.ssh', 'id_rsa_rails-example_deploy_wrapper.sh')
       ).include?('id_rsa_rails-example')
     end
-  end
 
-  describe 'default ssh key location' do
-
-    let(:pushit_home) { '/home/bar' }
-
-    it 'has created a public key' do
-      assert ::File.file?(
-        ::File.join(pushit_home, '.ssh', 'id_rsa.pub')
-      )
+    it 'has created a private dsa key' do
+      assert File.read(
+        ::File.join(pushit_home, '.ssh', 'id_dsa')
+      ).include?('-----BEGIN DSA PRIVATE KEY-----')
     end
 
-    it 'has created a private key' do
-      assert ::File.file?(
-        ::File.join(pushit_home, '.ssh', 'id_rsa')
-      )
+    it 'has created a public dsa key' do
+      assert File.read(
+        ::File.join(pushit_home, '.ssh', 'id_dsa.pub')
+      ).include?('ssh-dsa')
     end
   end
 end

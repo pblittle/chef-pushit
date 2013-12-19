@@ -11,20 +11,24 @@ long_description IO.read(
     'README.md'
   )
 )
-version '0.2.6'
+version '0.2.85'
 
 supports 'debian'
 supports 'ubuntu'
 
+depends 'campfire-deployment'
+depends 'certificate'
 depends 'git'
 depends 'logrotate'
 depends 'monit'
 depends 'nodejs'
 depends 'database'
+depends 'newrelic-deployment'
 depends 'nginx'
 depends 'ruby_build'
 depends 'ssh'
 depends 'ssh_known_hosts'
+depends 'sudo'
 
 recommends 'apt'
 recommends 'build-essential'

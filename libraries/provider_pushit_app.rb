@@ -50,13 +50,19 @@ class Chef
           create_database_yaml
           create_unicorn_config
           create_vhost_config
+          # create_ssl_cert
         end
 
         create_writable_directories
+
         create_deploy_revision
+
         create_service_config
         create_monit_check
         enable_and_start_service
+
+        create_newrelic_notification
+        create_campfire_notification
 
         new_resource.updated_by_last_action(true)
       end
@@ -162,6 +168,23 @@ class Chef
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
+      def create_ssl_cert
+        r = Chef::Resource::CertificateManage.new(
+          'eirenerx',
+          run_context
+        )
+        r.owner Etc.getpwnam(app.config['owner']).uid
+        r.group Etc.getpwnam(app.config['group']).gid
+        r.nginx_cert true
+        r.cert_path Pushit::Certs.certs_path
+        r.cert_file "#{new_resource.name}.pem"
+        r.key_file "#{new_resource.name}.key"
+        r.chain_file "#{new_resource.name}-bundle.crt"
+        r.run_action(:create)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      end
+
       def create_monit_check
         r = Chef::Resource::PushitMonit.new(
           new_resource.name,
@@ -178,6 +201,26 @@ class Chef
         r.run_action(:install)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      end
+
+      def create_newrelic_notification
+        r = Chef::Resource::NewrelicDeployment.new(
+          app.config['env']['NEW_RELIC_APP_NAME'],
+          run_context
+        )
+        r.api_key app.config['env']['NEW_RELIC_API_KEY']
+        r.revision app.version
+        r.user app.config['owner']
+        r.run_action(:create)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      end
+
+      def create_campfire_notification
+        r = Chef::Resource::CampfireDeployment.new(
+          app.config['env']['NEW_RELIC_APP_NAME'],
+          run_context
+        )
       end
     end
   end

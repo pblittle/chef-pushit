@@ -42,15 +42,15 @@ class Chef
       def action_create
         create_group
         create_user
+        create_ssh_directory
         create_ssh_keys
         create_deploy_keys
-      end
-
-      def action_create_ssh_keys
-        create_ssh_keys
+        create_authorized_keys
+        create_sudoers_file
       end
 
       def action_create_deploy_keys
+        create_ssh_directory
         create_deploy_keys
       end
 
@@ -60,64 +60,126 @@ class Chef
         @pushit_user ||= Pushit::User.new(new_resource.to_hash)
       end
 
-      def create_group
-        group = Chef::Resource::Group.new(
-          pushit_user.group,
-          run_context
-        )
-        group.group_name pushit_user.group
-        group.append true
-        group.run_action(:create)
-
-        if group.updated_by_last_action?
-          new_resource.updated_by_last_action(true)
-        end
-      end
-
       def create_user
-        user = Chef::Resource::User.new(
+        r = Chef::Resource::User.new(
           pushit_user.username,
           run_context
         )
-        user.shell '/bin/bash'
-        user.password pushit_user.password
-        user.home pushit_user.home
-        user.supports :manage_home => false
-        user.system false
-        user.gid Etc.getgrnam(pushit_user.group).gid
-        user.run_action(:create)
+        r.shell '/bin/bash'
+        r.password pushit_user.password
+        r.home pushit_user.home
+        r.supports :manage_home => false
+        r.system false
+        r.gid Etc.getgrnam(pushit_user.group).gid
+        r.run_action(:create)
 
-        if user.updated_by_last_action?
-          new_resource.updated_by_last_action(true)
-        end
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      end
+
+      def create_group
+        r = Chef::Resource::Group.new(
+          pushit_user.group,
+          run_context
+        )
+        r.group_name pushit_user.group
+        r.append true
+        r.run_action(:create)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def create_ssh_directory
-        dir = Chef::Resource::Directory.new(
+        r = Chef::Resource::Directory.new(
           pushit_user.ssh_directory,
           run_context
         )
-        dir.owner Etc.getpwnam(pushit_user.username).uid
-        dir.group Etc.getgrnam(pushit_user.group).gid
-        dir.mode '0700'
-        dir.recursive true
-        dir.run_action(:create)
+        r.owner Etc.getpwnam(pushit_user.username).uid
+        r.group Etc.getgrnam(pushit_user.group).gid
+        r.mode '0700'
+        r.recursive true
+        r.run_action(:create)
 
-        if dir.updated_by_last_action?
-          new_resource.updated_by_last_action(true)
-        end
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def create_ssh_keys
-        create_ssh_directory
+        return unless pushit_user.manage_ssh_keys?
 
-        new_resource.generate_ssh_keys &&
-          pushit_user.create_ssh_keys
+        create_ssh_private_key
+        create_ssh_public_key
+      end
+
+      def create_ssh_private_key
+        r = Chef::Resource::Template.new(
+          pushit_user.ssh_private_key_path,
+          run_context
+        )
+        r.source 'private_key.erb'
+        r.cookbook 'pushit'
+        r.owner Etc.getpwnam(pushit_user.username).uid
+        r.group Etc.getgrnam(pushit_user.group).gid
+        r.mode '0600'
+        r.variables(
+          :private_key => pushit_user.ssh_private_key
+        )
+        r.run_action(:create)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      end
+
+      def create_ssh_public_key
+        r = Chef::Resource::Template.new(
+          pushit_user.ssh_public_key_path,
+          run_context
+        )
+        r.source 'public_key.erb'
+        r.cookbook 'pushit'
+        r.owner Etc.getpwnam(pushit_user.username).uid
+        r.group Etc.getgrnam(pushit_user.group).gid
+        r.mode '0600'
+        r.variables(
+          :public_key => pushit_user.ssh_public_key
+        )
+        r.run_action(:create)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      end
+
+      def create_authorized_keys
+        r = Chef::Resource::Template.new(
+          pushit_user.authorized_keys_path,
+          run_context
+        )
+        r.source 'authorized_keys.erb'
+        r.cookbook 'pushit'
+        r.owner Etc.getpwnam(pushit_user.username).uid
+        r.group Etc.getgrnam(pushit_user.group).gid
+        r.mode '0600'
+        r.variables(
+          :ssh_keys => pushit_user.ssh_keys
+        )
+        r.run_action(:create)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      end
+
+      def create_sudoers_file
+        r = Chef::Resource::Sudo.new(
+          pushit_user.username,
+          run_context
+        )
+        r.user "%#{pushit_user.username}"
+        r.group pushit_user.group
+        r.commands [
+          '/usr/bin/chef-client'
+        ]
+        r.nopasswd true
+        r.run_action(:install)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def create_deploy_keys
-        create_ssh_directory
-
         pushit_user.ssh_deploy_keys.each do |key|
           create_deploy_key(key)
           create_deploy_wrapper(key)
@@ -126,44 +188,40 @@ class Chef
       end
 
       def create_deploy_key(key)
-        deploy_key = Chef::Resource::Template.new(
+        r = Chef::Resource::Template.new(
           ::File.join(pushit_user.ssh_directory, key['name']),
           run_context
         )
-        deploy_key.source 'ssh_deploy_key.erb'
-        deploy_key.cookbook 'pushit'
-        deploy_key.owner pushit_user.username
-        deploy_key.group Etc.getgrnam(pushit_user.group).gid
-        deploy_key.mode '0600'
-        deploy_key.variables({
-            :ssh_key_data => key['data']
+        r.source 'ssh_deploy_key.erb'
+        r.cookbook 'pushit'
+        r.owner pushit_user.username
+        r.group Etc.getgrnam(pushit_user.group).gid
+        r.mode '0600'
+        r.variables({
+          :ssh_key_data => key['data']
         })
-        deploy_key.run_action(:create)
+        r.run_action(:create)
 
-        if deploy_key.updated_by_last_action?
-          new_resource.updated_by_last_action(true)
-        end
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def create_deploy_wrapper(key)
-        wrapper = Chef::Resource::Template.new(
+        r = Chef::Resource::Template.new(
           ::File.join(pushit_user.ssh_directory, "#{key['name']}_deploy_wrapper.sh"),
           run_context
         )
-        wrapper.source 'ssh_wrapper.sh.erb'
-        wrapper.cookbook 'pushit'
-        wrapper.owner pushit_user.username
-        wrapper.group Etc.getgrnam(pushit_user.group).gid
-        wrapper.mode '0755'
-        wrapper.variables({
-            :ssh_key_dir => pushit_user.ssh_directory,
-            :ssh_key_name => key['name']
+        r.source 'ssh_wrapper.sh.erb'
+        r.cookbook 'pushit'
+        r.owner pushit_user.username
+        r.group Etc.getgrnam(pushit_user.group).gid
+        r.mode '0755'
+        r.variables({
+          :ssh_key_dir => pushit_user.ssh_directory,
+          :ssh_key_name => key['name']
         })
-        wrapper.run_action(:create)
+        r.run_action(:create)
 
-        if wrapper.updated_by_last_action?
-          new_resource.updated_by_last_action(true)
-        end
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def create_ssh_config(key)
@@ -177,8 +235,8 @@ class Chef
 
         ssh_config host_key_alias do
           options 'User' => 'git',
-          'HostName' => host_name,
-          'IdentityFile' => identity_file
+            'HostName' => host_name,
+            'IdentityFile' => identity_file
           user username
           path config_file
         end

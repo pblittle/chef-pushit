@@ -9,12 +9,20 @@ start on (local-filesystems and runlevel [2345])
 stop on runlevel [06]
 
 respawn
+console log
+
+setuid <%= @user %>
+setgid <%= @group %>
+
+chdir <%= @app_path %>
 
 <% @env.each do |key, value| -%>
 env <%= key %>="<%= value %>"
 <% end -%>
 
-chdir <%= @app_path %>
+pre-start exec <%= @exec %> <%= @script_path %> <%= @environment %> >> <%= @log_path %> 2>&1
+
+post-stop exec kill `cat <%= @pid_file %>`
 exec start-stop-daemon \
   --start \
   --chdir <%= @app_path %> \

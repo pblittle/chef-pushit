@@ -22,12 +22,14 @@
 
 node.default[:build_essential][:compiletime] = true
 
+node.default['nginx']['init_style'] = 'upstart'
 node.default['nginx']['install_method'] = 'source'
 node.default['nginx']['default_site_enabled'] = false
 node.default['nginx']['dir'] = '/opt/pushit/nginx'
 node.default['nginx']['log_dir'] = '/opt/pushit/nginx/log'
 node.default['nginx']['binary'] = '/opt/pushit/nginx/sbin/nginx'
 node.default['nginx']['version'] = '1.4.4'
+node.default['nginx']['source']['version'] = '1.4.4'
 node.default['nginx']['source']['modules'] = [
   'nginx::http_gzip_static_module',
   'nginx::http_ssl_module',
@@ -35,6 +37,8 @@ node.default['nginx']['source']['modules'] = [
 ]
 node.default['nginx']['gzip_static'] = 'on'
 
-node.default[:nodejs][:version] = '0.10.22'
-node.default[:nodejs][:npm] = '1.3.15'
+node.default[:nodejs][:version] = '0.10.23'
+node.default[:nodejs][:npm] = '1.3.17'
 # node.default[:nodejs][:dir] = Pushit::Nodejs.prefix_path
+
+node.default['authorization']['sudo']['include_sudoers_d'] = true

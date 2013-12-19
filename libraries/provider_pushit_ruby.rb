@@ -97,9 +97,6 @@ class Chef
         installer.command 'make install'
         installer.cwd "#{Chef::Config[:file_cache_path]}/chruby"
         installer.user 'root'
-        # installer.environment({
-        #   'share_path' => '/opt/pushit/chruby'
-        # })
         installer.run_action(:run)
 
         if installer.updated_by_last_action?

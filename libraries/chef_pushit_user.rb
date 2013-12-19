@@ -26,71 +26,75 @@ class Chef
   module Pushit
     class User
 
-      attr_accessor :username, :group, :home, :password
-      attr_accessor :ssh_deploy_keys, :ssh_directory
+      attr_accessor :ssh_private_key, :ssh_public_key
+      attr_accessor :ssh_deploy_keys
 
       def initialize(args = {})
-
         args = { username: args } if args.is_a?(String)
+        @args = args
 
-        @username = args[:username] || default_username
-        @group = args[:group] || username
-        @home = args[:home] || default_home
-
-        @ssh_directory = nil
-
-        @password = password
-
-        @ssh_public_key = args[:ssh_public_key] || ssh_public_key
-        @ssh_private_key = args[:ssh_private_key] || ssh_private_key
+        @ssh_private_key = ssh_private_key
+        @ssh_public_key = ssh_public_key
         @ssh_deploy_keys = ssh_deploy_keys
 
         @config_data = config_data
       end
 
-      def default_username
-        Pushit.pushit_user
+      def username
+        @args[:username] || Pushit.pushit_user
       end
 
-      def default_home
-        Pushit.pushit_path
+      def group
+        @args[:group] || Pushit.pushit_group
+      end
+
+      def home
+        @args[:home] || Pushit.pushit_path
       end
 
       def password
-        config_data['password'] || nil
+        config_data['password']
+      end
+
+      def manage_ssh_keys?
+        (ssh_private_key && !ssh_private_key.empty?) &&
+          (ssh_public_key && !ssh_public_key.empty?)
       end
 
       def ssh_directory
         File.join(home, '.ssh')
       end
 
-      def create_ssh_keys
-        # ssh_directory_exists?
-
-        unless ::File.exists?(ssh_public_key) &&
-            ::File.exists?(ssh_private_key)
-          `ssh-keygen -b 2048 -t rsa -f #{ssh_private_key} -P ''`
-        end
-      end
-
-      def ssh_directory_exists?
-        unless File.directory?(ssh_directory)
-          FileUtils.mkdir_p(
-            ssh_directory, :mode => 0700
-          )
-        end
+      def ssh_key_type
+        ssh_private_key.include?('BEGIN RSA PRIVATE KEY') ? 'rsa' : 'dsa'
       end
 
       def ssh_private_key
-        ::File.join(ssh_directory, 'id_rsa')
+        config_data['ssh_private_key'] || @args[:ssh_private_key]
       end
 
       def ssh_public_key
-        "#{ssh_private_key}.pub"
+        config_data['ssh_public_key'] || @args[:ssh_public_key]
+      end
+
+      def ssh_keys
+        config_data['ssh_keys'] || []
       end
 
       def ssh_deploy_keys
         config_data['ssh_deploy_keys'] || []
+      end
+
+      def ssh_private_key_path
+        ::File.join(ssh_directory, "id_#{ssh_key_type}")
+      end
+
+      def ssh_public_key_path
+        "#{ssh_private_key_path}.pub"
+      end
+
+      def authorized_keys_path
+        ::File.join(ssh_directory, 'authorized_keys')
       end
 
       private

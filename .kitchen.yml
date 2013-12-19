@@ -27,76 +27,76 @@ platforms:
         lower_case_table_names: 1
 
 suites:
-- name: user
-  run_list:
-    - recipe[minitest-handler]
-    - recipe[pushit_test::user]
-  data_bags_path:
-    'test/data_bags'
-  encrypted_data_bag_secret_key_path:
-    'test/encrypted_data_bag_secret'
+# - name: user
+#   run_list:
+#     - recipe[minitest-handler]
+#     - recipe[pushit_test::user]
+#   data_bags_path:
+#     'test/data_bags'
+#   encrypted_data_bag_secret_key_path:
+#     'test/encrypted_data_bag_secret'
 
-- name: webserver
-  run_list:
-    - recipe[minitest-handler]
-    - recipe[pushit_test::webserver]
-  data_bags_path:
-    'test/data_bags'
-  attributes:
-    nginx:
-      default_site_enabled: false
-      dir: '/opt/pushit/nginx'
-      log_dir: '/opt/pushit/nginx/log'
-      pid: '/opt/pushit/nginx/run/nginx.pid'
-      install_method: 'source'
-      source:
-        version: '1.4.3'
-        conf_path: '/opt/pushit/nginx/nginx.conf'
-        sbin_path: '/opt/pushit/nginx/sbin/nginx'
+# - name: webserver
+#   run_list:
+#     - recipe[minitest-handler]
+#     - recipe[pushit_test::webserver]
+#   data_bags_path:
+#     'test/data_bags'
+#   attributes:
+#     nginx:
+#       default_site_enabled: false
+#       dir: '/opt/pushit/nginx'
+#       log_dir: '/opt/pushit/nginx/log'
+#       pid: '/opt/pushit/nginx/run/nginx.pid'
+#       install_method: 'source'
+#       source:
+#         version: '1.4.5'
+#         conf_path: '/opt/pushit/nginx/nginx.conf'
+#         sbin_path: '/opt/pushit/nginx/sbin/nginx'
 
-- name: database
-  run_list:
-    - recipe[minitest-handler]
-    - recipe[pushit_test::database]
-  data_bags_path:
-    'test/data_bags'
+# - name: database
+#   run_list:
+#     - recipe[minitest-handler]
+#     - recipe[pushit_test::database]
+#   data_bags_path:
+#     'test/data_bags'
 
-- name: monit
-  run_list:
-    - recipe[minitest-handler]
-    - recipe[pushit_test::monit]
-  data_bags_path:
-    'test/data_bags'
+# - name: monit
+#   run_list:
+#     - recipe[minitest-handler]
+#     - recipe[pushit_test::monit]
+#   data_bags_path:
+#     'test/data_bags'
 
-- name: ssl
-  run_list:
-    - recipe[minitest-handler]
-    - recipe[pushit_test::ssl]
-  data_bags_path:
-    'test/data_bags'
+# - name: ssl
+#   run_list:
+#     - recipe[minitest-handler]
+#     - recipe[pushit_test::ssl]
+#   data_bags_path:
+#     'test/data_bags'
 
-- name: nodejs
-  run_list:
-    - recipe[minitest-handler]
-    - recipe[pushit_test::nodejs]
-  data_bags_path:
-    'test/data_bags'
-  encrypted_data_bag_secret_key_path:
-    'test/encrypted_data_bag_secret'
+# - name: nodejs
+#   run_list:
+#     - recipe[minitest-handler]
+#     - recipe[pushit_test::nodejs]
+#   data_bags_path:
+#     'test/data_bags'
+#   encrypted_data_bag_secret_key_path:
+#     'test/encrypted_data_bag_secret'
 
-- name: ruby
-  run_list:
-    - recipe[minitest-handler]
-    - recipe[pushit_test::ruby]
-  data_bags_path:
-    'test/data_bags'
+# - name: ruby
+#   run_list:
+#     - recipe[minitest-handler]
+#     - recipe[pushit_test::ruby]
+#   data_bags_path:
+#     'test/data_bags'
 
-- name: ruby-ree
-  run_list:
-    - recipe[minitest-handler]
-    - recipe[pushit_test::ruby-ree]
-  data_bags_path:
-    'test/data_bags'
+# - name: ruby-ree
+#   run_list:
+#     - recipe[minitest-handler]
+#     - recipe[pushit_test::ruby-ree]
+#   data_bags_path:
+#     'test/data_bags'
 
 - name: rails
   run_list:

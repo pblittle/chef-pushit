@@ -26,6 +26,7 @@ def load_current_resource
   )
 
   run_context.include_recipe 'database::mysql'
+  run_context.include_recipe 'database::postgresql'
 
   @current_resource
 end

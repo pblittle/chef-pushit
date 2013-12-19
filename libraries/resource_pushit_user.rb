@@ -30,27 +30,18 @@ class Chef
         @provider = Chef::Provider::PushitUser
         @action = :create
         @allowed_actions.push :create, :create_deploy_keys, :create_ssh_keys
-
-        @username = name
-        @group = nil
-        @home = nil
-        @password = nil
-        @ssh_public_key = nil
-        @ssh_private_key = nil
-        @ssh_deploy_keys = []
-
-        @generate_ssh_keys = nil
       end
 
       def to_hash
         {
-          :username => @username,
-          :group => @group,
-          :home => @home,
-          :password => @password,
-          :ssh_public_key => @ssh_public_key,
-          :ssh_private_key => @ssh_private_key,
-          :ssh_deploy_keys => @ssh_deploy_keys
+          :username => username,
+          :group => group,
+          :home => home,
+          :password => password,
+          :ssh_private_key => ssh_private_key,
+          :ssh_public_key => ssh_public_key,
+          :ssh_keys => ssh_keys,
+          :ssh_deploy_keys => ssh_deploy_keys
         }
       end
 
@@ -59,7 +50,8 @@ class Chef
           :username,
           arg,
           :kind_of => [String],
-          :regex => /^[a-z0-9\-_]+$/
+          :regex => /^[a-z0-9\-_]+$/,
+          :name_attribute => true
         )
       end
 
@@ -88,6 +80,14 @@ class Chef
         )
       end
 
+      def ssh_private_key(arg = nil)
+        set_or_return(
+          :ssh_private_key,
+          arg,
+          :kind_of => [String]
+        )
+      end
+
       def ssh_public_key(arg = nil)
         set_or_return(
           :ssh_public_key,
@@ -96,11 +96,12 @@ class Chef
         )
       end
 
-      def ssh_private_key(arg = nil)
+      def ssh_keys(arg = nil)
         set_or_return(
-          :ssh_private_key,
+          :ssh_keys,
           arg,
-          :kind_of => [String]
+          :kind_of => [Array],
+          :default => []
         )
       end
 
@@ -112,11 +113,11 @@ class Chef
         )
       end
 
-      def generate_ssh_keys(arg = nil)
+      def sudo_commands(arg = nil)
         set_or_return(
-          :generate_ssh_keys,
+          :sudo_commands,
           arg,
-          :kind_of => [TrueClass, FalseClass]
+          :kind_of => [Array]
         )
       end
     end

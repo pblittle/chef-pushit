@@ -46,17 +46,17 @@ server {
 
   location ~ ^/(images|javascripts|stylesheets)/ {
     gzip_static on;
-    expires max;
-    add_header Cache-Control public;
+    expires 3600;
+    add_header Cache-Control "must-revalidate, proxy-revalidate";
   }
 
   location = /favicon.ico {
+    gzip_static on;
     expires    max;
-    add_header Cache-Control public;
   }
 
   location ~ \.(php)$ {
-    return 405;
+    deny all;
   }
 
   error_page 500 502 503 504 /500.html;

@@ -40,32 +40,30 @@ class Chef
       private
 
       def create_deploy_revision
-        Chef::Log.debug("Creating deploy revision for #{new_resource.name}")
-
-        deploy = Chef::Resource::DeployRevision.new(
+        r = Chef::Resource::DeployRevision.new(
           new_resource.name,
           run_context
         )
-        deploy.action new_resource.deploy_action
-        deploy.deploy_to app.path
+        r.action new_resource.deploy_action
+        r.deploy_to app.path
 
-        deploy.repository config['repo']
-        deploy.revision new_resource.revision
-        deploy.shallow_clone true
-        deploy.ssh_wrapper "#{app.user.ssh_directory}/#{config['deploy_key']}_deploy_wrapper.sh" do
+        r.repository config['repo']
+        r.revision new_resource.revision
+        r.shallow_clone true
+        r.ssh_wrapper "#{app.user.ssh_directory}/#{config['deploy_key']}_deploy_wrapper.sh" do
           only_if do
             config['deploy_key'] && !config['deploy_key'].empty?
           end
         end
 
-        deploy.environment config['env']
-        deploy.user Etc.getpwnam(config['owner']).name
-        deploy.group Etc.getgrnam(config['group']).name
+        r.environment config['env']
+        r.user Etc.getpwnam(config['owner']).name
+        r.group Etc.getgrnam(config['group']).name
 
-        deploy.symlink_before_migrate({})
-        deploy.create_dirs_before_symlink([])
+        r.symlink_before_migrate({})
+        r.create_dirs_before_symlink([])
 
-        deploy.purge_before_symlink(
+        r.purge_before_symlink(
           %w{ log tmp/pids }
         )
 
@@ -73,9 +71,7 @@ class Chef
           { 'log' => 'log', 'pids' => 'pids' }
         )
 
-        deploy.before_migrate do
-          Chef::Log.debug("Installing NPM dependencies for #{new_resource.name}")
-
+        r.before_migrate do
           execute "Install #{new_resource.name} with dependencies" do
             command "#{Pushit::Nodejs.npm_binary} install"
             cwd release_path
@@ -85,11 +81,13 @@ class Chef
           end
         end
 
-        deploy.before_symlink nil
-        deploy.before_restart nil
-        deploy.after_restart nil
+        r.before_symlink nil
+        r.before_restart nil
+        r.after_restart nil
 
-        deploy.run_action(new_resource.deploy_action)
+        r.run_action(new_resource.deploy_action)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def create_service_config
@@ -124,6 +122,8 @@ class Chef
           "service[#{new_resource.name}]",
           :delayed
         )
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
     end
   end

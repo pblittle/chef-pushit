@@ -27,9 +27,6 @@ pushit_user 'deploy'
 pushit_user 'foo' do
   group 'foo'
   home '/home/foo'
-end
-
-pushit_user 'bar' do
-  home '/home/bar'
-  generate_ssh_keys true
+  ssh_private_key '-----BEGIN DSA PRIVATE KEY-----'
+  ssh_public_key 'ssh-dsa'
 end

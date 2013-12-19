@@ -1,10 +1,16 @@
 {
-  "id": "deploy",
-  "comment": "Application Deployer",
-  "ssh_deploy_keys": [
-    {
-      "name": "id_rsa_rails-example",
-      "data": "-----BEGIN RSA PRIVATE KEY-----\n=rails-example-deploy-key\n-----END RSA PRIVATE KEY-----"
-    }
-  ]
+    "id": "deploy",
+    "comment": "Application Deployer",
+    "ssh_private_key": "-----BEGIN RSA PRIVATE KEY-----",
+    "ssh_public_key": "ssh-rsa",
+    "ssh_deploy_keys": [
+        {
+            "name": "id_rsa_rails-example",
+            "data": "-----BEGIN RSA PRIVATE KEY-----\n=rails-example-deploy-key\n-----END RSA PRIVATE KEY-----"
+        }
+    ],
+    "ssh_keys": [
+        "ssh-rsa == foo",
+        "ssh-rsa == bar"
+    ]
 }

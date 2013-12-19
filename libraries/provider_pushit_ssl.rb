@@ -38,8 +38,14 @@ class Chef
       end
 
       def action_install
-        create_certs_directory
-        create_certs
+        certificate_manage app.name do
+          cert_path "/etc/postfix/ssl"
+          owner Etc.getpwnam(app.config['owner']).uid
+          group Etc.getpwnam(app.config['group']).gid
+        end
+
+        # create_certs_directory
+        # create_certs
       end
 
       private

@@ -32,3 +32,6 @@ attribute :config_source, :kind_of => String, :default => 'nginx.conf.erb'
 
 attribute :pid_file, :kind_of => String, :default => node['nginx']['pid']
 attribute :log_path, :kind_of => String, :default => node['nginx']['log_dir']
+
+attribute :user, :kind_of => String, :default => node['nginx']['user']
+attribute :group, :kind_of => String, :default => node['nginx']['group']

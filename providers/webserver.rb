@@ -61,8 +61,8 @@ def create_webserver_config
     group 'root'
     mode '0644'
     variables({
-      :user => 'deploy',
-      :group => 'deploy',
+      :user => new_resource.user,
+      :group => new_resource.group,
       :log_path => new_resource.log_path,
       :pid_file => new_resource.pid_file,
       :config_path => new_resource.config_path
@@ -74,5 +74,5 @@ end
 
 action :create do
   create_webserver_config
-  create_monit_check
+  # create_monit_check
 end

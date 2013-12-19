@@ -59,8 +59,11 @@ class Chef
         r.group pushit_user.group
         r.home pushit_user.home
         r.password pushit_user.password
+        r.ssh_private_key pushit_user.ssh_private_key
+        r.ssh_public_key pushit_user.ssh_public_key
+        r.ssh_keys pushit_user.ssh_keys
         r.ssh_deploy_keys pushit_user.ssh_deploy_keys
-        r.generate_ssh_keys true
+        # r.generate_ssh_keys true
         r.run_action(:create)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?

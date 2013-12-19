@@ -72,7 +72,7 @@ class Chef
         r.symlink_before_migrate({})
 
         r.migrate new_resource.migrate
-        r.migration_command "#{@bundle_binary} exec ./bin/rake db:migrate"
+        r.migration_command "#{@bundle_binary} exec ./bin/rake db:migrate --trace"
 
         app_config = config
         ruby_binary = ruby.ruby_binary
@@ -100,6 +100,10 @@ class Chef
 
           link "#{release_path}/config/unic0rn.rb" do
             to "#{new_resource.shared_path}/config/unic0rn.rb"
+          end
+
+          link "#{release_path}/db/certs" do
+            to "#{new_resource.shared_path}/certs"
           end
 
           link "#{release_path}/vendor/bundle" do
@@ -130,9 +134,6 @@ class Chef
         precompile_command = new_resource.precompile_command
 
         r.before_restart do
-
-          Chef::Log.debug("Precompiling assets for #{new_resource.name}")
-
           precompile = Chef::Resource::Execute.new(
             'Precompile assets',
             run_context
@@ -147,6 +148,8 @@ class Chef
         r.after_restart nil
 
         r.run_action(new_resource.deploy_action)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def create_ruby_version
@@ -186,8 +189,6 @@ class Chef
       end
 
       def create_database_yaml
-        Chef::Log.debug("Creating database.yml for #{new_resource.name}")
-
         environment = new_resource.environment
 
         if environment && config['database'].key?(environment)
@@ -196,16 +197,16 @@ class Chef
           database = config['database']
         end
 
-        db_yaml = Chef::Resource::Template.new(
+        r = Chef::Resource::Template.new(
           ::File.join(app.shared_path, 'config', 'database.yml'),
           run_context
         )
-        db_yaml.source 'database.yml.erb'
-        db_yaml.cookbook 'pushit'
-        db_yaml.owner config['owner']
-        db_yaml.group config['group']
-        db_yaml.mode '0644'
-        db_yaml.variables(
+        r.source 'database.yml.erb'
+        r.cookbook 'pushit'
+        r.owner config['owner']
+        r.group config['group']
+        r.mode '0644'
+        r.variables(
           :database => {
             :adapter => database['adapter'],
             :database => database['name'],
@@ -218,7 +219,7 @@ class Chef
           },
           :environment => new_resource.environment
         )
-        db_yaml.run_action(:create)
+        r.run_action(:create)
 
         fs_yaml = Chef::Resource::Template.new(
           ::File.join(app.shared_path, 'config', 'filestore.yml'),
