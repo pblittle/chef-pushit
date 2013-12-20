@@ -26,8 +26,6 @@ class Chef
   module Pushit
     class App
 
-      DATA_BAG = 'pushit_apps'.freeze
-
       def initialize(name)
         @app = Pushit.app_data_bag(name)
       end
@@ -37,7 +35,7 @@ class Chef
       end
 
       def config
-        data_bag_item = Chef::DataBagItem.load(DATA_BAG, @app['id'])
+        data_bag_item = Chef::DataBagItem.load(PUSHIT_DATA_BAG, @app['id'])
         data_bag_item || {}
       end
 
