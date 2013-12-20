@@ -79,7 +79,7 @@ class Chef
           run_context
         )
         r.repository 'https://github.com/postmodern/chruby.git'
-        r.reference 'v0.3.7'
+        r.reference 'v0.3.8'
         r.user 'root'
         r.group 'root'
         r.run_action(:sync)
