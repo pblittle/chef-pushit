@@ -74,34 +74,30 @@ class Chef
       def download_chruby
         ssh_known_hosts_entry 'github.com'
 
-        source = Chef::Resource::Git.new(
+        r = Chef::Rer::Git.new(
           "#{Chef::Config[:file_cache_path]}/chruby",
           run_context
         )
-        source.repository 'https://github.com/postmodern/chruby.git'
-        source.reference 'v0.3.7'
-        source.user 'root'
-        source.group 'root'
-        source.run_action(:sync)
+        r.repository 'https://github.com/postmodern/chruby.git'
+        r.reference 'v0.3.7'
+        r.user 'root'
+        r.group 'root'
+        r.run_action(:sync)
 
-        if source.updated_by_last_action?
-          new_resource.updated_by_last_action(true)
-        end
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def install_chruby
-        installer = Chef::Resource::Execute.new(
+        r = Chef::Resource::Execute.new(
           'Install chruby',
           run_context
         )
-        installer.command 'make install'
-        installer.cwd "#{Chef::Config[:file_cache_path]}/chruby"
-        installer.user 'root'
-        installer.run_action(:run)
+        r.command 'make install'
+        r.cwd "#{Chef::Config[:file_cache_path]}/chruby"
+        r.user 'root'
+        r.run_action(:run)
 
-        if installer.updated_by_last_action?
-          new_resource.updated_by_last_action(true)
-        end
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def source_chruby
