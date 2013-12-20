@@ -26,8 +26,9 @@ class Chef
 
       def initialize(new_resource, run_context = nil)
         @new_resource = new_resource
+
         @run_context = run_context
-        @run_context.include_recipe 'ruby_build'
+        @run_context.include_recipe('ruby_build::default')
 
         super(new_resource, run_context)
       end
@@ -74,7 +75,7 @@ class Chef
       def download_chruby
         ssh_known_hosts_entry 'github.com'
 
-        r = Chef::Rer::Git.new(
+        r = Chef::Resource::Git.new(
           "#{Chef::Config[:file_cache_path]}/chruby",
           run_context
         )

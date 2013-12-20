@@ -28,9 +28,9 @@ class Chef
 
       def initialize(new_resource, run_context = nil)
         @new_resource = new_resource
-        @run_context = run_context
 
-        @run_context.include_recipe 'mysql::ruby'
+        @run_context = run_context
+        @run_context.include_recipe('mysql::ruby')
 
         @framework = 'rails'
         @bundle_binary = ruby.gem_path('bundle')
@@ -48,6 +48,8 @@ class Chef
       private
 
       def create_deploy_revision
+        app_provider = self
+
         r = Chef::Resource::DeployRevision.new(
           new_resource.name,
           run_context
@@ -145,7 +147,9 @@ class Chef
           precompile.run_action(:run) if precompile_assets
         end
 
-        r.after_restart nil
+        r.after_restart do
+          app_provider.send(:after_restart)
+        end
 
         r.run_action(new_resource.deploy_action)
 

@@ -41,6 +41,7 @@ class Chef
       end
 
       def action_create
+
         create_directories
 
         if new_resource.framework == 'rails'
@@ -50,21 +51,22 @@ class Chef
           create_database_yaml
           create_unicorn_config
           create_vhost_config
-          # create_ssl_cert
         end
 
-        create_writable_directories
-
         create_deploy_revision
+      end
 
+      def before_restart
+        create_writable_directories
+      end
+
+      def after_restart
         create_service_config
         create_monit_check
         enable_and_start_service
 
         create_newrelic_notification
-        create_campfire_notification
-
-        new_resource.updated_by_last_action(true)
+        create_campfire_notification(:announce_success)
       end
 
       private
@@ -216,11 +218,24 @@ class Chef
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
-      def create_campfire_notification
+      def create_campfire_notification(action = :announce_start)
         r = Chef::Resource::CampfireDeployment.new(
-          app.config['env']['NEW_RELIC_APP_NAME'],
+          new_resource.name,
           run_context
         )
+        r.account app.config['env']['CAMPFIRE_DEPLOYMENT_ACCOUNT']
+        r.token app.config['env']['CAMPFIRE_DEPLOYMENT_TOKEN']
+        r.room app.config['env']['CAMPFIRE_DEPLOYMENT_ROOM']
+        r.play 'pushit'
+        r.release({
+          deployer: user.username,
+          environment: new_resource.environment,
+          revision: new_resource.revision,
+          application: new_resource.name
+        })
+        r.run_action(action)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
     end
   end
