@@ -67,7 +67,7 @@ class Chef
           %w{ log tmp/pids }
         )
 
-        deploy.symlinks(
+        r.symlinks(
           { 'log' => 'log', 'pids' => 'pids' }
         )
 
