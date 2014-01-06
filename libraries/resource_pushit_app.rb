@@ -82,6 +82,15 @@ class Chef
           :default => 'HEAD'
         )
       end
+
+      def config_files(arg = nil)
+        set_or_return(
+          :config_files,
+          arg,
+          :kind_of => [Array],
+          :default => []
+        )
+      end
     end
   end
 end

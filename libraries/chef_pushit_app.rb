@@ -43,6 +43,10 @@ class Chef
         @user ||= Pushit::User.new(@app['owner'])
       end
 
+      def name
+        @app['id']
+      end
+
       def path
         ::File.join(apps_path, @app['id'])
       end
@@ -57,6 +61,10 @@ class Chef
 
       def shared_path
         ::File.join(path, 'shared')
+      end
+
+      def log_path
+        ::File.join(path, 'shared', 'logs', "#{name}.log")
       end
 
       def upstart_pid

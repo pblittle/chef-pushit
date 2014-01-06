@@ -39,6 +39,5 @@ node.default['nginx']['gzip_static'] = 'on'
 
 node.default[:nodejs][:version] = '0.10.23'
 node.default[:nodejs][:npm] = '1.3.17'
-# node.default[:nodejs][:dir] = Pushit::Nodejs.prefix_path
 
 node.default['authorization']['sudo']['include_sudoers_d'] = true

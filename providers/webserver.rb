@@ -34,24 +34,6 @@ def whyrun_supported?
   true
 end
 
-def create_monit_check
-  r = Chef::Resource::PushitMonit.new(
-    new_resource.name,
-    run_context
-  )
-  r.check({
-    :name => new_resource.name,
-    :pid_file => new_resource.pid_file,
-    :start_program => "/etc/init.d/#{new_resource.name} start",
-    :stop_program => "/etc/init.d/#{new_resource.name} stop",
-    :uid => 'root',
-    :gid => 'root'
-  })
-  r.run_action(:install)
-
-  new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-end
-
 def create_webserver_config
   r = template 'nginx.conf' do
     path "#{new_resource.config_path}/nginx.conf"
@@ -74,5 +56,4 @@ end
 
 action :create do
   create_webserver_config
-  # create_monit_check
 end

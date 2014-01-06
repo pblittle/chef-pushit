@@ -28,12 +28,10 @@ require ::File.expand_path('../chef_pushit_app', __FILE__)
 class Chef
   module Pushit
 
-    PUSHIT_USER = 'deploy'.freeze
-    PUSHIT_GROUP = 'deploy'.freeze
-    PUSHIT_PATH = ::File.join('', 'opt', 'pushit').freeze
-    PUSHIT_DATA_BAG = 'pushit_apps'.freeze
-
-    WHYRUN_ENABLED = false
+    PUSHIT_USER ||= 'deploy'.freeze
+    PUSHIT_GROUP ||= 'deploy'.freeze
+    PUSHIT_PATH ||= ::File.join('', 'opt', 'pushit').freeze
+    PUSHIT_DATA_BAG ||= 'pushit_apps'.freeze
 
     class << self
 

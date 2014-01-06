@@ -21,7 +21,6 @@ require 'chef/mixin/command'
 
 require File.expand_path('../chef_pushit', __FILE__)
 require File.expand_path('../provider_pushit_base', __FILE__)
-require File.expand_path('../provider_pushit_monit', __FILE__)
 
 class Chef
   class Provider
@@ -41,32 +40,32 @@ class Chef
       end
 
       def action_create
-
         create_directories
 
         if new_resource.framework == 'rails'
           create_shared_directories
-          create_dotenv
           create_ruby_version
           create_database_yaml
           create_unicorn_config
           create_vhost_config
         end
 
+        create_dotenv
         create_deploy_revision
       end
 
-      def before_restart
+      def before_symlink
         create_writable_directories
+        create_config_files
       end
 
       def after_restart
         create_service_config
-        create_monit_check
+        create_logrotate_config
         enable_and_start_service
 
-        create_newrelic_notification
-        create_campfire_notification(:announce_success)
+        # create_newrelic_notification
+        # create_campfire_notification(:announce_success)
       end
 
       private
@@ -98,7 +97,6 @@ class Chef
         r.provider Chef::Provider::Service::Upstart
         r.supports :status => true, :restart => true
         r.run_action(:enable)
-        r.run_action(:stop)
         r.run_action(:start)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
@@ -154,6 +152,35 @@ class Chef
         end
       end
 
+      def create_config_files
+        new_resource.config_files.each do |file|
+          r = Chef::Resource::CookbookFile.new(
+            ::File.join(app.release_path, file),
+            run_context
+          )
+          r.source file
+          r.cookbook new_resource.cookbook_name
+          r.owner Etc.getpwnam(user.username).uid
+          r.group Etc.getgrnam(user.group).gid
+          r.mode 00755
+          r.run_action(:create)
+
+          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        end
+      end
+
+      def create_logrotate_config
+        r = Chef::Resource::LogrotateApp.new(
+          app.log_path,
+          run_context
+        )
+        r.template_owner Etc.getpwnam(user.username).uid
+        r.template_group Etc.getgrnam(user.group).gid
+        r.run_action(:create)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      end
+
       def create_vhost_config
         r = Chef::Resource::PushitVhost.new(
           new_resource.name,
@@ -187,24 +214,6 @@ class Chef
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
-      def create_monit_check
-        r = Chef::Resource::PushitMonit.new(
-          new_resource.name,
-          run_context
-        )
-        r.check({
-          :name => new_resource.name,
-          :pid_file => app.upstart_pid,
-          :start_program => "/sbin/start #{new_resource.name}",
-          :stop_program => "/sbin/stop #{new_resource.name}",
-          :uid => 'root',
-          :gid => 'root'
-        })
-        r.run_action(:install)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-      end
-
       def create_newrelic_notification
         r = Chef::Resource::NewrelicDeployment.new(
           app.config['env']['NEW_RELIC_APP_NAME'],
@@ -226,7 +235,6 @@ class Chef
         r.account app.config['env']['CAMPFIRE_DEPLOYMENT_ACCOUNT']
         r.token app.config['env']['CAMPFIRE_DEPLOYMENT_TOKEN']
         r.room app.config['env']['CAMPFIRE_DEPLOYMENT_ROOM']
-        r.play 'pushit'
         r.release({
           deployer: user.username,
           environment: new_resource.environment,

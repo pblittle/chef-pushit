@@ -71,19 +71,6 @@ action :create do
       database['root_password']
 
     run_context.include_recipe 'mysql::server'
-
-    pushit_monit 'mysql' do
-      check({
-        :name => 'mysql',
-        :host => database['host'],
-        :port => database['port'],
-        :pid_file => new_resource.pid_file,
-        :start_program => '/sbin/start mysql',
-        :stop_program => '/sbin/stop mysql',
-        :uid => 'root',
-        :gid => 'root'
-      })
-    end
   end
 
   mysql_database_user database['root_username'] do

@@ -2,7 +2,7 @@ site :opscode
 
 cookbook 'campfire-deployment', :path => '../chef-campfire-deployment'
 cookbook 'certificate', :github => 'atomic-penguin/cookbook-certificate'
-cookbook 'monit', :github => 'phlipper/chef-monit'
+cookbook 'logrotate', :github => 'opscode-cookbooks/logrotate'
 cookbook 'mysql', :github => 'opscode-cookbooks/mysql'
 cookbook 'newrelic', :github => 'heavywater/chef-newrelic'
 cookbook 'newrelic-deployment', :path => '../chef-newrelic-deployment'

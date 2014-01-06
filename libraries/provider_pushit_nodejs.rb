@@ -40,6 +40,8 @@ class Chef
       private
 
       def create_deploy_revision
+        app_provider = self
+
         r = Chef::Resource::DeployRevision.new(
           new_resource.name,
           run_context
@@ -56,16 +58,14 @@ class Chef
           end
         end
 
-        r.environment config['env']
+        r.environment new_resource.environment
+
         r.user Etc.getpwnam(config['owner']).name
         r.group Etc.getgrnam(config['group']).name
 
         r.symlink_before_migrate({})
         r.create_dirs_before_symlink([])
-
-        r.purge_before_symlink(
-          %w{ log tmp/pids }
-        )
+        r.purge_before_symlink([])
 
         r.symlinks(
           { 'log' => 'log', 'pids' => 'pids' }
@@ -81,33 +81,59 @@ class Chef
           end
         end
 
-        r.before_symlink nil
+        r.before_symlink do
+          app_provider.send(:before_symlink)
+        end
+
         r.before_restart nil
-        r.after_restart nil
+
+        r.after_restart do
+          app_provider.send(:after_restart)
+        end
 
         r.run_action(new_resource.deploy_action)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
-      def create_service_config
+      def create_dotenv
         r = Chef::Resource::Template.new(
-          ::File.join('', 'etc', 'init', "#{new_resource.name}.conf"),
+          ::File.join(app.shared_path, 'env'),
           run_context
         )
-        r.source "#{new_resource.framework}.upstart.conf.erb"
+        r.source 'env.erb'
         r.cookbook 'pushit'
-        r.user 'root'
-        r.group 'root'
+        r.owner config['owner']
+        r.group config['group']
+        r.mode '0644'
+        r.variables(
+          :env => escape_env(config['env'])
+        )
+        r.run_action(:create)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      end
+
+      def create_service_config
+        service_config = ::File.join(
+          '', 'etc', 'init', "#{new_resource.name}.conf"
+        )
+
+        r = Chef::Resource::Template.new(
+          service_config,
+          run_context
+        )
+        r.source "#{@framework}.upstart.conf.erb"
+        r.cookbook 'pushit'
+        r.user config['owner']
+        r.group config['group']
         r.mode '0644'
         r.variables(
           :instance => new_resource.name,
           :env_path => Pushit::Nodejs.bin_path,
           :app_path => app.release_path,
-          :log_path => ::File.join(
-            app.shared_path, 'log', 'upstart.log'
-          ),
-          :pid_path => app.upstart_pid,
+          :log_path => app.log_path,
+          :pid_file => app.upstart_pid,
           :exec => new_resource.node_binary,
           :script_path => ::File.join(
             app.release_path, new_resource.script_file

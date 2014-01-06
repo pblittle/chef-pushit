@@ -25,5 +25,6 @@ include_recipe 'nodejs::install_from_source'
 include_recipe 'nodejs::npm'
 
 pushit_nodejs 'nodejs-example' do
+  environment 'development'
   script_file 'server.js'
 end

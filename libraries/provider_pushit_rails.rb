@@ -81,9 +81,6 @@ class Chef
         bundle_binary = @bundle_binary
 
         r.before_migrate do
-
-          Chef::Log.debug("Symlinking files for #{new_resource.name}")
-
           link "#{release_path}/.env" do
             to "#{new_resource.shared_path}/env"
           end
@@ -104,15 +101,9 @@ class Chef
             to "#{new_resource.shared_path}/config/unic0rn.rb"
           end
 
-          link "#{release_path}/db/certs" do
-            to "#{new_resource.shared_path}/certs"
-          end
-
           link "#{release_path}/vendor/bundle" do
             to "#{new_resource.shared_path}/vendor_bundle"
           end
-
-          Chef::Log.debug("Installing gems for #{new_resource.name}")
 
           bundle_flags = [
             '--binstubs',
@@ -130,6 +121,10 @@ class Chef
           bundle.user app_config['owner']
           bundle.environment new_resource.environment
           bundle.run_action(:run)
+        end
+
+        r.before_symlink do
+          app_provider.send(:before_symlink)
         end
 
         precompile_assets = new_resource.precompile_assets
@@ -308,9 +303,7 @@ class Chef
           :instance => new_resource.name,
           :env_path => ruby.bin_path,
           :app_path => app.release_path,
-          :log_file => ::File.join(
-            app.release_path, 'log', 'upstart.log'
-          ),
+          :log_path => app.log_path,
           :pid_file => app.upstart_pid,
           :config_file => ::File.join(
             app.release_path, 'config', 'unic0rn.rb'

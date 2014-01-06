@@ -6,9 +6,15 @@ require 'minitest/spec'
 describe 'pushit_test::nodejs' do
 
   let(:pushit_path) { ::File.join('', 'opt', 'pushit', 'apps') }
+
   let(:pushit_app_path) { ::File.join(pushit_path, 'nodejs-example') }
+
+  let(:pushit_log_path) do
+    ::File.join(pushit_app_path, 'shared', 'logs', 'nodejs-example.log')
+  end
+
   let(:pushit_pid_path) do
-    ::File.join(pushit_app_path, 'current', 'pids', 'upstart.pid')
+    ::File.join(pushit_app_path, 'shared', 'pids', 'upstart.pid')
   end
 
   it 'has created the base pushit directory' do
@@ -19,10 +25,8 @@ describe 'pushit_test::nodejs' do
     assert File.directory?(pushit_app_path)
   end
 
-  it 'has created a log directory' do
-    assert File.directory?(
-      ::File.join(pushit_app_path, 'shared', 'log')
-    )
+  it 'has created a log file' do
+    assert File.file?(pushit_log_path)
   end
 
   it 'has created a pids directory' do
