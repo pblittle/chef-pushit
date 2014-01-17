@@ -64,7 +64,7 @@ class Chef
       end
 
       def log_path
-        ::File.join(path, 'shared', 'logs', "#{name}.log")
+        ::File.join(path, 'shared', 'log', "#{name}.log")
       end
 
       def upstart_pid
@@ -73,6 +73,26 @@ class Chef
 
       def upstream_socket
         ::File.join(path, 'shared', 'sockets', 'unicorn.sock')
+      end
+
+      def upstream_port
+        @app['webserver']['upstream_port'] || 8080
+      end
+
+      def http_port
+        @app['webserver']['http_port'] || 80
+      end
+
+      def has_webserver?
+        !@app['webserver'].nil?
+      end
+
+      def use_ssl?
+        @app['webserver'] && @app['webserver']['use_ssl'] != false
+      end
+
+      def server_name
+        @app['webserver']['server_name'] || '_'
       end
 
       def root

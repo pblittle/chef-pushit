@@ -47,11 +47,20 @@ class Chef
           create_ruby_version
           create_database_yaml
           create_unicorn_config
-          create_vhost_config
         end
 
         create_dotenv
         create_deploy_revision
+
+        if app.has_webserver?
+          create_ssl_cert if app.use_ssl?
+          create_vhost_config
+        end
+
+        create_service_config
+        create_logrotate_config
+
+        enable_and_start_service
       end
 
       def before_symlink
@@ -60,10 +69,6 @@ class Chef
       end
 
       def after_restart
-        create_service_config
-        create_logrotate_config
-        enable_and_start_service
-
         # create_newrelic_notification
         # create_campfire_notification(:announce_success)
       end
@@ -95,8 +100,12 @@ class Chef
           run_context
         )
         r.provider Chef::Provider::Service::Upstart
-        r.supports :status => true, :restart => true
+        r.supports :status => true, :restart => true, :reload => true
+        r.restart_command(
+          "stop #{new_resource.name} && start #{new_resource.name}"
+        )
         r.run_action(:enable)
+        r.run_action(:stop)
         r.run_action(:start)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
@@ -170,15 +179,15 @@ class Chef
       end
 
       def create_logrotate_config
-        r = Chef::Resource::LogrotateApp.new(
-          app.log_path,
-          run_context
-        )
-        r.template_owner Etc.getpwnam(user.username).uid
-        r.template_group Etc.getgrnam(user.group).gid
-        r.run_action(:create)
+        # r = Chef::Resource::LogrotateApp.new(
+        #   app.log_path,
+        #   run_context
+        # )
+        # r.template_owner Etc.getpwnam(user.username).uid
+        # r.template_group Etc.getgrnam(user.group).gid
+        # r.run_action(:create)
 
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        # new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def create_vhost_config
@@ -187,11 +196,17 @@ class Chef
           run_context
         )
         r.config_type new_resource.framework
-        r.http_port 80
-        r.server_name '_'
-        r.upstream_port 8080
+        r.http_port app.http_port
+        r.server_name app.server_name
+        r.upstream_port app.upstream_port
         r.upstream_socket app.upstream_socket
-        r.use_ssl true
+        r.use_ssl app.use_ssl?
+        r.ssl_certificate ::File.join(
+          Pushit::Certs.certs_path, 'certs', "#{new_resource.name}-bundle.crt"
+        )
+        r.ssl_certificate_key ::File.join(
+          Pushit::Certs.certs_path, 'private', "#{new_resource.name}.key"
+        )
         r.run_action(:create)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
@@ -199,16 +214,16 @@ class Chef
 
       def create_ssl_cert
         r = Chef::Resource::CertificateManage.new(
-          'eirenerx',
+          new_resource.name,
           run_context
         )
-        r.owner Etc.getpwnam(app.config['owner']).uid
-        r.group Etc.getpwnam(app.config['group']).gid
-        r.nginx_cert true
+        r.owner 'root' # Etc.getpwnam(app.config['owner']).name
+        r.group 'root' # Etc.getgrnam(app.config['group']).name
         r.cert_path Pushit::Certs.certs_path
         r.cert_file "#{new_resource.name}.pem"
         r.key_file "#{new_resource.name}.key"
         r.chain_file "#{new_resource.name}-bundle.crt"
+        r.nginx_cert false
         r.run_action(:create)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?

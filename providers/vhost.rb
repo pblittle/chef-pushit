@@ -44,39 +44,6 @@ end
 
 action :create do
 
-  bash "Create SSL Key for #{new_resource.name}" do
-    cwd new_resource.install_path
-    user 'root'
-    group 'root'
-    code <<-EOH
-    umask 077
-    openssl genrsa 2048 > #{new_resource.ssl_certificate_key}
-    EOH
-
-    not_if do
-      ::File.exists?(new_resource.ssl_certificate_key)
-    end
-  end
-
-  bash "Create SSL Certificate for #{new_resource.name}" do
-    cwd new_resource.install_path
-    user 'root'
-    group 'root'
-    code <<-EOH
-    umask 077
-    openssl req -x509 -nodes -days 3650 -subj '#{new_resource.ssl_request}' \
-    -new -key #{new_resource.ssl_certificate_key} > \
-    #{new_resource.ssl_certificate}
-    cat #{new_resource.ssl_certificate_key} #{new_resource.ssl_certificate} > \
-    #{new_resource.ssl_certificate_pem}
-    EOH
-
-    not_if do
-      ::File.exists?(new_resource.ssl_certificate) &&
-        ::File.exists?(new_resource.ssl_certificate_pem)
-    end
-  end
-
   site_config = ::File.join(
     new_resource.install_path, 'sites-available', "#{new_resource.app_name}.conf"
   )

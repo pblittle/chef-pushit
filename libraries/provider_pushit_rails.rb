@@ -285,7 +285,6 @@ class Chef
       end
 
       def create_service_config
-
         service_config = ::File.join(
           '', 'etc', 'init', "#{new_resource.name}.conf"
         )

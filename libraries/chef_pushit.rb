@@ -33,6 +33,8 @@ class Chef
     PUSHIT_PATH ||= ::File.join('', 'opt', 'pushit').freeze
     PUSHIT_DATA_BAG ||= 'pushit_apps'.freeze
 
+    WHYRUN_ENABLED = false
+
     class << self
 
       def pushit_user

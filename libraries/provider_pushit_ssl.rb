@@ -39,7 +39,7 @@ class Chef
 
       def action_install
         certificate_manage app.name do
-          cert_path "/etc/postfix/ssl"
+          cert_path Pushit::Certs.certs_path
           owner Etc.getpwnam(app.config['owner']).uid
           group Etc.getpwnam(app.config['group']).gid
         end
@@ -56,7 +56,7 @@ class Chef
 
       def create_certs_directory
         dir = Chef::Resource::Directory.new(
-          ::File.join(Pushit.pushit_path, 'certs'),
+          Pushit::Certs.certs_path,
           run_context
         )
         dir.owner Etc.getpwnam(app.config['owner']).uid
