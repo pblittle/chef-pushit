@@ -49,18 +49,25 @@ class Chef
           create_unicorn_config
         end
 
+        if app.database_has_certificate?
+          create_ssl_cert(app.database_certificate)
+        end
+
+        if app.has_certificate?
+          create_ssl_cert(app.certificate)
+        end
+
         create_dotenv
         create_deploy_revision
 
         if app.has_webserver?
-          create_ssl_cert if app.use_ssl?
           create_vhost_config
         end
 
-        create_service_config
-        create_logrotate_config
+        logrotate_create_config
 
-        enable_and_start_service
+        service_create_upstart
+        service_perform_action
       end
 
       def before_symlink
@@ -94,19 +101,14 @@ class Chef
         end
       end
 
-      def enable_and_start_service
+      def service_perform_action
         r = Chef::Resource::Service.new(
           new_resource.name,
           run_context
         )
         r.provider Chef::Provider::Service::Upstart
         r.supports :status => true, :restart => true, :reload => true
-        r.restart_command(
-          "stop #{new_resource.name} && start #{new_resource.name}"
-        )
-        r.run_action(:enable)
-        r.run_action(:stop)
-        r.run_action(:start)
+        r.action([:start, :enable])
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
@@ -178,7 +180,7 @@ class Chef
         end
       end
 
-      def create_logrotate_config
+      def logrotate_create_config
         # r = Chef::Resource::LogrotateApp.new(
         #   app.log_path,
         #   run_context
@@ -212,17 +214,17 @@ class Chef
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
-      def create_ssl_cert
+      def create_ssl_cert(certificate)
         r = Chef::Resource::CertificateManage.new(
-          new_resource.name,
+          certificate,
           run_context
         )
-        r.owner 'root' # Etc.getpwnam(app.config['owner']).name
-        r.group 'root' # Etc.getgrnam(app.config['group']).name
+        r.owner Etc.getpwnam(app.config['owner']).name
+        r.group Etc.getgrnam(app.config['group']).name
         r.cert_path Pushit::Certs.certs_path
-        r.cert_file "#{new_resource.name}.pem"
-        r.key_file "#{new_resource.name}.key"
-        r.chain_file "#{new_resource.name}-bundle.crt"
+        r.cert_file "#{certificate}.pem"
+        r.key_file "#{certificate}.key"
+        r.chain_file "#{certificate}-bundle.crt"
         r.nginx_cert false
         r.run_action(:create)
 

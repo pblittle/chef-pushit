@@ -73,7 +73,7 @@ class Chef
 
         r.before_migrate do
           execute "Install #{new_resource.name} with dependencies" do
-            command "#{Pushit::Nodejs.npm_binary} install"
+            command "#{Pushit::Nodejs.npm_binary} install && #{Pushit::Nodejs.npm_binary} run-script setup"
             cwd release_path
             user 'root'
             group 'root'
@@ -114,7 +114,7 @@ class Chef
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
-      def create_service_config
+      def service_create_upstart
         service_config = ::File.join(
           '', 'etc', 'init', "#{new_resource.name}.conf"
         )

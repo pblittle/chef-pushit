@@ -83,12 +83,33 @@ class Chef
         @app['webserver']['http_port'] || 80
       end
 
-      def has_webserver?
-        !@app['webserver'].nil?
+      def https_port
+        @app['webserver']['https_port'] || 443
       end
 
-      def use_ssl?
-        @app['webserver'] && @app['webserver']['use_ssl'] != false
+      def has_webserver?
+        @app['webserver'] && !@app['webserver'].empty?
+      end
+
+      def has_certificate?
+        @app['certificate'] && !@app['certificate'].empty?
+      end
+
+      def certificate
+        has_certificate? ? @app['certificate'] : nil
+      end
+
+      def has_database?
+        @app['database'] && !@app['database'].empty?
+      end
+
+      def database_has_certificate?
+        self.has_database? && @app['database']['certificate'] &&
+          !@app['database']['certificate'].empty?
+      end
+
+      def database_certificate
+        database_has_certificate? ? @app['database']['certificate'] : nil
       end
 
       def server_name

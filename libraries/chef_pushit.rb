@@ -22,7 +22,6 @@
 
 require 'fileutils'
 
-# Why is this required?
 require ::File.expand_path('../chef_pushit_app', __FILE__)
 
 class Chef
