@@ -49,12 +49,12 @@ class Chef
           create_unicorn_config
         end
 
-        if app.database_has_certificate?
+        if app.has_database_certificate?
           create_ssl_cert(app.database_certificate)
         end
 
-        if app.has_certificate?
-          create_ssl_cert(app.certificate)
+        if app.has_webserver_certificate?
+          create_ssl_cert(app.webserver_certificate)
         end
 
         create_dotenv
@@ -77,7 +77,7 @@ class Chef
 
       def after_restart
         # create_newrelic_notification
-        # create_campfire_notification(:announce_success)
+        create_campfire_notification(:announce_success)
       end
 
       private
@@ -202,7 +202,7 @@ class Chef
         r.server_name app.server_name
         r.upstream_port app.upstream_port
         r.upstream_socket app.upstream_socket
-        r.use_ssl app.use_ssl?
+        r.use_ssl app.has_webserver_certificate?
         r.ssl_certificate ::File.join(
           Pushit::Certs.certs_path, 'certs', "#{new_resource.name}-bundle.crt"
         )

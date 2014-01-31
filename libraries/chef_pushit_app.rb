@@ -91,25 +91,26 @@ class Chef
         @app['webserver'] && !@app['webserver'].empty?
       end
 
-      def has_certificate?
-        @app['certificate'] && !@app['certificate'].empty?
+      def has_webserver_certificate?
+        self.has_webserver? && @app['webserver']['certificate'] &&
+          !@app['webserver']['certificate'].empty?
       end
 
-      def certificate
-        has_certificate? ? @app['certificate'] : nil
+      def webserver_certificate
+        has_webserver_certificate? ? @app['webserver']['certificate'] : nil
       end
 
       def has_database?
         @app['database'] && !@app['database'].empty?
       end
 
-      def database_has_certificate?
+      def has_database_certificate?
         self.has_database? && @app['database']['certificate'] &&
           !@app['database']['certificate'].empty?
       end
 
       def database_certificate
-        database_has_certificate? ? @app['database']['certificate'] : nil
+        has_database_certificate? ? @app['database']['certificate'] : nil
       end
 
       def server_name
