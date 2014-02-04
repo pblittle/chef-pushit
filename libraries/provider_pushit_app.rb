@@ -28,7 +28,9 @@ class Chef
 
       def initialize(new_resource, run_context = nil)
         @new_resource = new_resource
+
         @run_context = run_context
+        @run_context.include_recipe('campfire-deployment::default')
 
         super(new_resource, run_context)
       end
@@ -76,8 +78,10 @@ class Chef
       end
 
       def after_restart
-        # create_newrelic_notification
-        create_campfire_notification(:announce_success)
+        if new_resource.environment != 'development'
+          # create_newrelic_notification
+          create_campfire_notification(:announce_success)
+        end
       end
 
       private
