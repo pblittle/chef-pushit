@@ -80,7 +80,7 @@ class Chef
       def after_restart
         if new_resource.environment != 'development'
           # create_newrelic_notification
-          create_campfire_notification(:announce_success)
+          # create_campfire_notification(:announce_success)
         end
       end
 
