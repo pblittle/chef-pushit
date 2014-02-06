@@ -1,16 +1,11 @@
 {
-  "id": "nodejs-example",
-  "owner": "deploy",
-  "group": "deploy",
-  "repo": "git@github.com:twilson63/node-cloudq.git",
-  "framework": "nodejs",
-  "environment": "development",
-  "ssl": {
-    "sslca": "test-ca.pem",
-    "sslcert": "test-cert.pem",
-    "sslkey": "test-key.pem"
-  },
-  "env": {
-    "FOO": "bar"
-  }
+    "id": "nodejs-example",
+    "owner": "deploy",
+    "group": "deploy",
+    "repo": "https://github.com/twilson63/node-cloudq.git",
+    "framework": "nodejs",
+    "environment": "test",
+    "env": {
+        "FOO": "bar"
+    }
 }
