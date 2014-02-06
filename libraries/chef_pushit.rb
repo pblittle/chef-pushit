@@ -87,7 +87,7 @@ class Chef
       attr_accessor :ruby_binary
       attr_accessor :gem_path
 
-      def initialize(version = nil)
+      def initialize(version = '1.9.3-p392')
         @version = version
         @rubies_path = rubies_path
         @prefix_path = prefix_path
@@ -117,7 +117,6 @@ class Chef
     end
 
     class Certs
-
       def self.certs_path
         ::File.join(Pushit.pushit_path, 'certs')
       end
