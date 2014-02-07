@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'berkshelf', '2.0.13'
+gem 'berkshelf', '2.0.14'
 gem 'foodcritic', '3.0.3'
 
 group 'integration' do
