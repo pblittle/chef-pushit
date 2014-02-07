@@ -84,15 +84,21 @@ class Chef
       attr_accessor :rubies_path
       attr_accessor :prefix_path
       attr_accessor :bin_path
-      attr_accessor :ruby_binary
       attr_accessor :gem_path
+      attr_accessor :ruby_binary
+      attr_accessor :foreman_binary
 
-      def initialize(version = '1.9.3-p392')
+      def initialize(version)
         @version = version
         @rubies_path = rubies_path
         @prefix_path = prefix_path
         @bin_path = bin_path
         @ruby_binary = ruby_binary
+        @foreman_binary = foreman_binary
+      end
+
+      def version
+        @version || '1.9.3-p392'
       end
 
       def rubies_path
@@ -100,7 +106,7 @@ class Chef
       end
 
       def prefix_path
-        ::File.join(@rubies_path, @version)
+        ::File.join(@rubies_path, version)
       end
 
       def bin_path
@@ -109,6 +115,10 @@ class Chef
 
       def ruby_binary
         ::File.join(@bin_path, 'ruby')
+      end
+
+      def foreman_binary
+        ::File.join(@bin_path, 'foreman')
       end
 
       def gem_path(executable)

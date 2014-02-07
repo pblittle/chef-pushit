@@ -43,6 +43,10 @@ class Chef
         @user ||= Pushit::User.new(@app['owner'])
       end
 
+      def ruby
+        @ruby ||= Pushit::Ruby.new(@app['ruby'])
+      end
+
       def name
         @app['id']
       end
@@ -69,6 +73,35 @@ class Chef
 
       def upstart_pid
         ::File.join(path, 'shared', 'pids', 'upstart.pid')
+      end
+
+      def envfile
+        ::File.join(release_path, '.env')
+      end
+
+      def procfile
+        ::File.join(release_path, 'Procfile')
+      end
+
+      def procfile?
+        ::File.exists?(procfile)
+      end
+
+      def service_config
+        File.join(
+          '', 'etc', 'init', "#{name}.conf"
+        )
+      end
+
+      def foreman_export_flags
+        args = []
+        args << 'upstart /etc/init'
+        args << "-f #{procfile}"
+        args << "-e #{envfile}"
+        args << "-a #{name}"
+        args << "-u #{@app['owner']}"
+        args << "-l #{log_path}"
+        args.join(' ')
       end
 
       def upstream_socket

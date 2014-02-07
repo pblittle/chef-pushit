@@ -41,10 +41,6 @@ class Chef
 
       def load_current_resource; end
 
-      def ruby
-        @ruby ||= Pushit::Ruby.new(config['ruby'])
-      end
-
       private
 
       def create_deploy_revision

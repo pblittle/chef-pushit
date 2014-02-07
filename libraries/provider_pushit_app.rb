@@ -98,6 +98,10 @@ class Chef
         @user ||= app.user
       end
 
+      def ruby
+        @ruby ||= app.ruby
+      end
+
       def escape_env(vars = {})
         vars.inject({}) do |hash, (key, value)|
           hash[key.upcase] = value.gsub(/"/) { %q(\") }

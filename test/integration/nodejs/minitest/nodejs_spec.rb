@@ -17,6 +17,10 @@ describe 'pushit_test::nodejs' do
     ::File.join(pushit_app_path, 'shared', 'pids', 'upstart.pid')
   end
 
+  let(:upstart_config_path) do
+    ::File.join('', 'etc', 'init', 'nodejs-example-web.config')
+  end
+
   it 'has created the base pushit directory' do
     assert File.directory?(pushit_path)
   end
@@ -29,6 +33,10 @@ describe 'pushit_test::nodejs' do
     assert File.file?(pushit_log_path)
   end
 
+  it 'has created an upstart config file' do
+    assert File.file?(upstart_config_path)
+  end
+
   it 'has created a pids directory' do
     assert File.directory?(
       ::File.join(pushit_app_path, 'shared', 'pids')
@@ -38,6 +46,12 @@ describe 'pushit_test::nodejs' do
   it 'has symlinked the current directory' do
     assert File.symlink?(
       ::File.join(pushit_app_path, 'current')
+    )
+  end
+
+  it 'has symlinked the .env file' do
+    assert File.symlink?(
+      ::File.join(pushit_app_path, 'current', '.env')
     )
   end
 

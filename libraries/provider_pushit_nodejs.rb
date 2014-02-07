@@ -77,11 +77,12 @@ class Chef
             "Install #{new_resource.name} dependencies",
             run_context
           )
-          npm.command "#{Pushit::Nodejs.npm_binary} install && #{Pushit::Nodejs.npm_binary}"
+          npm.command "#{Pushit::Nodejs.npm_binary} install"
           npm.cwd release_path
           npm.user 'root'
           npm.group 'root'
           npm.environment new_resource.environment
+          npm.run_action :run
         end
 
         r.before_symlink do
@@ -118,12 +119,30 @@ class Chef
       end
 
       def service_create_upstart
-        service_config = ::File.join(
-          '', 'etc', 'init', "#{new_resource.name}.conf"
-        )
+        if app.procfile?
+          foreman_export_upstart_config
+        else
+          export_upstart_config
+        end
+      end
 
+      def foreman_export_upstart_config
+        r = Chef::Resource::Execute.new(
+          "Export #{new_resource.name} upstart config",
+          run_context
+        )
+        r.command "sudo #{ruby.foreman_binary} export #{app.foreman_export_flags}"
+        r.cwd app.release_path
+        r.user 'root'
+        r.group 'root'
+        r.run_action :run
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      end
+
+      def export_upstart_config
         r = Chef::Resource::Template.new(
-          service_config,
+          app.service_config,
           run_context
         )
         r.source "#{@framework}.upstart.conf.erb"

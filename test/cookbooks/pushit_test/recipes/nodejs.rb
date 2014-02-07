@@ -22,6 +22,8 @@
 
 include_recipe 'pushit_test::base'
 
+pushit_ruby '1.9.3-p392'
+
 include_recipe 'nodejs::install_from_source'
 include_recipe 'nodejs::npm'
 
