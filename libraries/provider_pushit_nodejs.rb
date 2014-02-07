@@ -71,13 +71,15 @@ class Chef
         )
 
         r.before_migrate do
-          execute "Install #{new_resource.name} with dependencies" do
-            command "#{Pushit::Nodejs.npm_binary} install && #{Pushit::Nodejs.npm_binary} run-script setup"
-            cwd release_path
-            user 'root'
-            group 'root'
-            environment new_resource.environment
-          end
+          npm = Chef::Resource::Execute.new(
+            "Install #{new_resource.name} dependencies",
+            run_context
+          )
+          npm.command "#{Pushit::Nodejs.npm_binary} install && #{Pushit::Nodejs.npm_binary}"
+          npm.cwd release_path
+          npm.user 'root'
+          npm.group 'root'
+          npm.environment new_resource.environment
         end
 
         r.before_symlink do
