@@ -56,6 +56,7 @@ class Chef
         r.repository config['repo']
         r.revision new_resource.revision
         r.shallow_clone true
+
         r.ssh_wrapper "#{app.user.ssh_directory}/#{config['deploy_key']}_deploy_wrapper.sh" do
           only_if do
             config['deploy_key'] && !config['deploy_key'].empty?

@@ -52,6 +52,13 @@ class Chef
           end
         end
 
+        new_resource.base_gems.each do |gem|
+          gem_package gem[:name] do
+            gem_binary ::File.join(ruby.bin_path, 'gem')
+            version gem[:version] if gem[:version]
+          end
+        end
+
         new_resource.gems.each do |gem|
           gem_package gem[:name] do
             gem_binary ::File.join(ruby.bin_path, 'gem')

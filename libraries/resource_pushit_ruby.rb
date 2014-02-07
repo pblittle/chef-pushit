@@ -49,7 +49,7 @@ class Chef
         )
       end
 
-      def gems(arg = nil)
+      def base_gems(arg = nil)
         set_or_return(
           :gems,
           arg,
@@ -59,6 +59,15 @@ class Chef
             { :name => 'foreman' },
             { :name => 'unicorn' }
           ]
+        )
+      end
+
+      def gems(arg = nil)
+        set_or_return(
+          :gems,
+          arg,
+          :kind_of => [Array],
+          :default => []
         )
       end
 
