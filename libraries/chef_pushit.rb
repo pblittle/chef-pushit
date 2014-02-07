@@ -31,6 +31,7 @@ class Chef
     PUSHIT_GROUP ||= 'deploy'.freeze
     PUSHIT_PATH ||= ::File.join('', 'opt', 'pushit').freeze
     PUSHIT_DATA_BAG ||= 'pushit_apps'.freeze
+    PUSHIT_RUBY_DEFAULT ||= '1.9.3-p392'
 
     WHYRUN_ENABLED = false
 
@@ -98,7 +99,7 @@ class Chef
       end
 
       def version
-        @version || '1.9.3-p392'
+        @version || PUSHIT_RUBY_DEFAULT
       end
 
       def rubies_path
