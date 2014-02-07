@@ -23,6 +23,9 @@ before_fork do |server, worker|
   defined?(ActiveRecord::Base) and
     ActiveRecord::Base.connection.disconnect!
 
+  defined?(Sequel::Model) and
+    Sequel::DATABASES.each{ |db| db.disconnect }
+
   # old_pid = "#{server.config[:pid]}.oldbin"
   # if old_pid != server.pid
   #   begin
