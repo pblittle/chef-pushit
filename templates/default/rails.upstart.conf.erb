@@ -11,8 +11,8 @@ stop on runlevel [06]
 respawn
 console log
 
-setuid <%= @user %>
-setgid <%= @group %>
+setuid root
+setgid root
 
 chdir <%= @app_path %>
 
