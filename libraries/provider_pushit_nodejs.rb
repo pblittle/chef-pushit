@@ -67,7 +67,9 @@ class Chef
         r.purge_before_symlink([])
 
         r.symlinks(
-          { 'log' => 'log', 'pids' => 'pids' }
+          'env' => '.env',
+          'log' => 'log',
+          'pids' => 'pids'
         )
 
         r.before_migrate do
