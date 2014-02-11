@@ -138,6 +138,8 @@ class Chef
           precompile.user app_config['owner']
           precompile.environment new_resource.environment
           precompile.run_action(:run) if precompile_assets
+
+          app_provider.send(:before_restart)
         end
 
         r.after_restart do

@@ -63,16 +63,21 @@ class Chef
         r.group Etc.getgrnam(config['group']).name
 
         r.symlink_before_migrate({})
-        r.create_dirs_before_symlink([])
-        r.purge_before_symlink([])
-
-        r.symlinks(
-          'env' => '.env',
-          'log' => 'log',
-          'pids' => 'pids'
-        )
+        r.symlinks('pids' => 'tmp/pids', 'log' => 'log')
 
         r.before_migrate do
+          link "#{release_path}/.env" do
+            to "#{new_resource.shared_path}/env"
+          end
+
+          link "#{release_path}/log" do
+            to "#{new_resource.shared_path}/log"
+          end
+
+          link "#{release_path}/pids" do
+            to "#{new_resource.shared_path}/pids"
+          end
+
           npm = Chef::Resource::Execute.new(
             "Install #{new_resource.name} dependencies",
             run_context
@@ -89,7 +94,9 @@ class Chef
           app_provider.send(:before_symlink)
         end
 
-        r.before_restart nil
+        r.before_restart do
+          app_provider.send(:before_restart)
+        end
 
         r.after_restart do
           app_provider.send(:after_restart)
@@ -120,15 +127,17 @@ class Chef
 
       def service_create_upstart
         if app.procfile?
+          Chef::Log.warn 'XXX - Foreman'
           foreman_export_upstart_config
         else
+          Chef::Log.warn 'XXX - Upstart'
           export_upstart_config
         end
       end
 
       def foreman_export_upstart_config
         r = Chef::Resource::Execute.new(
-          "Export #{new_resource.name} upstart config",
+          "Foreman export #{new_resource.name} upstart config",
           run_context
         )
         r.command "sudo #{ruby.foreman_binary} export #{app.foreman_export_flags}"
@@ -141,6 +150,7 @@ class Chef
       end
 
       def export_upstart_config
+        Chef::Log.warn 'YYY - Upstart'
         r = Chef::Resource::Template.new(
           app.service_config,
           run_context

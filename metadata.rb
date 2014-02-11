@@ -11,7 +11,7 @@ long_description IO.read(
     'README.md'
   )
 )
-version '0.4.62'
+version '0.4.79'
 
 supports 'debian'
 supports 'ubuntu'
@@ -19,6 +19,7 @@ supports 'ubuntu'
 depends 'campfire-deployment'
 depends 'certificate'
 depends 'git'
+depends 'monit'
 depends 'logrotate'
 depends 'nodejs'
 depends 'database'

@@ -8,8 +8,15 @@
       "git": "git://github.com/atomic-penguin/cookbook-certificate.git",
       "ref": "c138e8237702dca5f01ccbf57a62e8048f88dab6"
     },
+    "monit": {
+      "locked_version": "1.5.2",
+      "git": "git://github.com/phlipper/chef-monit.git",
+      "ref": "23756d508f8c10b8687213e0f9a3f4ae47f836ac"
+    },
     "logrotate": {
-      "locked_version": "1.4.0"
+      "locked_version": "1.5.0",
+      "git": "git://github.com/stevendanna/logrotate.git",
+      "ref": "d0e24c6cb6051b033c3c7bc855469c50094452b9"
     },
     "mysql": {
       "locked_version": "4.0.10"

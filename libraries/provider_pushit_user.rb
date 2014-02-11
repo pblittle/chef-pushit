@@ -30,6 +30,8 @@ class Chef
         @new_resource = new_resource
         @run_context = run_context
 
+        Chef::Log.warn 'YYY - Provider_pushit_user new'
+
         super(new_resource, run_context)
       end
 
@@ -188,6 +190,10 @@ class Chef
       end
 
       def create_deploy_key(key)
+        deploy_key = ::File.join(
+          pushit_user.ssh_directory, key['name']
+        )
+
         r = Chef::Resource::Template.new(
           ::File.join(pushit_user.ssh_directory, key['name']),
           run_context
@@ -201,13 +207,18 @@ class Chef
           :ssh_key_data => key['data']
         })
         r.run_action(:create)
+        r.not_if { ::File.exists?(deploy_key) }
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def create_deploy_wrapper(key)
+        deploy_wrapper = ::File.join(
+          pushit_user.ssh_directory, "#{key['name']}_deploy_wrapper.sh"
+        )
+
         r = Chef::Resource::Template.new(
-          ::File.join(pushit_user.ssh_directory, "#{key['name']}_deploy_wrapper.sh"),
+          deploy_wrapper,
           run_context
         )
         r.source 'ssh_wrapper.sh.erb'
@@ -220,6 +231,7 @@ class Chef
           :ssh_key_name => key['name']
         })
         r.run_action(:create)
+        r.not_if { ::File.exists?(deploy_wrapper) }
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
@@ -230,7 +242,6 @@ class Chef
         host_name = 'github.com'
         identity_file = ::File.join(pushit_user.ssh_directory, key_name)
         config_file = ::File.join(pushit_user.ssh_directory, 'config')
-
         username = pushit_user.username
 
         ssh_config host_key_alias do
@@ -239,6 +250,7 @@ class Chef
             'IdentityFile' => identity_file
           user username
           path config_file
+          not_if { `grep #{identity_file} #{config_file}` }
         end
       end
     end

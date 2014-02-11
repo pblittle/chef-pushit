@@ -28,6 +28,9 @@ class Chef
       attr_accessor :pushit_user
 
       def initialize(new_resource, run_context = nil)
+
+        Chef::Log.warn 'XXX - Provider_pushit_base new'
+
         create_filesystem
         create_user
       end
@@ -63,7 +66,6 @@ class Chef
         r.ssh_public_key pushit_user.ssh_public_key
         r.ssh_keys pushit_user.ssh_keys
         r.ssh_deploy_keys pushit_user.ssh_deploy_keys
-        # r.generate_ssh_keys true
         r.run_action(:create)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?

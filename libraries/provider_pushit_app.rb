@@ -31,6 +31,7 @@ class Chef
 
         @run_context = run_context
         @run_context.include_recipe('campfire-deployment::default')
+        @run_context.include_recipe('logrotate::global')
 
         super(new_resource, run_context)
       end
@@ -61,20 +62,19 @@ class Chef
 
         create_dotenv
         create_deploy_revision
+        create_vhost_config if app.has_webserver?
 
-        if app.has_webserver?
-          create_vhost_config
-        end
-
-        logrotate_create_config
-
-        service_create_upstart
         service_perform_action
       end
 
       def before_symlink
         create_writable_directories
         create_config_files
+      end
+
+      def before_restart
+        create_logrotate_config
+        service_create_upstart
       end
 
       def after_restart
@@ -188,16 +188,20 @@ class Chef
         end
       end
 
-      def logrotate_create_config
-        # r = Chef::Resource::LogrotateApp.new(
-        #   app.log_path,
-        #   run_context
-        # )
-        # r.template_owner Etc.getpwnam(user.username).uid
-        # r.template_group Etc.getgrnam(user.group).gid
-        # r.run_action(:create)
+      def create_logrotate_config
+        a = app
+        u = user
 
-        # new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r = logrotate_app a.name do
+          cookbook 'logrotate'
+          path ::File.join(a.log_dir, '*.log')
+          frequency 'daily'
+          rotate 180
+          options %w{ missingok dateext delaycompress notifempty compress }
+          create "644 #{u.username} #{u.group}"
+        end
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def create_vhost_config
@@ -260,12 +264,12 @@ class Chef
         r.account app.config['env']['CAMPFIRE_DEPLOYMENT_ACCOUNT']
         r.token app.config['env']['CAMPFIRE_DEPLOYMENT_TOKEN']
         r.room app.config['env']['CAMPFIRE_DEPLOYMENT_ROOM']
-        r.release({
+        r.release(
           deployer: user.username,
           environment: new_resource.environment,
           revision: new_resource.revision,
           application: new_resource.name
-        })
+        )
         r.run_action(action)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
