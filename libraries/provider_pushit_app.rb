@@ -21,6 +21,7 @@ require 'chef/mixin/command'
 
 require File.expand_path('../chef_pushit', __FILE__)
 require File.expand_path('../provider_pushit_base', __FILE__)
+require File.expand_path('../provider_pushit_monit', __FILE__)
 
 class Chef
   class Provider
@@ -32,6 +33,7 @@ class Chef
         @run_context = run_context
         @run_context.include_recipe('campfire-deployment::default')
         @run_context.include_recipe('logrotate::global')
+        @run_context.include_recipe('monit::default')
 
         super(new_resource, run_context)
       end
@@ -60,9 +62,12 @@ class Chef
           create_ssl_cert(app.webserver_certificate)
         end
 
+        create_vhost_config if app.has_webserver?
+        monit_create_check
+        create_logrotate_config
+
         create_dotenv
         create_deploy_revision
-        create_vhost_config if app.has_webserver?
 
         service_perform_action
       end
@@ -73,7 +78,6 @@ class Chef
       end
 
       def before_restart
-        create_logrotate_config
         service_create_upstart
       end
 
@@ -178,7 +182,7 @@ class Chef
             run_context
           )
           r.source file
-          r.cookbook new_resource.cookbook_name
+          r.cookbook new_resource.cookbook_name.to_s
           r.owner Etc.getpwnam(user.username).uid
           r.group Etc.getgrnam(user.group).gid
           r.mode 00755
@@ -186,6 +190,24 @@ class Chef
 
           new_resource.updated_by_last_action(true) if r.updated_by_last_action?
         end
+      end
+
+      def monit_create_check
+        r = Chef::Resource::PushitMonit.new(
+          new_resource.name,
+          run_context
+        )
+        r.check(
+          :name => new_resource.name,
+          :pid_file => app.upstart_pid,
+          :start_program => "/sbin/start #{new_resource.name}",
+          :stop_program => "/sbin/stop #{new_resource.name}",
+          :uid => 'root',
+          :gid => 'root'
+        )
+        r.run_action(:install)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def create_logrotate_config
