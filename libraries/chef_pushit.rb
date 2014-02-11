@@ -33,8 +33,6 @@ class Chef
     PUSHIT_DATA_BAG ||= 'pushit_apps'.freeze
     PUSHIT_RUBY_DEFAULT ||= '1.9.3-p392'
 
-    WHYRUN_ENABLED = false
-
     class << self
 
       def pushit_user
@@ -50,7 +48,7 @@ class Chef
       end
 
       def whyrun_enabled?
-        @whyrun_enabled || WHYRUN_ENABLED
+        @whyrun_enabled ||= false
       end
 
       # This should be an encrypted data bag
