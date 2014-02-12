@@ -79,8 +79,12 @@ class Chef
         ::File.join(path, 'shared', 'log')
       end
 
+      def pid_path
+        ::File.join(path, 'shared', 'pids')
+      end
+
       def upstart_pid
-        ::File.join(path, 'shared', 'pids', 'upstart.pid')
+        ::File.join(pid_path, 'upstart.pid')
       end
 
       def envfile
