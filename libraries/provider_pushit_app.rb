@@ -170,9 +170,26 @@ class Chef
           r.run_action(:create)
 
           new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-
           execute "chmod -R 00755 #{::File.join(app.shared_path, dir)}"
         end
+      end
+
+      def create_dotenv
+        r = Chef::Resource::Template.new(
+          ::File.join(app.shared_path, 'env'),
+          run_context
+        )
+        r.source 'env.erb'
+        r.cookbook 'pushit'
+        r.owner config['owner']
+        r.group config['group']
+        r.mode '0644'
+        r.variables(
+          :env => escape_env(config['env'])
+        )
+        r.run_action(:create)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def create_config_files
