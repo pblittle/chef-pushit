@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cd <%= @release_path %>
+exec chpst -u <%= @user %> -e <%= @runit_sv_path %>/env <%= @npm_binary %> start

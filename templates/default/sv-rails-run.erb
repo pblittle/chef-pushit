@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cd <%= @release_path %>
+exec chpst -u <%= @user %> -e <%= @runit_sv_path %>/env <%= @bundle_binary %> exec unicorn -p $PORT -c ./config/unicorn.rb

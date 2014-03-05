@@ -260,16 +260,14 @@ class Chef
         runit_service "#{user.username}-app" do
           sv_dir ::File.join(user.home, 'sv')
           service_dir ::File.join(user.home, 'service')
-          # run_template_name 'deployer'
-          # log_template_name 'deployer'
-          sv_templates false
-          log false
+          run_template_name 'deployer'
+          log_template_name 'deployer'
           owner user.username
           group user.group
-          options({
-            :runit_service_path => File.join(user.home, 'service'),
-            :user => user.username
-          })
+          options(
+            :runit_service_path => ::File.join(user.home, 'service'),
+            :username => user.username
+          )
           cookbook 'pushit'
         end
       end
