@@ -160,11 +160,7 @@ class Chef
         r.group config['group']
         r.mode '0644'
         r.variables(
-          :env => escape_env(
-            config['env'].merge(
-              'PATH' => '$PATH:/opt/pushit/rubies/ree-1.8.7-2012.02/bin'
-            )
-          )
+          :env => escape_env(config['env'])
         )
         r.run_action(:create)
 
