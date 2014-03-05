@@ -78,27 +78,27 @@ class Chef
         r.before_migrate do
           link "#{release_path}/.env" do
             to "#{new_resource.shared_path}/env"
-          end if File.exists? "#{new_resource.shared_path}/env"
+          end if ::File.exists? "#{new_resource.shared_path}/env"
 
           link "#{release_path}/.ruby-version" do
             to "#{new_resource.shared_path}/ruby-version"
-          end if File.exists? "#{new_resource.shared_path}/ruby-version"
+          end if ::File.exists? "#{new_resource.shared_path}/ruby-version"
 
           link "#{release_path}/config/database.yml" do
             to "#{new_resource.shared_path}/config/database.yml"
-          end if File.exists? "#{new_resource.shared_path}/config/database.yml"
+          end if ::File.exists? "#{new_resource.shared_path}/config/database.yml"
 
           link "#{release_path}/config/filestore.yml" do
             to "#{new_resource.shared_path}/config/filestore.yml"
-          end if File.exists? "#{new_resource.shared_path}/config/filestore.yml"
+          end if ::File.exists? "#{new_resource.shared_path}/config/filestore.yml"
 
           link "#{release_path}/config/unicorn.rb" do
             to "#{new_resource.shared_path}/config/unicorn.rb"
-          end if File.exists? "#{new_resource.shared_path}/config/unicorn.rb"
+          end if ::File.exists? "#{new_resource.shared_path}/config/unicorn.rb"
 
           link "#{release_path}/vendor/bundle" do
             to "#{new_resource.shared_path}/vendor_bundle"
-          end if File.exists? "#{new_resource.shared_path}/vendor_bundle"
+          end if ::File.exists? "#{new_resource.shared_path}/vendor_bundle"
 
           bundle_flags = [
             '--binstubs',
