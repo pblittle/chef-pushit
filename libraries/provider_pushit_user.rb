@@ -259,7 +259,7 @@ class Chef
 
         runit_service user.username do
           sv_dir ::File.join(user.home, 'sv')
-          service_dir ::File.join(user.home, 'service')
+          service_dir ::File.join('.', 'etc', 'service')
           run_template_name 'deployer'
           log_template_name 'deployer'
           owner user.username
