@@ -101,7 +101,7 @@ class Chef
       end
 
       def create_directories
-        [app.apps_path, app.path, app.shared_path].each do |dir|
+        [app.apps_path, app.path, app.shared_path, app.vendor_path].each do |dir|
           r = Chef::Resource::Directory.new(
             dir,
             run_context
