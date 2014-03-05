@@ -85,6 +85,7 @@ class Chef
       attr_accessor :bin_path
       attr_accessor :gem_path
       attr_accessor :ruby_binary
+      attr_accessor :bundle_binary
       attr_accessor :foreman_binary
 
       def initialize(version)
@@ -93,7 +94,9 @@ class Chef
         @prefix_path = prefix_path
         @bin_path = bin_path
         @ruby_binary = ruby_binary
+        @bundle_binary = bundle_binary
         @foreman_binary = foreman_binary
+        @unicorn_binary = unicorn_binary
       end
 
       def version
@@ -116,8 +119,16 @@ class Chef
         ::File.join(@bin_path, 'ruby')
       end
 
+      def bundle_binary
+        ::File.join(@bin_path, 'bundle')
+      end
+
       def foreman_binary
         ::File.join(@bin_path, 'foreman')
+      end
+
+      def unicorn_binary
+        ::File.join(@bin_path, 'unicorn')
       end
 
       def gem_path(executable)
@@ -127,7 +138,15 @@ class Chef
 
     class Certs
       def self.certs_path
-        ::File.join(Pushit.pushit_path, 'certs')
+        ::File.join(Pushit.pushit_path, 'ssl')
+      end
+
+      def self.certs_directory
+        ::File.join(certs_path, 'certs')
+      end
+
+      def self.keys_directory
+        ::File.join(certs_path, 'private')
       end
     end
   end

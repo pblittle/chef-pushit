@@ -71,7 +71,7 @@ class Chef
         if procfile?
           ::File.join(path, 'shared', 'log')
         else
-          ::File.join(path, 'shared', 'log', "#{app.name}.log")
+          ::File.join(path, 'shared', 'log', "#{name}.log")
         end
       end
 
@@ -100,14 +100,20 @@ class Chef
       end
 
       def service_config
-        File.join(
-          '', 'etc', 'init', "#{name}.conf"
-        )
+        File.join('', 'etc', 'init', "#{name}.conf")
+      end
+
+      def runit_service_path
+        File.join('', 'etc', 'service')
+      end
+
+      def runit_sv_path
+        File.join('', 'etc', 'sv')
       end
 
       def foreman_export_flags
         args = []
-        args << 'upstart /etc/init'
+        args << "runit #{runit_sv_path}"
         args << "-f #{procfile}"
         args << "-e #{envfile}"
         args << "-a #{name}"
@@ -132,30 +138,30 @@ class Chef
         @app['webserver']['https_port'] || 443
       end
 
-      def has_webserver?
+      def webserver?
         @app['webserver'] && !@app['webserver'].empty?
       end
 
-      def has_webserver_certificate?
-        self.has_webserver? && @app['webserver']['certificate'] &&
+      def webserver_certificate?
+        self.webserver? && @app['webserver']['certificate'] &&
           !@app['webserver']['certificate'].empty?
       end
 
       def webserver_certificate
-        has_webserver_certificate? ? @app['webserver']['certificate'] : nil
+        webserver_certificate? ? @app['webserver']['certificate'] : nil
       end
 
-      def has_database?
+      def database?
         @app['database'] && !@app['database'].empty?
       end
 
-      def has_database_certificate?
-        self.has_database? && @app['database']['certificate'] &&
+      def database_certificate?
+        self.database? && @app['database']['certificate'] &&
           !@app['database']['certificate'].empty?
       end
 
       def database_certificate
-        has_database_certificate? ? @app['database']['certificate'] : nil
+        database_certificate? ? @app['database']['certificate'] : nil
       end
 
       def server_name

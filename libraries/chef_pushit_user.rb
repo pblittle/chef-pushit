@@ -33,8 +33,6 @@ class Chef
         args = { username: args } if args.is_a?(String)
         @args = args
 
-        Chef::Log.warn 'ZZZ - Chef_pushit_user new'
-
         @ssh_private_key = ssh_private_key
         @ssh_public_key = ssh_public_key
         @ssh_deploy_keys = ssh_deploy_keys
@@ -102,7 +100,6 @@ class Chef
       private
 
       def config_data
-        Chef::Log.warn 'WWW - Chef_pushit_user config_data'
         Chef::DataBagItem.load('users', username)
       rescue
         {}

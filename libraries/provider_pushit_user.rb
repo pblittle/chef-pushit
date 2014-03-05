@@ -30,8 +30,6 @@ class Chef
         @new_resource = new_resource
         @run_context = run_context
 
-        Chef::Log.warn 'YYY - Provider_pushit_user new'
-
         super(new_resource, run_context)
       end
 
@@ -49,6 +47,7 @@ class Chef
         create_deploy_keys
         create_authorized_keys
         create_sudoers_file
+        create_runit_service
       end
 
       def action_create_deploy_keys
@@ -70,9 +69,10 @@ class Chef
         r.shell '/bin/bash'
         r.password pushit_user.password
         r.home pushit_user.home
-        r.supports :manage_home => false
+        r.supports :manage_home => true
         r.system false
         r.gid Etc.getgrnam(pushit_user.group).gid
+        r.uid Etc.getpwnam(pushit_user.username).uid
         r.run_action(:create)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
@@ -251,6 +251,26 @@ class Chef
           user username
           path config_file
           not_if { `grep #{identity_file} #{config_file}` }
+        end
+      end
+
+      def create_runit_service
+        user = pushit_user
+
+        runit_service "#{user.username}-app" do
+          sv_dir ::File.join(user.home, 'sv')
+          service_dir ::File.join(user.home, 'service')
+          # run_template_name 'deployer'
+          # log_template_name 'deployer'
+          sv_templates false
+          log false
+          owner user.username
+          group user.group
+          options({
+            :runit_service_path => File.join(user.home, 'service'),
+            :user => user.username
+          })
+          cookbook 'pushit'
         end
       end
     end

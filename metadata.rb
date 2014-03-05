@@ -11,7 +11,7 @@ long_description IO.read(
     'README.md'
   )
 )
-version '0.4.81'
+version '0.4.112'
 
 supports 'debian'
 supports 'ubuntu'
@@ -25,7 +25,9 @@ depends 'nodejs'
 depends 'database'
 depends 'newrelic-deployment'
 depends 'nginx'
+depends 'rsyslog'
 depends 'ruby_build'
+depends 'runit'
 depends 'ssh'
 depends 'ssh_known_hosts'
 depends 'sudo'

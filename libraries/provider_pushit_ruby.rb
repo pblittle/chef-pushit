@@ -26,7 +26,6 @@ class Chef
 
       def initialize(new_resource, run_context = nil)
         @new_resource = new_resource
-
         @run_context = run_context
         @run_context.include_recipe('ruby_build::default')
 
@@ -56,6 +55,7 @@ class Chef
           gem_package gem[:name] do
             gem_binary ::File.join(ruby.bin_path, 'gem')
             version gem[:version] if gem[:version]
+            options '--no-rdoc --no-ri'
           end
         end
 
@@ -112,7 +112,7 @@ class Chef
         template '/etc/profile.d/chruby.sh' do
           source 'chruby.sh.erb'
           cookbook 'pushit'
-          mode '0644'
+          mode '0755'
           variables(
             :chruby_path => '/usr/local/share/chruby',
             :rubies_path => ruby.rubies_path,

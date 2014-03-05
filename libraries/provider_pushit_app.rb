@@ -21,7 +21,6 @@ require 'chef/mixin/command'
 
 require File.expand_path('../chef_pushit', __FILE__)
 require File.expand_path('../provider_pushit_base', __FILE__)
-require File.expand_path('../provider_pushit_monit', __FILE__)
 
 class Chef
   class Provider
@@ -29,11 +28,9 @@ class Chef
 
       def initialize(new_resource, run_context = nil)
         @new_resource = new_resource
-
         @run_context = run_context
         @run_context.include_recipe('campfire-deployment::default')
         @run_context.include_recipe('logrotate::global')
-        @run_context.include_recipe('monit::default')
 
         super(new_resource, run_context)
       end
@@ -50,27 +47,23 @@ class Chef
         if new_resource.framework == 'rails'
           create_shared_directories
           create_ruby_version
-          create_database_yaml
-          create_unicorn_config
+          create_database_config if app.database?
+          create_unicorn_config if app.webserver?
         end
 
-        if app.has_database_certificate?
-          create_ssl_cert(app.database_certificate)
-        end
+        create_ssl_cert(app.database_certificate) if app.database_certificate?
+        create_ssl_cert(app.webserver_certificate) if app.webserver_certificate?
 
-        if app.has_webserver_certificate?
-          create_ssl_cert(app.webserver_certificate)
-        end
-
-        create_vhost_config if app.has_webserver?
-        monit_create_check
-        create_logrotate_config
+        create_vhost_config if app.webserver?
 
         create_dotenv
         create_deploy_revision
 
-        service_perform_action
+        create_logrotate_config
+        create_service_config
       end
+
+      def before_migrate; end
 
       def before_symlink
         create_writable_directories
@@ -78,7 +71,8 @@ class Chef
       end
 
       def before_restart
-        service_create_upstart
+        # create_logrotate_config
+        # create_service_config
       end
 
       def after_restart
@@ -106,27 +100,8 @@ class Chef
         @ruby ||= app.ruby
       end
 
-      def escape_env(vars = {})
-        vars.inject({}) do |hash, (key, value)|
-          hash[key.upcase] = value.gsub(/"/) { %q(\") }
-          hash
-        end
-      end
-
-      def service_perform_action
-        r = Chef::Resource::Service.new(
-          new_resource.name,
-          run_context
-        )
-        r.provider Chef::Provider::Service::Upstart
-        r.supports :status => true, :restart => true, :reload => true
-        r.action([:start, :enable])
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-      end
-
       def create_directories
-        [app.path, app.shared_path].each do |dir|
+        [app.apps_path, app.path, app.shared_path].each do |dir|
           r = Chef::Resource::Directory.new(
             dir,
             run_context
@@ -185,7 +160,11 @@ class Chef
         r.group config['group']
         r.mode '0644'
         r.variables(
-          :env => escape_env(config['env'])
+          :env => escape_env(
+            config['env'].merge(
+              'PATH' => '$PATH:/opt/pushit/rubies/ree-1.8.7-2012.02/bin'
+            )
+          )
         )
         r.run_action(:create)
 
@@ -209,35 +188,108 @@ class Chef
         end
       end
 
-      def monit_create_check
-        r = Chef::Resource::PushitMonit.new(
-          new_resource.name,
+      def create_service_config
+        if app.procfile?
+          foreman_export_service_config
+          foreman_symlink_service_config
+        else
+          export_upstart_config
+        end
+      end
+
+      def foreman_export_service_config
+        foreman_binary = ruby.foreman_binary
+        foreman_export_flags = app.foreman_export_flags
+        release_path = app.release_path
+
+        r = Chef::Resource::Execute.new(
+          "#{foreman_binary} export #{foreman_export_flags}",
           run_context
         )
-        r.check(
-          :name => new_resource.name,
-          :pid_file => app.upstart_pid,
-          :start_program => "/sbin/start #{new_resource.name}",
-          :stop_program => "/sbin/stop #{new_resource.name}",
-          :uid => 'root',
-          :gid => 'root'
+        r.cwd release_path
+        r.user 'root'
+        r.group 'root'
+        r.run_action :run
+        r.notifies(
+          :restart,
+          "service[#{new_resource.name}]",
+          :delayed
         )
-        r.run_action(:install)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
-      def create_logrotate_config
-        a = app
-        u = user
+      def foreman_symlink_service_config
+        services_path = "#{app.runit_sv_path}/#{app.name}*"
 
-        r = logrotate_app a.name do
+        Dir.glob(services_path).each do |service|
+
+          service_name = service.split('/').last
+          # service_path = ::File.join(app.runit_service_path, service_name)
+          # runit_sv_path = ::File.join(app.runit_sv_path, service_name)
+
+          r = runit_service service_name do
+            log false
+            sv_templates false
+            env(
+              'PATH' => '$PATH:/opt/pushit/rubies/ree-1.8.7-2012.02/bin'
+            )
+            action [:disable, :enable]
+          end
+
+          # r = link service_path do
+          #   to runit_sv_path
+          # end
+
+          # r = Chef::Resource::Link.new(
+          #   service_path,
+          #   run_context
+          # )
+          # r.to sv_path
+
+
+
+
+      #     bundle_binary = ruby.bundle_binary
+      #     log_dir = app.log_dir
+      #     npm_binary = Pushit::Nodejs.npm_binary
+      #     release_path = app.release_path
+      #     service_name = service.split('/').last
+      #     runit_sv_path = ::File.join(app.runit_sv_path, service_name)
+      #     username = user.username
+
+      #     r = runit_service service_name do
+      #       run_template_name new_resource.framework
+      #       log_template_name 'app'
+      #       options({
+      #         :bundle_binary => bundle_binary,
+      #         :log_dir => log_dir,
+      #         :npm_binary => npm_binary,
+      #         :release_path => release_path,
+      #         :runit_sv_path => runit_sv_path,
+      #         :user => username
+      #       })
+      #       cookbook 'pushit'
+      #       action [:disable, :enable]
+      #     end
+
+          new_resource.updated_by_last_action(r.updated_by_last_action?)
+        end
+      end
+
+      def create_logrotate_config
+        log_dir = app.log_dir
+        name = app.name
+        username = user.username
+        group = user.group
+
+        r = logrotate_app name do
           cookbook 'logrotate'
-          path ::File.join(a.log_dir, '*.log')
+          path ::File.join(log_dir, '*.log')
           frequency 'daily'
           rotate 180
           options %w{ missingok dateext delaycompress notifempty compress }
-          create "644 #{u.username} #{u.group}"
+          create "644 #{username} #{group}"
         end
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
@@ -253,12 +305,14 @@ class Chef
         r.server_name app.server_name
         r.upstream_port app.upstream_port
         r.upstream_socket app.upstream_socket
-        r.use_ssl app.has_webserver_certificate?
+        r.use_ssl app.webserver_certificate?
         r.ssl_certificate ::File.join(
-          Pushit::Certs.certs_path, 'certs', "#{new_resource.name}-bundle.crt"
+          Pushit::Certs.certs_directory,
+          "#{app.webserver_certificate}-bundle.crt"
         )
         r.ssl_certificate_key ::File.join(
-          Pushit::Certs.certs_path, 'private', "#{new_resource.name}.key"
+          Pushit::Certs.keys_directory,
+          "#{app.webserver_certificate}.key"
         )
         r.run_action(:create)
 
@@ -312,6 +366,13 @@ class Chef
         r.run_action(action)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      end
+
+      def escape_env(vars = {})
+        vars.inject({}) do |hash, (key, value)|
+          hash[key.upcase] = value.gsub(/"/) { %q(\") }
+          hash
+        end
       end
     end
   end

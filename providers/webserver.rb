@@ -25,6 +25,7 @@ def load_current_resource
     new_resource.type
   )
 
+  run_context.include_recipe 'logrotate::default'
   run_context.include_recipe 'nginx::default'
 
   @current_resource
@@ -32,6 +33,11 @@ end
 
 def whyrun_supported?
   true
+end
+
+action :create do
+  create_webserver_config
+  create_logrotate_config
 end
 
 def create_webserver_config
@@ -54,6 +60,20 @@ def create_webserver_config
   new_resource.updated_by_last_action(true) if r.updated_by_last_action?
 end
 
-action :create do
-  create_webserver_config
+def create_logrotate_config
+  log_dir = new_resource.log_path
+  name = 'nginx'
+  username = new_resource.user
+  group = new_resource.group
+
+  r = logrotate_app name do
+    cookbook 'logrotate'
+    path ::File.join(log_dir, '*.log')
+    frequency 'daily'
+    rotate 180
+    options %w{ missingok dateext delaycompress notifempty compress }
+    create "644 #{username} #{group}"
+  end
+
+  new_resource.updated_by_last_action(true) if r.updated_by_last_action?
 end

@@ -28,13 +28,10 @@ class Chef
 
       def initialize(new_resource, run_context = nil)
         @new_resource = new_resource
-
         @run_context = run_context
         @run_context.include_recipe('mysql::ruby')
 
         @framework = 'rails'
-        @bundle_binary = ruby.gem_path('bundle')
-        @unicorn_binary = ruby.gem_path('unicorn')
 
         super(new_resource, run_context)
       end
@@ -50,7 +47,7 @@ class Chef
           new_resource.name,
           run_context
         )
-        r.action new_resource.deploy_action
+        r.action 'force_deploy' # new_resource.deploy_action
         r.deploy_to app.path
 
         r.repository config['repo']
@@ -71,36 +68,37 @@ class Chef
         r.symlink_before_migrate({})
 
         r.migrate new_resource.migrate
-        r.migration_command "#{@bundle_binary} exec ./bin/rake db:migrate --trace"
+        r.migration_command "#{ruby.bundle_binary} exec ./bin/rake db:migrate --trace"
 
         app_config = config
+
         ruby_binary = ruby.ruby_binary
-        bundle_binary = @bundle_binary
+        bundle_binary = ruby.bundle_binary
 
         r.before_migrate do
           link "#{release_path}/.env" do
             to "#{new_resource.shared_path}/env"
-          end
+          end if File.exists? "#{new_resource.shared_path}/env"
 
           link "#{release_path}/.ruby-version" do
             to "#{new_resource.shared_path}/ruby-version"
-          end
+          end if File.exists? "#{new_resource.shared_path}/ruby-version"
 
           link "#{release_path}/config/database.yml" do
             to "#{new_resource.shared_path}/config/database.yml"
-          end
+          end if File.exists? "#{new_resource.shared_path}/config/database.yml"
 
           link "#{release_path}/config/filestore.yml" do
             to "#{new_resource.shared_path}/config/filestore.yml"
-          end
+          end if File.exists? "#{new_resource.shared_path}/config/filestore.yml"
 
-          link "#{release_path}/config/unic0rn.rb" do
-            to "#{new_resource.shared_path}/config/unic0rn.rb"
-          end
+          link "#{release_path}/config/unicorn.rb" do
+            to "#{new_resource.shared_path}/config/unicorn.rb"
+          end if File.exists? "#{new_resource.shared_path}/config/unicorn.rb"
 
           link "#{release_path}/vendor/bundle" do
             to "#{new_resource.shared_path}/vendor_bundle"
-          end
+          end if File.exists? "#{new_resource.shared_path}/vendor_bundle"
 
           bundle_flags = [
             '--binstubs',
@@ -169,7 +167,7 @@ class Chef
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
-      def create_database_yaml
+      def create_database_config
         environment = new_resource.environment
 
         if environment && config['database'].key?(environment)
@@ -241,7 +239,7 @@ class Chef
 
       def create_unicorn_config
         r = Chef::Resource::Template.new(
-          ::File.join(app.shared_path, 'config', 'unic0rn.rb'),
+          ::File.join(app.shared_path, 'config', 'unicorn.rb'),
           run_context
         )
         r.source 'unicorn.rb.erb'
@@ -266,13 +264,9 @@ class Chef
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
-      def service_create_upstart
-        service_config = ::File.join(
-          '', 'etc', 'init', "#{new_resource.name}.conf"
-        )
-
+      def export_upstart_config
         r = Chef::Resource::Template.new(
-          service_config,
+          app.service_config,
           run_context
         )
         r.source "#{@framework}.upstart.conf.erb"

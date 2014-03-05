@@ -46,7 +46,7 @@ class Chef
           new_resource.name,
           run_context
         )
-        r.action new_resource.deploy_action
+        r.action 'force_deploy' # new_resource.deploy_action
         r.deploy_to app.path
 
         r.repository config['repo']
@@ -63,20 +63,24 @@ class Chef
         r.group Etc.getgrnam(config['group']).name
 
         r.symlink_before_migrate({})
-        r.symlinks('pids' => 'tmp/pids', 'log' => 'log')
+        r.symlinks(
+          'env' => '.env',
+          'log' => 'log',
+          'pids' => 'pids'
+        )
 
         r.before_migrate do
-          link "#{release_path}/.env" do
-            to "#{new_resource.shared_path}/env"
-          end
+          # link "#{release_path}/.env" do
+          #   to "#{new_resource.shared_path}/env"
+          # end
 
-          link "#{release_path}/log" do
-            to "#{new_resource.shared_path}/log"
-          end
+          # link "#{release_path}/log" do
+          #   to "#{new_resource.shared_path}/log"
+          # end
 
-          link "#{release_path}/pids" do
-            to "#{new_resource.shared_path}/pids"
-          end
+          # link "#{release_path}/pids" do
+          #   to "#{new_resource.shared_path}/pids"
+          # end
 
           npm = Chef::Resource::Execute.new(
             "Install #{new_resource.name} dependencies",
@@ -107,32 +111,7 @@ class Chef
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
-      def service_create_upstart
-        if app.procfile?
-          Chef::Log.warn 'XXX - Foreman'
-          foreman_export_upstart_config
-        else
-          Chef::Log.warn 'XXX - Upstart'
-          export_upstart_config
-        end
-      end
-
-      def foreman_export_upstart_config
-        r = Chef::Resource::Execute.new(
-          "Foreman export #{new_resource.name} upstart config",
-          run_context
-        )
-        r.command "sudo #{ruby.foreman_binary} export #{app.foreman_export_flags}"
-        r.cwd app.release_path
-        r.user 'root'
-        r.group 'root'
-        r.run_action :run
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-      end
-
       def export_upstart_config
-        Chef::Log.warn 'YYY - Upstart'
         r = Chef::Resource::Template.new(
           app.service_config,
           run_context

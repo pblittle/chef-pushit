@@ -61,13 +61,6 @@ suites:
   data_bags_path:
     'test/data_bags'
 
-- name: ssl
-  run_list:
-    - recipe[minitest-handler]
-    - recipe[pushit_test::ssl]
-  data_bags_path:
-    'test/data_bags'
-
 - name: nodejs
   run_list:
     - recipe[minitest-handler]

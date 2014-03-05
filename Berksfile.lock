@@ -16,7 +16,7 @@
     "logrotate": {
       "locked_version": "1.5.0",
       "git": "git://github.com/stevendanna/logrotate.git",
-      "ref": "d0e24c6cb6051b033c3c7bc855469c50094452b9"
+      "ref": "39e91256be71c7091083851425a165193daea9d6"
     },
     "mysql": {
       "locked_version": "4.0.10"
@@ -35,9 +35,9 @@
       "ref": "3c73362c3471edd462074908b5980f5ee7f2166c"
     },
     "runit": {
-      "locked_version": "1.5.2",
+      "locked_version": "1.5.9",
       "git": "git://github.com/opscode-cookbooks/runit.git",
-      "ref": "76413dddc0db4fd6bc300b047a66b6d611ac0bf6"
+      "ref": "2b2c7664eea94b3a6ea0228916df575b1b95b8de"
     },
     "ssh": {
       "locked_version": "0.6.5",
@@ -79,7 +79,7 @@
       "locked_version": "2.3.1"
     },
     "rsyslog": {
-      "locked_version": "1.10.2"
+      "locked_version": "1.12.2"
     },
     "ohai": {
       "locked_version": "1.1.12"

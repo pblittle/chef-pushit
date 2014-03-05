@@ -28,10 +28,7 @@ class Chef
       attr_accessor :pushit_user
 
       def initialize(new_resource, run_context = nil)
-
-        Chef::Log.warn 'XXX - Provider_pushit_base new'
-
-        create_filesystem
+        # create_filesystem
         create_user
       end
 
@@ -40,18 +37,18 @@ class Chef
       end
 
       def pushit_user
-        @pushit_user ||= Pushit::User.new
+        @pushit_user ||= Chef::Pushit::User.new
       end
 
       private
 
-      def create_filesystem
-        return if Dir.exist?(pushit_user.home)
+      # def create_filesystem
+      #   return if Dir.exist?(pushit_user.home)
 
-        FileUtils.mkdir_p(
-          pushit_user.home, :mode => 0755
-        )
-      end
+      #   FileUtils.mkdir_p(
+      #     pushit_user.home, :mode => 0755
+      #   )
+      # end
 
       def create_user
         r = Chef::Resource::PushitUser.new(

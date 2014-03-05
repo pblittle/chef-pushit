@@ -29,7 +29,7 @@ class Chef
         @resource_name = :pushit_monit
         @provider = Chef::Provider::PushitMonit
         @action = :install
-        @allowed_actions.push :install
+        @allowed_actions.push :install, :restart
       end
 
       def name(arg = nil)

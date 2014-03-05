@@ -40,8 +40,15 @@ class Chef
       def action_install
         monit_monitrc new_resource.name do
           variables(new_resource.check)
-          template_source 'pushit_app.monitrc.erb'
+          template_source 'pushit_nodejs.monitrc.erb'
           template_cookbook 'pushit'
+          variables({ start_delay: 30 })
+        end
+      end
+
+      def action_restart
+        execute "monit restart #{new_resource.name}" do
+          command "monit restart #{new_resource.name}"
         end
       end
     end
