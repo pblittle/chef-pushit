@@ -228,14 +228,32 @@ class Chef
           # service_path = ::File.join(app.runit_service_path, service_name)
           # runit_sv_path = ::File.join(app.runit_sv_path, service_name)
 
+          username = user.username
+          group = user.group
+          home = user.home
+
           r = runit_service service_name do
-            log false
-            sv_templates false
-            env(
-              'PATH' => '$PATH:/opt/pushit/rubies/ree-1.8.7-2012.02/bin'
+            sv_dir ::File.join(home, 'sv')
+            service_dir ::File.join('', 'etc', 'service')
+            run_template_name 'deployer'
+            log_template_name 'deployer'
+            owner username
+            group group
+            options(
+              :runit_service_path => ::File.join(home, 'service'),
+              :username => username
             )
-            action [:disable, :enable]
+            cookbook 'pushit'
           end
+
+          # r = runit_service service_name do
+          #   log false
+          #   sv_templates false
+          #   env(
+          #     'PATH' => '$PATH:/opt/pushit/rubies/ree-1.8.7-2012.02/bin'
+          #   )
+          #   action [:disable, :enable]
+          # end
 
           # r = link service_path do
           #   to runit_sv_path
