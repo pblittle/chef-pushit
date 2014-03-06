@@ -216,7 +216,7 @@ class Chef
       end
 
       def foreman_symlink_service_config
-        services_path = "#{app.runit_sv_path}/#{app.name}*"
+        services_path = "#{user.runit_sv_dir}/#{app.name}*"
 
         Dir.glob(services_path).each do |service|
 

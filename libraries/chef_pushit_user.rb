@@ -97,6 +97,14 @@ class Chef
         ::File.join(ssh_directory, 'authorized_keys')
       end
 
+      def runit_service_dir
+        File.join(home, 'service')
+      end
+
+      def runit_sv_dir
+        File.join(home, 'sv')
+      end
+
       private
 
       def config_data

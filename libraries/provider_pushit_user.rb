@@ -47,6 +47,7 @@ class Chef
         create_deploy_keys
         create_authorized_keys
         create_sudoers_file
+        create_runit_service
       end
 
       def action_create_deploy_keys
@@ -250,6 +251,24 @@ class Chef
           user username
           path config_file
           not_if { `grep #{identity_file} #{config_file}` }
+        end
+      end
+
+      def create_runit_service
+        user = pushit_user
+
+        runit_service user.runit_sv_dir do
+          # sv_dir ::File.join(user.home, 'sv')
+          # service_dir ::File.join('.', 'etc', 'service')
+          run_template_name 'deployer'
+          log_template_name 'deployer'
+          # owner user.username
+          # group user.group
+          options(
+            :runit_service_dir => user.runit_service_dir,
+            :username => user.username
+          )
+          cookbook 'pushit'
         end
       end
     end
