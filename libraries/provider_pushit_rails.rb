@@ -112,10 +112,6 @@ class Chef
           bundle.user app_config['owner']
           bundle.environment new_resource.environment
           bundle.run_action(:run)
-
-          link "#{release_path}/vendor/bundle" do
-            to "#{new_resource.shared_path}/vendor_bundle"
-          end
         end
 
         r.before_symlink do
