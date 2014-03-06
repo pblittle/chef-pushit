@@ -100,7 +100,6 @@ class Chef
             '--binstubs',
             '--deployment',
             '--without test development',
-            "--path #{new_resource.shared_path}/vendor_bundle",
             "--shebang=#{ruby_binary}"
           ].join(' ')
 
