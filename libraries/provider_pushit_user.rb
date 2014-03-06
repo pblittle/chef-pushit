@@ -258,12 +258,12 @@ class Chef
         user = pushit_user
 
         runit_service user.runit_sv_dir do
-          # sv_dir ::File.join(user.home, 'sv')
-          # service_dir ::File.join('.', 'etc', 'service')
+          sv_dir user.runit_sv_dir
+          service_dir user.runit_service_dir
           run_template_name 'deployer'
           log_template_name 'deployer'
-          # owner user.username
-          # group user.group
+          owner user.username
+          group user.group
           options(
             :runit_service_dir => user.runit_service_dir,
             :username => user.username
