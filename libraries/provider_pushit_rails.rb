@@ -115,7 +115,7 @@ class Chef
 
           link "#{release_path}/vendor/bundle" do
             to "#{new_resource.shared_path}/vendor_bundle"
-          end if ::File.exists? "#{new_resource.shared_path}/vendor_bundle"
+          end
         end
 
         r.before_symlink do
