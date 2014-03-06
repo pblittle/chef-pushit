@@ -73,18 +73,18 @@ class Chef
 
       def log_path
         if procfile?
-          ::File.join(path, 'shared', 'log')
+          ::File.join(shared_path, 'log')
         else
-          ::File.join(path, 'shared', 'log', "#{name}.log")
+          ::File.join(shared_path, 'log', "#{name}.log")
         end
       end
 
       def log_dir
-        ::File.join(path, 'shared', 'log')
+        ::File.join(shared_path, 'log')
       end
 
       def pid_path
-        ::File.join(path, 'shared', 'pids')
+        ::File.join(shared_path, 'pids')
       end
 
       def upstart_pid
