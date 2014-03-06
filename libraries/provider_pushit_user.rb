@@ -257,7 +257,7 @@ class Chef
       def create_runit_service
         user = pushit_user
 
-        runit_service user.runit_sv_dir do
+        runit_service user.username do
           sv_dir user.runit_sv_dir
           service_dir user.runit_service_dir
           run_template_name 'deployer'
