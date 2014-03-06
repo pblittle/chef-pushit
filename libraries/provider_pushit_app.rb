@@ -236,7 +236,7 @@ class Chef
             owner username
             group group
             options(
-              :runit_service_path => runit_service_dir,
+              :runit_service_dir => runit_service_dir,
               :username => username
             )
             cookbook 'pushit'

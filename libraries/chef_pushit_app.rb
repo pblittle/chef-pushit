@@ -107,14 +107,6 @@ class Chef
         File.join('', 'etc', 'init', "#{name}.conf")
       end
 
-      def runit_service_path
-        File.join('', 'etc', 'service')
-      end
-
-      def runit_sv_path
-        File.join('', 'etc', 'sv')
-      end
-
       def foreman_export_flags
         args = []
         args << "runit /opt/pushit/sv"
