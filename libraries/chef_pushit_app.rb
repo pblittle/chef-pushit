@@ -117,7 +117,7 @@ class Chef
 
       def foreman_export_flags
         args = []
-        args << "runit #{runit_sv_path}"
+        args << "runit /opt/pushit/sv"
         args << "-f #{procfile}"
         args << "-e #{envfile}"
         args << "-a #{name}"

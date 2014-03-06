@@ -216,27 +216,27 @@ class Chef
       end
 
       def foreman_symlink_service_config
-        services_path = "#{user.runit_sv_dir}/#{app.name}*"
+        services_path = "#{user.runit_service_dir}/#{app.name}*"
 
         Dir.glob(services_path).each do |service|
 
           service_name = service.split('/').last
-          # service_path = ::File.join(app.runit_service_path, service_name)
-          # runit_sv_path = ::File.join(app.runit_sv_path, service_name)
+
+          runit_sv_dir = user.runit_sv_dir
+          runit_service_dir = user.runit_service_dir
 
           username = user.username
           group = user.group
-          home = user.home
 
           r = runit_service service_name do
-            sv_dir ::File.join(home, 'sv')
-            service_dir ::File.join('', 'etc', 'service')
+            sv_dir runit_sv_dir
+            service_dir runit_service_dir
             run_template_name 'deployer'
             log_template_name 'deployer'
             owner username
             group group
             options(
-              :runit_service_path => ::File.join(home, 'service'),
+              :runit_service_path => runit_service_dir,
               :username => username
             )
             cookbook 'pushit'
