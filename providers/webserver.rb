@@ -66,7 +66,7 @@ def create_logrotate_config
   username = new_resource.user
   group = new_resource.group
 
-  r = logrotate_app name do
+  logrotate_app name do
     cookbook 'logrotate'
     path ::File.join(log_dir, '*.log')
     frequency 'daily'
@@ -74,6 +74,4 @@ def create_logrotate_config
     options %w{ missingok dateext delaycompress notifempty compress }
     create "644 #{username} #{group}"
   end
-
-  new_resource.updated_by_last_action(true) if r.updated_by_last_action?
 end
