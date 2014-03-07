@@ -73,7 +73,6 @@ class Chef
         r.supports :manage_home => true
         r.system false
         r.gid Etc.getgrnam(pushit_user.group).gid
-        r.uid Etc.getpwnam(pushit_user.username).uid
         r.run_action(:create)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
