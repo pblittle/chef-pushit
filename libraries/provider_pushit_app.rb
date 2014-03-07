@@ -42,9 +42,6 @@ class Chef
       end
 
       def action_create
-        install_ruby
-        create_ruby_version
-
         create_directories
 
         if new_resource.framework == 'rails'
@@ -52,6 +49,9 @@ class Chef
           create_database_config if app.database?
           create_unicorn_config if app.webserver?
         end
+
+        install_ruby
+        create_ruby_version
 
         create_ssl_cert(app.database_certificate) if app.database_certificate?
         create_ssl_cert(app.webserver_certificate) if app.webserver_certificate?
