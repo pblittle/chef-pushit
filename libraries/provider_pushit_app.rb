@@ -42,11 +42,13 @@ class Chef
       end
 
       def action_create
+        install_ruby
+        create_ruby_version
+
         create_directories
 
         if new_resource.framework == 'rails'
           create_shared_directories
-          create_ruby_version
           create_database_config if app.database?
           create_unicorn_config if app.webserver?
         end
@@ -98,6 +100,16 @@ class Chef
 
       def ruby
         @ruby ||= app.ruby
+      end
+
+      def install_ruby
+        r = Chef::Resource::PushitRuby.new(
+          ruby.version,
+          run_context
+        )
+        r.run_action(:create)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def create_directories
@@ -203,8 +215,8 @@ class Chef
           run_context
         )
         r.cwd release_path
-        r.user 'root'
-        r.group 'root'
+        r.user user.username
+        r.group user.username
         r.run_action :run
         r.notifies(
           :restart,
@@ -228,7 +240,7 @@ class Chef
           username = user.username
           group = user.group
 
-          r = runit_service "#{username}-#{service_name}" do
+          r = runit_service service_name do
             log false
             sv_templates false
             sv_dir runit_sv_dir
