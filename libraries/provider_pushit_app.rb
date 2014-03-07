@@ -112,6 +112,24 @@ class Chef
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
+      def create_ruby_version
+        r = Chef::Resource::Template.new(
+          ::File.join(app.shared_path, 'ruby-version'),
+          run_context
+        )
+        r.source 'ruby-version.erb'
+        r.cookbook 'pushit'
+        r.owner config['owner']
+        r.group config['group']
+        r.mode '0644'
+        r.variables(
+          :ruby_version => config['ruby']
+        )
+        r.run_action(:create)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      end
+
       def create_directories
         [app.apps_path, app.path, app.shared_path].each do |dir|
           r = Chef::Resource::Directory.new(
