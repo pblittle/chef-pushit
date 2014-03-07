@@ -229,17 +229,14 @@ class Chef
           group = user.group
 
           r = runit_service service_name do
+            log false
+            sv_templates false
             sv_dir runit_sv_dir
             service_dir runit_service_dir
-            run_template_name 'deployer'
-            log_template_name 'deployer'
             owner username
             group group
-            options(
-              :runit_service_dir => runit_service_dir,
-              :username => username
-            )
             cookbook 'pushit'
+            action [:disable, :enable]
           end
 
           # r = runit_service service_name do
@@ -260,9 +257,6 @@ class Chef
           #   run_context
           # )
           # r.to sv_path
-
-
-
 
       #     bundle_binary = ruby.bundle_binary
       #     log_dir = app.log_dir

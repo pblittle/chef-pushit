@@ -98,7 +98,7 @@ class Chef
       end
 
       def runit_service_dir
-        File.join('.', 'etc', 'service')
+        File.join(home, 'service')
       end
 
       def runit_sv_dir
