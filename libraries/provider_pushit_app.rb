@@ -320,7 +320,7 @@ class Chef
         username = user.username
         group = user.group
 
-        r = logrotate_app name do
+        logrotate_app name do
           cookbook 'logrotate'
           path ::File.join(log_dir, '*.log')
           frequency 'daily'
@@ -328,8 +328,6 @@ class Chef
           options %w{ missingok dateext delaycompress notifempty compress }
           create "644 #{username} #{group}"
         end
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def create_vhost_config
