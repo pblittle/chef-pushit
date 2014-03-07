@@ -228,7 +228,7 @@ class Chef
           username = user.username
           group = user.group
 
-          r = runit_service service_name do
+          r = runit_service "#{username}-#{service_name}" do
             log false
             sv_templates false
             sv_dir runit_sv_dir
@@ -236,7 +236,6 @@ class Chef
             owner username
             group group
             cookbook 'pushit'
-            action [:disable, :enable]
           end
 
           # r = runit_service service_name do
