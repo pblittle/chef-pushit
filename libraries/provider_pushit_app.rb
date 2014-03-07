@@ -113,6 +113,14 @@ class Chef
       end
 
       def create_ruby_version
+
+        Chef::Log.warn "XXXXX"
+        Chef::Log.warn app.shared_path
+        Chef::Log.warn ruby.inspect
+        Chef::Log.warn ruby.version
+        Chef::Log.warn config.inspect
+        Chef::Log.warn "XXXXX"
+
         r = Chef::Resource::Template.new(
           ::File.join(app.shared_path, 'ruby-version'),
           run_context
@@ -123,7 +131,7 @@ class Chef
         r.group config['group']
         r.mode '0644'
         r.variables(
-          :ruby_version => config['ruby']
+          :ruby_version => ruby.version
         )
         r.run_action(:create)
 
