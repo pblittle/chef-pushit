@@ -103,15 +103,19 @@ class Chef
       end
 
       def install_ruby
-        r = Chef::Resource::PushitRuby.new(
-          ruby.version,
-          run_context
-        )
-        r.user Etc.getpwnam(user.username).uid
-        r.group Etc.getgrnam(user.group).gid
-        r.run_action(:create)
+        ruby_block "Install ruby #{ruby.version}" do
+          block do
+            r = Chef::Resource::PushitRuby.new(
+              ruby.version,
+              run_context
+            )
+            r.user Etc.getpwnam(user.username).uid
+            r.group Etc.getgrnam(user.group).gid
+            r.run_action(:create)
 
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+            new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+          end
+        end
       end
 
       def create_ruby_version
