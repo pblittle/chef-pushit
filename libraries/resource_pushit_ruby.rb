@@ -86,6 +86,22 @@ class Chef
           :kind_of => [String]
         )
       end
+
+      def user(arg = nil)
+        set_or_return(
+          :user,
+          arg,
+          :kind_of => [Integer]
+        )
+      end
+
+      def group(arg = nil)
+        set_or_return(
+          :group,
+          arg,
+          :kind_of => [Integer]
+        )
+      end
     end
   end
 end

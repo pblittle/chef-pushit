@@ -39,38 +39,13 @@ class Chef
       end
 
       def action_create
-        ruby_build_ruby new_resource.name do
-          # user pushit_user.username
-          # group pushit_user.group
-          definition ruby.version
-          prefix_path ruby.prefix_path
-          environment(new_resource.environment)
-
-          not_if do
-            ::File.exists?(::File.join(ruby.bin_path, 'ruby'))
-          end
-        end
-
-        new_resource.base_gems.each do |gem|
-          gem_package gem[:name] do
-            gem_binary ::File.join(ruby.bin_path, 'gem')
-            version gem[:version] if gem[:version]
-            options '--no-rdoc --no-ri'
-          end
-        end
-
-        new_resource.gems.each do |gem|
-          gem_package gem[:name] do
-            gem_binary ::File.join(ruby.bin_path, 'gem')
-            version gem[:version] if gem[:version]
-          end
-        end
+        install_ruby
+        install_base_gems
+        install_gems
 
         download_chruby
         install_chruby
         source_chruby
-
-        new_resource.updated_by_last_action(true)
       end
 
       def ruby
@@ -78,6 +53,33 @@ class Chef
       end
 
       private
+
+      def install_ruby
+        ruby_build_ruby new_resource.name do
+          definition ruby.version
+          prefix_path ruby.prefix_path
+          environment(new_resource.environment)
+        end
+      end
+
+      def install_base_gems
+        new_resource.base_gems.each do |gem|
+          gem_package gem[:name] do
+            gem_binary ::File.join(ruby.bin_path, 'gem')
+            version gem[:version] if gem[:version]
+            options '--no-rdoc --no-ri'
+          end
+        end
+      end
+
+      def install_gems
+        new_resource.gems.each do |gem|
+          gem_package gem[:name] do
+            gem_binary ::File.join(ruby.bin_path, 'gem')
+            version gem[:version] if gem[:version]
+          end
+        end
+      end
 
       def download_chruby
         ssh_known_hosts_entry 'github.com'

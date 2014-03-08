@@ -103,39 +103,26 @@ class Chef
       end
 
       def install_ruby
-        pushit_ruby ruby.version
+        r = Chef::Resource::PushitRuby.new(
+          ruby.version,
+          run_context
+        )
+        r.user Etc.getpwnam(user.username).uid
+        r.group Etc.getgrnam(user.group).gid
+        r.run_action(:create)
 
-        Chef::Log.warn "BBB"
-
-        # Chef::Log.warn app.shared_path
-        # Chef::Log.warn ruby.inspect
-        # Chef::Log.warn ruby.version
-        # Chef::Log.warn config.inspect
-        # Chef::Log.warn "XXXXX"
-
-        # r = Chef::Resource::PushitRuby.new(
-        #   ruby.version,
-        #   run_context
-        # )
-        # r.run_action(:create)
-
-        # Chef::Log.warn "YYYYY"
-        # Chef::Log.warn r.inspect
-        # Chef::Log.warn "YYYYY"
-
-        # new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def create_ruby_version
-
         r = Chef::Resource::Template.new(
           ::File.join(app.shared_path, 'ruby-version'),
           run_context
         )
         r.source 'ruby-version.erb'
         r.cookbook 'pushit'
-        r.owner config['owner']
-        r.group config['group']
+        r.owner user.username
+        r.group user.group
         r.mode '0644'
         r.variables(
           :ruby_version => ruby.version
