@@ -70,6 +70,7 @@ class Chef
         r.shell '/bin/bash'
         r.password pushit_user.password
         r.home pushit_user.home
+        r.manage_home true
         r.supports :manage_home => true
         r.system false
         r.gid Etc.getgrnam(pushit_user.group).gid
@@ -273,12 +274,8 @@ class Chef
         user = pushit_user
 
         runit_service "runsvdir-#{user.username}" do
-          sv_dir user.runit_sv_dir
-          service_dir user.runit_service_dir
           run_template_name 'deployer'
           log_template_name 'deployer'
-          owner user.username
-          group user.group
           options(
             :runit_service_dir => user.runit_service_dir,
             :username => user.username

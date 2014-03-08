@@ -263,10 +263,9 @@ class Chef
 
         Dir.glob(services_path).each do |service|
 
+          sv_dir = user.runit_sv_dir
+          service_dir = user.runit_service_dir
           service_name = service.split('/').last
-
-          runit_sv_dir = user.runit_sv_dir
-          runit_service_dir = user.runit_service_dir
 
           username = user.username
           group = user.group
@@ -274,54 +273,12 @@ class Chef
           r = runit_service service_name do
             log false
             sv_templates false
-            sv_dir runit_sv_dir
-            service_dir runit_service_dir
+            sv_dir sv_dir
+            service_dir service_dir
             owner username
             group group
             cookbook 'pushit'
           end
-
-          # r = runit_service service_name do
-          #   log false
-          #   sv_templates false
-          #   env(
-          #     'PATH' => '$PATH:/opt/pushit/rubies/ree-1.8.7-2012.02/bin'
-          #   )
-          #   action [:disable, :enable]
-          # end
-
-          # r = link service_path do
-          #   to runit_sv_path
-          # end
-
-          # r = Chef::Resource::Link.new(
-          #   service_path,
-          #   run_context
-          # )
-          # r.to sv_path
-
-      #     bundle_binary = ruby.bundle_binary
-      #     log_dir = app.log_dir
-      #     npm_binary = Pushit::Nodejs.npm_binary
-      #     release_path = app.release_path
-      #     service_name = service.split('/').last
-      #     runit_sv_path = ::File.join(app.runit_sv_path, service_name)
-      #     username = user.username
-
-      #     r = runit_service service_name do
-      #       run_template_name new_resource.framework
-      #       log_template_name 'app'
-      #       options({
-      #         :bundle_binary => bundle_binary,
-      #         :log_dir => log_dir,
-      #         :npm_binary => npm_binary,
-      #         :release_path => release_path,
-      #         :runit_sv_path => runit_sv_path,
-      #         :user => username
-      #       })
-      #       cookbook 'pushit'
-      #       action [:disable, :enable]
-      #     end
 
           new_resource.updated_by_last_action(r.updated_by_last_action?)
         end

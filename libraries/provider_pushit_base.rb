@@ -28,7 +28,6 @@ class Chef
       attr_accessor :pushit_user
 
       def initialize(new_resource, run_context = nil)
-        # create_filesystem
         create_user
       end
 
@@ -36,33 +35,25 @@ class Chef
         Pushit.whyrun_enabled?
       end
 
-      def pushit_user
-        @pushit_user ||= Chef::Pushit::User.new
+      def user
+        @user ||= Chef::Pushit::User.new
       end
 
       private
 
-      # def create_filesystem
-      #   return if Dir.exist?(pushit_user.home)
-
-      #   FileUtils.mkdir_p(
-      #     pushit_user.home, :mode => 0755
-      #   )
-      # end
-
       def create_user
         r = Chef::Resource::PushitUser.new(
-          pushit_user.username,
+          user.username,
           run_context
         )
-        r.name pushit_user.username
-        r.group pushit_user.group
-        r.home pushit_user.home
-        r.password pushit_user.password
-        r.ssh_private_key pushit_user.ssh_private_key
-        r.ssh_public_key pushit_user.ssh_public_key
-        r.ssh_keys pushit_user.ssh_keys
-        r.ssh_deploy_keys pushit_user.ssh_deploy_keys
+        r.name user.username
+        r.group user.group
+        r.home user.home
+        r.password user.password
+        r.ssh_private_key user.ssh_private_key
+        r.ssh_public_key user.ssh_public_key
+        r.ssh_keys user.ssh_keys
+        r.ssh_deploy_keys user.ssh_deploy_keys
         r.run_action(:create)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
