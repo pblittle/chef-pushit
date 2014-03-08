@@ -103,16 +103,6 @@ class Chef
       end
 
       def install_ruby
-        r = Chef::Resource::PushitRuby.new(
-          ruby.version,
-          run_context
-        )
-        r.run_action(:create)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-      end
-
-      def create_ruby_version
 
         Chef::Log.warn "XXXXX"
         Chef::Log.warn app.shared_path
@@ -120,6 +110,21 @@ class Chef
         Chef::Log.warn ruby.version
         Chef::Log.warn config.inspect
         Chef::Log.warn "XXXXX"
+
+        r = Chef::Resource::PushitRuby.new(
+          ruby.version,
+          run_context
+        )
+        r.run_action(:create)
+
+        Chef::Log.warn "YYYYY"
+        Chef::Log.warn r.inspect
+        Chef::Log.warn "YYYYY"
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      end
+
+      def create_ruby_version
 
         r = Chef::Resource::Template.new(
           ::File.join(app.shared_path, 'ruby-version'),
