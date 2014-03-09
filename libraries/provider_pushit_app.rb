@@ -108,7 +108,8 @@ class Chef
           user Etc.getpwnam(u.username).uid
           group Etc.getgrnam(u.group).gid
           action :nothing
-        end.run_action(:create)
+        end
+        r.run_action(:create)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
