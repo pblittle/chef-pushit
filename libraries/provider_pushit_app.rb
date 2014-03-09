@@ -103,9 +103,10 @@ class Chef
       end
 
       def install_ruby
+        u = user
         r = pushit_ruby ruby.version do
-          user Etc.getpwnam(user.username).uid
-          group Etc.getgrnam(user.group).gid
+          user Etc.getpwnam(u.username).uid
+          group Etc.getgrnam(u.group).gid
           action :nothing
         end.run_action(:create)
 
