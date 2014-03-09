@@ -27,7 +27,7 @@ class Chef
         @resource_name = :pushit_ruby
         @provider = Chef::Provider::PushitRuby
         @action = :create
-        @allowed_actions = [:create]
+        @allowed_actions = [:create, :nothing]
       end
 
       def name(arg = nil)
