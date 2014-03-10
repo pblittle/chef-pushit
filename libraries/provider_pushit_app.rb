@@ -73,8 +73,8 @@ class Chef
       end
 
       def before_restart
-        # create_logrotate_config
-        # create_service_config
+        create_logrotate_config
+        create_service_config
       end
 
       def after_restart
@@ -267,6 +267,10 @@ class Chef
             group group
             cookbook 'pushit'
           end
+
+          Chef::Log.warn 'XXXX'
+          Chef::Log.warn r
+          Chef::Log.warn 'ZZZZ'
 
           new_resource.updated_by_last_action(r.updated_by_last_action?)
         end
