@@ -98,13 +98,9 @@ class Chef
         @user ||= app.user
       end
 
-      def ruby
-        @ruby ||= app.ruby
-      end
-
       def install_ruby
         u = user
-        r = pushit_ruby ruby.version do
+        r = pushit_ruby config['ruby'] do
           user u.username
           group u.group
           action :nothing
@@ -125,7 +121,7 @@ class Chef
         r.group user.group
         r.mode '0644'
         r.variables(
-          :ruby_version => ruby.version
+          :ruby_version => config['ruby']
         )
         r.run_action(:create)
 
