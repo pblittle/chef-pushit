@@ -98,21 +98,18 @@ class Chef
         @user ||= app.user
       end
 
+      def ruby
+        @ruby ||= app.ruby
+      end
+
       def install_ruby
-
-        Chef::Log.warn '11111'
-        Chef::Log.warn config['ruby']
-
         u = user
-        r = pushit_ruby config['ruby'] do
+        r = pushit_ruby app.ruby.version do
           user u.username
           group u.group
           action :nothing
         end
         r.run_action(:create)
-
-        Chef::Log.warn '11111'
-        Chef::Log.warn r
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
@@ -128,7 +125,7 @@ class Chef
         r.group user.group
         r.mode '0644'
         r.variables(
-          :ruby_version => config['ruby']
+          :ruby_version => ruby.version
         )
         r.run_action(:create)
 

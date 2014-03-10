@@ -44,7 +44,9 @@ class Chef
       end
 
       def ruby
-        @ruby ||= Pushit::Ruby.new(@app['ruby'])
+        @ruby ||= Pushit::Ruby.new(
+          @app['ruby'] || PUSHIT_RUBY_DEFAULT
+        )
       end
 
       def name
