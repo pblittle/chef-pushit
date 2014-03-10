@@ -91,7 +91,7 @@ class Chef
         set_or_return(
           :user,
           arg,
-          :kind_of => [Integer]
+          :kind_of => [String]
         )
       end
 
@@ -99,7 +99,7 @@ class Chef
         set_or_return(
           :group,
           arg,
-          :kind_of => [Integer]
+          :kind_of => [String]
         )
       end
     end

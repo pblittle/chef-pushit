@@ -19,7 +19,7 @@
 
 require 'chef/provider'
 
-require File.expand_path('../chef_pushit', __FILE__)
+require ::File.expand_path('../chef_pushit', __FILE__)
 
 class Chef
   class Provider

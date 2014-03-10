@@ -11,6 +11,7 @@ cookbook 'nginx', :github => 'opscode-cookbooks/nginx'
 cookbook 'runit', :github => 'opscode-cookbooks/runit'
 cookbook 'ssh', :github => 'markolson/chef-ssh'
 cookbook 'sudo', :github => 'opscode-cookbooks/sudo'
+cookbook 'ruby_build', :github => 'fnichol/chef-ruby_build'
 
 metadata
 

@@ -49,6 +49,9 @@
       "git": "git://github.com/opscode-cookbooks/sudo.git",
       "ref": "6a616bcf0c7e26918103bca976064996dcd08350"
     },
+    "ruby_build": {
+      "locked_version": "0.8.0"
+    },
     "pushit": {
       "path": "."
     },
@@ -113,9 +116,6 @@
     },
     "xfs": {
       "locked_version": "1.1.0"
-    },
-    "ruby_build": {
-      "locked_version": "0.8.0"
     },
     "ssh_known_hosts": {
       "locked_version": "1.1.0"
