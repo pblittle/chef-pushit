@@ -89,7 +89,7 @@ class Chef
       attr_accessor :foreman_binary
 
       def initialize(version)
-        @version = version
+        @version = version || PUSHIT_RUBY_DEFAULT
         @rubies_path = rubies_path
         @prefix_path = prefix_path
         @bin_path = bin_path
@@ -100,7 +100,7 @@ class Chef
       end
 
       def version
-        @version || PUSHIT_RUBY_DEFAULT
+        @version
       end
 
       def rubies_path
