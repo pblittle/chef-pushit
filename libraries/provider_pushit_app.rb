@@ -226,12 +226,11 @@ class Chef
       end
 
       def foreman_export_service_config
-        foreman_binary = ruby.foreman_binary
         foreman_export_flags = app.foreman_export_flags
         release_path = app.release_path
 
         r = Chef::Resource::Execute.new(
-          "#{foreman_binary} export #{foreman_export_flags}",
+          "foreman export #{foreman_export_flags}",
           run_context
         )
         r.cwd release_path
