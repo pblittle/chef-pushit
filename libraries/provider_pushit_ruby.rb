@@ -55,7 +55,7 @@ class Chef
       private
 
       def install_ruby
-        ruby_build_ruby new_resource.name do
+        ruby_build_ruby ruby.version do
           definition ruby.version
           prefix_path ruby.prefix_path
           environment(new_resource.environment)

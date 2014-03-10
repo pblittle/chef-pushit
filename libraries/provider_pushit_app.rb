@@ -99,6 +99,10 @@ class Chef
       end
 
       def install_ruby
+
+        Chef::Log.warn '11111'
+        Chef::Log.warn config['ruby']
+
         u = user
         r = pushit_ruby config['ruby'] do
           user u.username
@@ -106,6 +110,9 @@ class Chef
           action :nothing
         end
         r.run_action(:create)
+
+        Chef::Log.warn '11111'
+        Chef::Log.warn r
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
