@@ -239,7 +239,7 @@ class Chef
         r.run_action :run
         r.notifies(
           :restart,
-          "service[#{new_resource.name}]",
+          "runit_service[#{new_resource.name}]",
           :delayed
         )
 
