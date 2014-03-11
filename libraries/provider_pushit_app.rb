@@ -60,11 +60,6 @@ class Chef
 
         create_dotenv
         create_deploy_revision
-
-        create_logrotate_config
-
-        create_service_config
-        service_perform_action
       end
 
       def before_migrate; end
@@ -77,6 +72,7 @@ class Chef
       def before_restart
         create_logrotate_config
         create_service_config
+        service_perform_action
       end
 
       def after_restart
