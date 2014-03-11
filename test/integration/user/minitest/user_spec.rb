@@ -72,14 +72,6 @@ describe 'pushit_test::user' do
         ::File.join(pushit_home, '.ssh', 'authorized_keys')
       ).include?('ssh-rsa == foo')
     end
-
-    it 'has created a runit sv directory' do
-      assert File.directory?(::File.join(pushit_home, 'sv'))
-    end
-
-    it 'has created a runit service directory' do
-      assert File.directory?(::File.join(pushit_home, 'service'))
-    end
   end
 
   describe 'custom pushit user' do

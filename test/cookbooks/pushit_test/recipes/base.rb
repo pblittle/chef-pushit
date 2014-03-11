@@ -21,4 +21,3 @@
 #
 
 include_recipe 'git::default'
-include_recipe 'runit::default'

@@ -240,37 +240,11 @@ class Chef
         r.run_action :run
         r.notifies(
           :restart,
-          "runit_service[#{new_resource.name}]",
+          "service[#{new_resource.name}]",
           :delayed
         )
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-      end
-
-      def foreman_symlink_service_config
-        services_path = "#{user.runit_service_dir}/#{app.name}*"
-
-        Dir.glob(services_path).each do |service|
-
-          sv_dir = user.runit_sv_dir
-          service_dir = user.runit_service_dir
-          service_name = service.split('/').last
-
-          username = user.username
-          group = user.group
-
-          r = runit_service service_name do
-            log false
-            sv_templates false
-            sv_dir sv_dir
-            service_dir service_dir
-            owner username
-            group group
-            cookbook 'pushit'
-          end
-
-          new_resource.updated_by_last_action(r.updated_by_last_action?)
-        end
       end
 
       def service_perform_action

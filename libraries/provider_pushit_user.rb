@@ -47,8 +47,6 @@ class Chef
         create_deploy_keys
         create_authorized_keys
         create_sudoers_file
-        create_runit_directories
-        create_runit_service
       end
 
       def action_create_deploy_keys
@@ -252,37 +250,6 @@ class Chef
           user username
           path config_file
           not_if { `grep #{identity_file} #{config_file}` }
-        end
-      end
-
-      def create_runit_directories
-        [ pushit_user.runit_sv_dir, pushit_user.runit_service_dir ].each do |directory|
-          r = Chef::Resource::Directory.new(
-            directory,
-            run_context
-          )
-          r.owner pushit_user.username
-          r.group pushit_user.group
-          r.recursive true
-          r.run_action(:create)
-
-          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-        end
-      end
-
-      def create_runit_service
-        user = pushit_user
-
-        runit_service "runsvdir-#{user.username}" do
-          run_template_name 'deployer'
-          log_template_name 'deployer'
-          owner user.username
-          group user.group
-          options(
-            :runit_service_dir => user.runit_service_dir,
-            :username => user.username
-          )
-          cookbook 'pushit'
         end
       end
     end
