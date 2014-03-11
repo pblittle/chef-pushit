@@ -20,4 +20,8 @@
 # limitations under the License.
 #
 
-chef_gem 'foreman'
+r = chef_gem 'foreman' do
+  action :nothing
+end
+
+r.run_action(:install)

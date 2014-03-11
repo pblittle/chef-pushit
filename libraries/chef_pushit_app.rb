@@ -111,7 +111,7 @@ class Chef
 
       def foreman_export_flags
         args = []
-        args << "runit /opt/pushit/service"
+        args << "upstart /etc/init"
         args << "-f #{procfile}"
         args << "-e #{envfile}"
         args << "-a #{name}"

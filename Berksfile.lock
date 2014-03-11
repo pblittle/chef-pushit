@@ -35,9 +35,9 @@
       "ref": "3c73362c3471edd462074908b5980f5ee7f2166c"
     },
     "runit": {
-      "locked_version": "1.5.9",
+      "locked_version": "1.5.11",
       "git": "git://github.com/opscode-cookbooks/runit.git",
-      "ref": "2b2c7664eea94b3a6ea0228916df575b1b95b8de"
+      "ref": "d54b9ade9311c3bdf242c9d6650b9fd761588247"
     },
     "ssh": {
       "locked_version": "0.6.5",

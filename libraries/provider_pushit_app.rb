@@ -218,8 +218,9 @@ class Chef
 
       def create_service_config
         if app.procfile?
-          foreman_export_service_config
-          foreman_symlink_service_config
+          export_upstart_config
+          # foreman_export_service_config
+          # foreman_symlink_service_config
         else
           export_upstart_config
         end
