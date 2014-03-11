@@ -62,7 +62,9 @@ class Chef
         create_deploy_revision
 
         create_logrotate_config
+
         create_service_config
+        service_perform_action
       end
 
       def before_migrate; end
@@ -218,9 +220,7 @@ class Chef
 
       def create_service_config
         if app.procfile?
-          export_upstart_config
-          # foreman_export_service_config
-          # foreman_symlink_service_config
+          foreman_export_service_config
         else
           export_upstart_config
         end
@@ -271,6 +271,18 @@ class Chef
 
           new_resource.updated_by_last_action(r.updated_by_last_action?)
         end
+      end
+
+      def service_perform_action
+        r = Chef::Resource::Service.new(
+          new_resource.name,
+          run_context
+        )
+        r.provider Chef::Provider::Service::Upstart
+        r.supports :status => true, :restart => true, :reload => true
+        r.action([:start, :enable])
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def create_logrotate_config

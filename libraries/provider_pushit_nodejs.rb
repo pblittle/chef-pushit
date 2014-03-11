@@ -70,18 +70,6 @@ class Chef
         )
 
         r.before_migrate do
-          # link "#{release_path}/.env" do
-          #   to "#{new_resource.shared_path}/env"
-          # end
-
-          # link "#{release_path}/log" do
-          #   to "#{new_resource.shared_path}/log"
-          # end
-
-          # link "#{release_path}/pids" do
-          #   to "#{new_resource.shared_path}/pids"
-          # end
-
           npm = Chef::Resource::Execute.new(
             "Install #{new_resource.name} dependencies",
             run_context
