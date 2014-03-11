@@ -321,8 +321,8 @@ class Chef
           certificate,
           run_context
         )
-        r.owner Etc.getpwnam(app.config['owner']).name
-        r.group Etc.getgrnam(app.config['group']).name
+        r.owner user.username
+        r.group user.group
         r.cert_path Pushit::Certs.certs_path
         r.cert_file "#{certificate}.pem"
         r.key_file "#{certificate}.key"
