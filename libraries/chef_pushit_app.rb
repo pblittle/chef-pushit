@@ -78,7 +78,7 @@ class Chef
       end
 
       def log_path
-        ::File.join(log_dir, 'log', "#{name}.log")
+        ::File.join(log_dir, "#{name}.log")
       end
 
       def pid_path
