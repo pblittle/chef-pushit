@@ -235,8 +235,8 @@ class Chef
           run_context
         )
         r.cwd release_path
-        r.user user.username
-        r.group user.username
+        r.user 'root'
+        r.group 'root'
         r.run_action :run
         r.notifies(
           :restart,
