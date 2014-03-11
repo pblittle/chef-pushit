@@ -261,8 +261,8 @@ class Chef
             directory,
             run_context
           )
-          r.owner Etc.getpwnam(pushit_user.username).uid
-          r.group Etc.getgrnam(pushit_user.group).gid
+          r.owner pushit_user.username
+          r.group pushit_user.group
           r.recursive true
           r.run_action(:create)
 
@@ -276,6 +276,8 @@ class Chef
         runit_service "runsvdir-#{user.username}" do
           run_template_name 'deployer'
           log_template_name 'deployer'
+          owner user.username
+          group user.group
           options(
             :runit_service_dir => user.runit_service_dir,
             :username => user.username
