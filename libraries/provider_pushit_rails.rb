@@ -258,7 +258,7 @@ class Chef
           :log_path => app.log_path,
           :pid_file => app.upstart_pid,
           :config_file => ::File.join(
-            app.release_path, 'config', 'unic0rn.rb'
+            app.shared_path, 'config', 'unicorn.rb'
           ),
           :exec => ::File.join(
             app.release_path, 'bin', 'unicorn'
