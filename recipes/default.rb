@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
 # Cookbook Name:: pushit
-# Recipe:: ruby
+# Recipe:: default
 #
 # Author:: P. Barrett Little (<barrett@barrettlittle.com>)
 #
@@ -19,9 +19,3 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-r = chef_gem 'foreman' do
-  action :nothing
-end
-
-r.run_action(:install)
