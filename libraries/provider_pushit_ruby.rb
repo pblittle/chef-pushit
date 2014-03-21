@@ -22,6 +22,7 @@ require File.expand_path('../provider_pushit_base', __FILE__)
 
 class Chef
   class Provider
+
     class PushitRuby < Chef::Provider::PushitBase
 
       def initialize(new_resource, run_context = nil)
@@ -40,7 +41,6 @@ class Chef
 
       def action_create
         install_ruby
-        install_base_gems
         install_gems
 
         download_chruby
@@ -59,16 +59,6 @@ class Chef
           definition ruby.version
           prefix_path ruby.prefix_path
           environment(new_resource.environment)
-        end
-      end
-
-      def install_base_gems
-        new_resource.base_gems.each do |gem|
-          gem_package gem[:name] do
-            gem_binary ::File.join(ruby.bin_path, 'gem')
-            version gem[:version] if gem[:version]
-            options '--no-rdoc --no-ri'
-          end
         end
       end
 

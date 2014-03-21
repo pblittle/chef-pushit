@@ -44,13 +44,15 @@ class Chef
       end
 
       def ruby
-        @ruby ||= Pushit::Ruby.new(
-          @app['ruby'] || PUSHIT_RUBY_DEFAULT
-        )
+        @ruby ||= Pushit::Ruby.new(@app['ruby'])
       end
 
       def name
-        @app['id']
+        @name ||= @app['id']
+      end
+
+      def gem_dependencies
+        @gem_dependencies ||= PUSHIT_GEM_DEPENDENCIES
       end
 
       def path
@@ -73,12 +75,8 @@ class Chef
         ::File.join(path, 'vendor')
       end
 
-      def log_dir
-        ::File.join(shared_path, 'log')
-      end
-
       def log_path
-        ::File.join(log_dir, "#{name}.log")
+        ::File.join(shared_path, 'logs', "#{name}.log")
       end
 
       def pid_path
@@ -102,7 +100,7 @@ class Chef
       end
 
       def service_config
-        File.join('', 'etc', 'init', "#{name}.conf")
+        ::File.join('', 'etc', 'init', "#{name}.conf")
       end
 
       def foreman_export_flags
@@ -166,9 +164,11 @@ class Chef
         ::File.join(current_path, 'public')
       end
 
-      def version
-        cached_copy_dir = ::File.join(shared_path, 'cached-copy')
+      def cached_copy_dir
+        ::File.join(shared_path, 'cached-copy')
+      end
 
+      def version
         if ::File.directory?(::File.join(cached_copy_dir, '.git'))
           Dir.chdir(cached_copy_dir) do
             `git rev-parse HEAD`.chomp

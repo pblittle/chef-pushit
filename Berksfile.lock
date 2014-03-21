@@ -108,9 +108,6 @@
     "database": {
       "locked_version": "1.6.0"
     },
-    "postgresql": {
-      "locked_version": "3.3.4"
-    },
     "aws": {
       "locked_version": "1.0.0"
     },

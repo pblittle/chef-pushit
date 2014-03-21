@@ -42,6 +42,7 @@ class Chef
       end
 
       def action_create
+        install_gem_dependencies
         create_directories
 
         if new_resource.framework == 'rails'
@@ -50,7 +51,6 @@ class Chef
           create_unicorn_config if app.webserver?
         end
 
-        install_ruby
         create_ruby_version
 
         create_ssl_cert(app.database_certificate) if app.database_certificate?
@@ -98,6 +98,26 @@ class Chef
 
       def ruby
         @ruby ||= app.ruby
+      end
+
+      def install_gem_dependencies
+        Chef::Log.warn 'WWWWW'
+        Chef::Log.warn app.gem_dependencies
+
+        app.gem_dependencies.each do |gem|
+          r = Chef::Resource::ChefGem.new(
+            gem,
+            run_context
+          )
+          r.run_action(:install)
+
+          Chef::Log.warn 'XXXXX'
+          Chef::Log.warn gem
+          Chef::Log.warn r
+          Chef::Log.warn 'XXXXX'
+
+          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        end
       end
 
       def install_ruby
@@ -223,11 +243,12 @@ class Chef
       end
 
       def foreman_export_service_config
+        foreman_binary = ruby.foreman_binary
         foreman_export_flags = app.foreman_export_flags
         release_path = app.release_path
 
         r = Chef::Resource::Execute.new(
-          "foreman export #{foreman_export_flags}",
+          "#{foreman_binary} export #{foreman_export_flags}",
           run_context
         )
         r.cwd release_path
@@ -256,14 +277,14 @@ class Chef
       end
 
       def create_logrotate_config
-        log_dir = app.log_dir
+        log_path = app.log_path
         name = app.name
         username = user.username
         group = user.group
 
         logrotate_app name do
           cookbook 'logrotate'
-          path ::File.join(log_dir, '*.log')
+          path log_path
           frequency 'daily'
           rotate 180
           options %w{ missingok dateext delaycompress notifempty compress }

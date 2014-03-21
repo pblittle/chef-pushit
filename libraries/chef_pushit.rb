@@ -32,6 +32,7 @@ class Chef
     PUSHIT_PATH ||= ::File.join('', 'opt', 'pushit').freeze
     PUSHIT_DATA_BAG ||= 'pushit_apps'.freeze
     PUSHIT_RUBY_DEFAULT ||= '2.0.0-p353'
+    PUSHIT_GEM_DEPENDENCIES ||= %w{ bundler foreman unicorn }.freeze
 
     class << self
 
@@ -89,7 +90,7 @@ class Chef
       attr_accessor :foreman_binary
 
       def initialize(version)
-        @version = version || PUSHIT_RUBY_DEFAULT
+        @version = version
         @rubies_path = rubies_path
         @prefix_path = prefix_path
         @bin_path = bin_path
@@ -100,7 +101,7 @@ class Chef
       end
 
       def version
-        @version
+        @version ||= PUSHIT_RUBY_DEFAULT
       end
 
       def rubies_path
@@ -120,15 +121,15 @@ class Chef
       end
 
       def bundle_binary
-        ::File.join(@bin_path, 'bundle')
+        ::File.join('bundle')
       end
 
       def foreman_binary
-        ::File.join(@bin_path, 'foreman')
+        ::File.join('foreman')
       end
 
       def unicorn_binary
-        ::File.join(@bin_path, 'unicorn')
+        ::File.join('unicorn')
       end
 
       def gem_path(executable)

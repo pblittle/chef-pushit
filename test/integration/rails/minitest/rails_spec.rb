@@ -31,12 +31,6 @@ describe 'pushit_test::rails' do
     )
   end
 
-  it 'has created a pids directory' do
-    assert File.directory?(
-      ::File.join(pushit_app_path, 'shared', 'pids')
-    )
-  end
-
   it 'has symlinked the current release' do
     assert File.symlink?(
       ::File.join(pushit_app_path, 'current')
@@ -61,6 +55,12 @@ describe 'pushit_test::rails' do
     assert ::File.read(
       database_yaml_path
     ).include?('foo: bar')
+  end
+
+  it 'has created a pids directory' do
+    assert File.directory?(
+      ::File.join(pushit_app_path, 'shared', 'pids')
+    )
   end
 
   it 'has created a service config' do
