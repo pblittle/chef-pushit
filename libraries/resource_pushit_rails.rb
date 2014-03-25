@@ -44,18 +44,6 @@ class Chef
         )
       end
 
-      def gems(arg = nil)
-        set_or_return(
-          :gems,
-          arg,
-          :kind_of => [Array],
-          :default => [
-            { :name => 'bundler' },
-            { :name => 'unicorn' }
-          ]
-        )
-      end
-
       def migrate(arg = nil)
         set_or_return(
           :migrate,

@@ -10,7 +10,7 @@ describe 'pushit_test::nodejs' do
   let(:pushit_app_path) { ::File.join(pushit_path, 'nodejs-example') }
 
   let(:pushit_log_path) do
-    ::File.join(pushit_app_path, 'shared', 'logs', 'nodejs-example.log')
+    ::File.join(pushit_app_path, 'shared', 'log', 'nodejs-example.log')
   end
 
   let(:pushit_pid_path) do
