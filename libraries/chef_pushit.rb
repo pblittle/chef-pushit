@@ -121,7 +121,7 @@ class Chef
       end
 
       def bundle_binary
-        ::File.join('bundle')
+        ::File.join(@bin_path, 'bundle')
       end
 
       def foreman_binary
