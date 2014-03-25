@@ -72,27 +72,6 @@ class Chef
         end
         r.run_action(:install)
 
-        # r = rbenv_ruby do
-        #   definition ruby.version
-        #   root_path ruby.rubies_path
-        #   user @user.username
-        #   environment(new_resource.environment)
-        #   action :nothing
-        # end
-        # r.run_action(:create)
-
-        # r = Chef::Resource::RbenvRuby.new(
-        #   ruby.version,
-        #   run_context
-        # )
-        # r.root_path ruby.rubies_path
-        # r.user @user.username
-        # r.root_path @user.home
-        # r.environment(new_resource.environment)
-
-        Chef::Log.warn 'ZZZZ'
-        Chef::Log.warn r
-
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
@@ -108,6 +87,12 @@ class Chef
       end
 
       def install_gems
+
+        Chef::Log.warn 'BBBBBB'
+        Chef::Log.warn new_resource.gems
+        Chef::Log.warn ruby
+        Chef::Log.warn 'BBBBBB'
+
         new_resource.gems.each do |gem|
           r = Chef::Resource::RbenvGem.new(
             ruby.version,
