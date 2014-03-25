@@ -49,7 +49,10 @@ class Chef
           :gems,
           arg,
           :kind_of => [Array],
-          :default => %w{ bundler unicorn }
+          :default => [
+            { :name => 'bundler' },
+            { :name => 'unicorn' }
+          ]
         )
       end
 
