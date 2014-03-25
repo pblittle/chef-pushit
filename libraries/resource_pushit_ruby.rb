@@ -54,7 +54,9 @@ class Chef
           :gems,
           arg,
           :kind_of => [Array],
-          :default => []
+          :default => [
+            { :name => 'bundler' }
+          ]
         )
       end
 
