@@ -87,15 +87,9 @@ class Chef
       end
 
       def install_gems
-
-        Chef::Log.warn 'BBBBBB'
-        Chef::Log.warn new_resource.gems
-        Chef::Log.warn ruby
-        Chef::Log.warn 'BBBBBB'
-
         new_resource.gems.each do |gem|
           r = Chef::Resource::RbenvGem.new(
-            ruby.version,
+            gem[:name],
             run_context
           )
           r.rbenv_version ruby.version
