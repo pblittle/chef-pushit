@@ -4,9 +4,9 @@
       "path": "../chef-campfire-deployment"
     },
     "certificate": {
-      "locked_version": "0.4.3",
+      "locked_version": "0.5.1",
       "git": "git://github.com/atomic-penguin/cookbook-certificate.git",
-      "ref": "c138e8237702dca5f01ccbf57a62e8048f88dab6"
+      "ref": "1264117b84a2eb1c1d8db468a531f3d8a0ddfd70"
     },
     "monit": {
       "locked_version": "1.5.2",
@@ -39,6 +39,19 @@
       "git": "git://github.com/opscode-cookbooks/runit.git",
       "ref": "d54b9ade9311c3bdf242c9d6650b9fd761588247"
     },
+    "postgresql": {
+      "locked_version": "3.3.4",
+      "git": "git://github.com/opscode-cookbooks/postgresql.git",
+      "ref": "5800238828b443725442fe510ec4f5308ed9ce8b"
+    },
+    "rbenv": {
+      "locked_version": "0.7.3",
+      "git": "git://github.com/fnichol/chef-rbenv.git",
+      "ref": "0a3018634bafe58ad21c6ee271af015220e444b9"
+    },
+    "ruby_build": {
+      "locked_version": "0.8.0"
+    },
     "ssh": {
       "locked_version": "0.6.5",
       "git": "git://github.com/markolson/chef-ssh.git",
@@ -48,9 +61,6 @@
       "locked_version": "2.2.3",
       "git": "git://github.com/opscode-cookbooks/sudo.git",
       "ref": "6a616bcf0c7e26918103bca976064996dcd08350"
-    },
-    "ruby_build": {
-      "locked_version": "0.8.0"
     },
     "pushit": {
       "path": "."
@@ -73,7 +83,7 @@
       "locked_version": "1.1.0"
     },
     "build-essential": {
-      "locked_version": "1.4.2"
+      "locked_version": "1.4.4"
     },
     "curl": {
       "locked_version": "1.1.0"
@@ -88,37 +98,40 @@
       "locked_version": "1.1.12"
     },
     "yum-epel": {
-      "locked_version": "0.2.0"
+      "locked_version": "0.3.4"
+    },
+    "java": {
+      "locked_version": "1.22.0"
     },
     "git": {
-      "locked_version": "2.9.0"
+      "locked_version": "4.0.0"
     },
     "dmg": {
-      "locked_version": "2.1.4"
+      "locked_version": "2.2.0"
     },
     "windows": {
-      "locked_version": "1.12.8"
+      "locked_version": "1.30.0"
     },
     "chef_handler": {
-      "locked_version": "1.1.4"
+      "locked_version": "1.1.5"
     },
     "nodejs": {
       "locked_version": "1.3.0"
     },
     "database": {
-      "locked_version": "1.6.0"
+      "locked_version": "2.0.0"
     },
     "aws": {
-      "locked_version": "1.0.0"
+      "locked_version": "2.1.1"
     },
     "xfs": {
       "locked_version": "1.1.0"
     },
     "ssh_known_hosts": {
-      "locked_version": "1.1.0"
+      "locked_version": "1.2.0"
     },
     "partial_search": {
-      "locked_version": "1.0.6"
+      "locked_version": "1.0.8"
     }
   }
 }

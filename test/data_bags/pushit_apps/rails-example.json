@@ -2,9 +2,9 @@
   "id": "rails-example",
   "owner": "deploy",
   "group": "deploy",
-  "repo": "https://github.com/heroku/ruby-rails-unicorn-sample.git",
+  "repo": "https://github.com/heroku/ruby-rails-sample",
   "framework": "rails",
-  "ruby": "1.9.3-p392",
+  "ruby": "2.1.1",
   "environment": "development",
   "webserver": {
     "type": "nginx",

@@ -101,20 +101,12 @@ class Chef
       end
 
       def install_gem_dependencies
-        Chef::Log.warn 'WWWWW'
-        Chef::Log.warn app.gem_dependencies
-
         app.gem_dependencies.each do |gem|
           r = Chef::Resource::ChefGem.new(
             gem,
             run_context
           )
           r.run_action(:install)
-
-          Chef::Log.warn 'XXXXX'
-          Chef::Log.warn gem
-          Chef::Log.warn r
-          Chef::Log.warn 'XXXXX'
 
           new_resource.updated_by_last_action(true) if r.updated_by_last_action?
         end

@@ -28,7 +28,19 @@ class Chef
       def initialize(new_resource, run_context = nil)
         @new_resource = new_resource
         @run_context = run_context
-        @run_context.include_recipe('ruby_build::default')
+        # @run_context.node.default['rbenv']['user_installs'] = [{
+        #   'user' => new_resource.user,
+        #   'home' => user.home,
+        #   'environment' => new_resource.environment
+        # }]
+
+        recipe_eval do
+          @run_context.include_recipe('ruby_build::default')
+        end
+
+        recipe_eval do
+          @run_context.include_recipe('rbenv::user_install')
+        end
 
         super(new_resource, run_context)
       end
@@ -41,11 +53,8 @@ class Chef
 
       def action_create
         install_ruby
+        rehash
         install_gems
-
-        download_chruby
-        install_chruby
-        source_chruby
       end
 
       def ruby
@@ -55,61 +64,60 @@ class Chef
       private
 
       def install_ruby
-        ruby_build_ruby ruby.version do
+        r = ruby_build_ruby ruby.version do
           definition ruby.version
           prefix_path ruby.prefix_path
           environment(new_resource.environment)
+          action :nothing
         end
+        r.run_action(:install)
+
+        # r = rbenv_ruby do
+        #   definition ruby.version
+        #   root_path ruby.rubies_path
+        #   user @user.username
+        #   environment(new_resource.environment)
+        #   action :nothing
+        # end
+        # r.run_action(:create)
+
+        # r = Chef::Resource::RbenvRuby.new(
+        #   ruby.version,
+        #   run_context
+        # )
+        # r.root_path ruby.rubies_path
+        # r.user @user.username
+        # r.root_path @user.home
+        # r.environment(new_resource.environment)
+
+        Chef::Log.warn 'ZZZZ'
+        Chef::Log.warn r
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      end
+
+      def rehash
+        r = Chef::Resource::RbenvRehash.new(
+          ruby.version,
+          run_context
+        )
+        r.root_path ruby.rubies_path
+        r.user @user.username
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def install_gems
         new_resource.gems.each do |gem|
-          gem_package gem[:name] do
-            gem_binary ::File.join(ruby.bin_path, 'gem')
-            version gem[:version] if gem[:version]
-          end
-        end
-      end
-
-      def download_chruby
-        ssh_known_hosts_entry 'github.com'
-
-        r = Chef::Resource::Git.new(
-          "#{Chef::Config[:file_cache_path]}/chruby",
-          run_context
-        )
-        r.repository 'https://github.com/postmodern/chruby.git'
-        r.reference 'v0.3.8'
-        r.user 'root'
-        r.group 'root'
-        r.run_action(:sync)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-      end
-
-      def install_chruby
-        r = Chef::Resource::Execute.new(
-          'Install chruby',
-          run_context
-        )
-        r.command 'make install'
-        r.cwd "#{Chef::Config[:file_cache_path]}/chruby"
-        r.user 'root'
-        r.run_action(:run)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-      end
-
-      def source_chruby
-        template '/etc/profile.d/chruby.sh' do
-          source 'chruby.sh.erb'
-          cookbook 'pushit'
-          mode '0755'
-          variables(
-            :chruby_path => '/usr/local/share/chruby',
-            :rubies_path => ruby.rubies_path,
-            :default_ruby => new_resource.name
+          r = Chef::Resource::RbenvGem.new(
+            ruby.version,
+            run_context
           )
+          r.rbenv_version ruby.version
+          r.version gem[:version] if gem[:version]
+          r.user @user.username
+
+          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
         end
       end
     end

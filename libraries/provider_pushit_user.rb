@@ -194,7 +194,7 @@ class Chef
         )
 
         r = Chef::Resource::Template.new(
-          ::File.join(pushit_user.ssh_directory, key['name']),
+          deploy_key,
           run_context
         )
         r.source 'ssh_deploy_key.erb'
