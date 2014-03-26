@@ -88,6 +88,11 @@ class Chef
         ::File.join(pid_path, 'upstart.pid')
       end
 
+      def env_vars
+        env = config['env'] || {}
+        env.merge!('PATH' => "<%= ruby.bin_path %>:$PATH")
+      end
+
       def envfile
         ::File.join(release_path, '.env')
       end
