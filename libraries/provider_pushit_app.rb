@@ -356,6 +356,13 @@ class Chef
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
+
+      def escape_env(vars = {})
+        vars.inject({}) do |hash, (key, value)|
+          hash[key.upcase] = value.gsub(/"/) { %q(\") }
+          hash
+        end
+      end
     end
   end
 end
