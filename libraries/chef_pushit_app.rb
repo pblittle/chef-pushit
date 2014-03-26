@@ -89,8 +89,9 @@ class Chef
       end
 
       def env_vars
-        env = config['env'] || {}
-        env.merge!('PATH' => "#{ruby.bin_path}:$PATH")
+        vars = config['env'] || {}
+        vars.merge!('PATH' => "$PATH:#{ruby.bin_path}")
+        escape_env(vars)
       end
 
       def envfile
@@ -179,6 +180,13 @@ class Chef
           Dir.chdir(cached_copy_dir) do
             `git rev-parse HEAD`.chomp
           end
+        end
+      end
+
+      def escape_env(vars = {})
+        vars.inject({}) do |hash, (key, value)|
+          hash[key.upcase] = value.gsub(/"/) { %q(\") }
+          hash
         end
       end
     end
