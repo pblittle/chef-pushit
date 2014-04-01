@@ -193,7 +193,9 @@ class Chef
             :host => database['host'],
             :username => database['username'],
             :password => database['password'],
-            :options => database['options'] || []
+            :sslkey => database['options']['sslkey'] || '',
+            :sslcert => database['options']['sslcert'] || '',
+            :sslca => database['options']['sslca'] || ''
           },
           :environment => new_resource.environment
         )

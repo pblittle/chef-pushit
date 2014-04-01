@@ -1,4 +1,4 @@
 <%= @environment %>:
-  connection: <%= @database[:adapter] %>://<%= @database[:username] %>:<%= @database[:password] %>@<%= @database[:host] %>/<%= @database[:database] %>?sslkey=/opt/pushit/apps/eirenerx/current/db/certs/jack_russell_software-key.pem&sslcert=/opt/pushit/apps/eirenerx/current/db/certs/jack_russell_software-cert.pem&sslca=/opt/pushit/apps/eirenerx/current/db/certs/cleardb-ca.pem
+  connection: <%= @database[:adapter] %>://<%= @database[:username] %>:<%= @database[:password] %>@<%= @database[:host] %>/<%= @database[:database] %>?sslkey=<%= @database[:sslkey] %>&sslcert=<%= @database[:sslcert] %>&sslca=<%= @database[:sslca] %>
   adapter: db
   table_name: document_datas
