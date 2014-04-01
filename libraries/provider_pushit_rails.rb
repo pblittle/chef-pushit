@@ -153,6 +153,11 @@ class Chef
           database = config['database']
         end
 
+        options = database['options'] || []
+        sslkey = (options && options['sslkey']) ? options['sslkey'] : ''
+        sslcert = (options && options['sslcert']) ? options['sslcert'] : ''
+        sslca = (options && options['sslca']) ? options['sslca'] : ''
+
         r = Chef::Resource::Template.new(
           ::File.join(app.shared_path, 'config', 'database.yml'),
           run_context
@@ -170,7 +175,7 @@ class Chef
             :host => database['host'],
             :username => database['username'],
             :password => database['password'],
-            :options => database['options'] || [],
+            :options => options,
             :reconnect => database['reconnect']
           },
           :environment => new_resource.environment
@@ -193,9 +198,9 @@ class Chef
             :host => database['host'],
             :username => database['username'],
             :password => database['password'],
-            :sslkey => database['options']['sslkey'] || '',
-            :sslcert => database['options']['sslcert'] || '',
-            :sslca => database['options']['sslca'] || ''
+            :sslkey => sslkey,
+            :sslcert => sslcert,
+            :sslca => sslca
           },
           :environment => new_resource.environment
         )
