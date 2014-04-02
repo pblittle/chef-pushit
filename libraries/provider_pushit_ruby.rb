@@ -39,7 +39,7 @@ class Chef
         end
 
         recipe_eval do
-          @run_context.include_recipe('rbenv::user_install')
+          @run_context.include_recipe('rbenv::system_install')
         end
 
         super(new_resource, run_context)
