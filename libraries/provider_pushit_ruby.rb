@@ -28,11 +28,6 @@ class Chef
       def initialize(new_resource, run_context = nil)
         @new_resource = new_resource
         @run_context = run_context
-        # @run_context.node.default['rbenv']['user_installs'] = [{
-        #   'user' => new_resource.user,
-        #   'home' => user.home,
-        #   'environment' => new_resource.environment
-        # }]
 
         recipe_eval do
           @run_context.include_recipe('ruby_build::default')
