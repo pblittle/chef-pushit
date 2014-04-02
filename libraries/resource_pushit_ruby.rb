@@ -55,7 +55,8 @@ class Chef
           arg,
           :kind_of => [Array],
           :default => [
-            { :name => 'bundler' }
+            { :name => 'bundler' },
+            { :name => 'unicorn' }
           ]
         )
       end
