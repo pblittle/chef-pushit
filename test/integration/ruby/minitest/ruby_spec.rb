@@ -39,13 +39,21 @@ describe 'pushit_test::ruby' do
     )
   end
 
-  let(:ree_binary) do
-    ::File.join(rubies_path, 'ree-1.8.7-2012.02', 'bin', 'ruby')
+  it 'has successfully installed bundler' do
+    assert system(
+      'su - deploy -c "which bundle"'
+    )
   end
 
-  it 'has successfully installed ree' do
+  it 'has successfully installed foreman' do
     assert system(
-      "#{ree_binary} -v | grep -e '1.8.7'"
+      'su - deploy -c "which foreman"'
+    )
+  end
+
+  it 'has successfully installed unicorn' do
+    assert system(
+      'su - deploy -c "which unicorn"'
     )
   end
 end

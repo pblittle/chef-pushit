@@ -31,10 +31,7 @@ class Chef
 
         recipe_eval do
           @run_context.include_recipe('ruby_build::default')
-        end
-
-        recipe_eval do
-          @run_context.include_recipe('rbenv::system_install')
+          @run_context.include_recipe('rbenv::user_install')
         end
 
         super(new_resource, run_context)
@@ -48,7 +45,8 @@ class Chef
 
       def action_create
         install_ruby
-        rehash
+        rbenv_global
+        rbenv_rehash
         install_gems
       end
 
@@ -70,26 +68,40 @@ class Chef
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
-      def rehash
+      def rbenv_global
+        r = Chef::Resource::RbenvGlobal.new(
+          ruby.version,
+          run_context
+        )
+        r.root_path ruby.rbenv_path
+        r.name ruby.version
+        r.user user.username
+        r.run_action(:create)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      end
+
+      def rbenv_rehash
         r = Chef::Resource::RbenvRehash.new(
           ruby.version,
           run_context
         )
-        r.root_path ruby.rubies_path
-        r.user @user.username
+        r.root_path ruby.rbenv_path
+        r.user user.username
+        r.run_action(:run)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def install_gems
+        u = user
         new_resource.gems.each do |gem|
-          r = Chef::Resource::RbenvGem.new(
-            gem[:name],
-            run_context
-          )
-          r.rbenv_version ruby.version
-          r.version gem[:version] if gem[:version]
-          r.user @user.username
+          r = rbenv_gem gem[:name] do
+            rbenv_version ruby.version
+            version gem[:version] if gem[:version]
+            user u.username
+          end
+          r.run_action(:install)
 
           new_resource.updated_by_last_action(true) if r.updated_by_last_action?
         end

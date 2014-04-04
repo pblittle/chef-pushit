@@ -107,7 +107,7 @@ class Chef
             'Install gems',
             run_context
           )
-          bundle.command "rbenv exec bundle install #{bundle_flags}"
+          bundle.command "#{bundle_binary} install #{bundle_flags}"
           bundle.cwd release_path
           bundle.user app_config['owner']
           bundle.environment new_resource.environment

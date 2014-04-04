@@ -108,6 +108,10 @@ class Chef
         ::File.join(Pushit.pushit_path, 'rubies')
       end
 
+      def rbenv_path
+        ::File.join(Pushit.pushit_path, 'rbenv')
+      end
+
       def prefix_path
         ::File.join(@rubies_path, version)
       end

@@ -56,6 +56,7 @@ class Chef
           :kind_of => [Array],
           :default => [
             { :name => 'bundler' },
+            { :name => 'foreman' },
             { :name => 'unicorn' }
           ]
         )
