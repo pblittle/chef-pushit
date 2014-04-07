@@ -11,16 +11,16 @@ describe 'pushit_test::ruby' do
     )
   end
 
-  it 'has successfully installed rbenv' do
+  it 'has successfully installed chruby' do
     assert system(
-      'su - deploy -c "which rbenv"'
+      'su - deploy -c "which chruby-exec"'
     )
   end
 
-  it 'has created rbenv.sh' do
+  it 'has created chruby.sh' do
     assert ::File.read(
-      '/etc/profile.d/rbenv.sh'
-    ).include?('rbenv init')
+      '/etc/profile.d/chruby.sh'
+    ).include?('1.9.3-p448')
   end
 
   let(:rubies_path) { ::File.join('', 'opt', 'pushit', 'rubies') }

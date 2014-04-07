@@ -108,10 +108,6 @@ class Chef
         ::File.join(Pushit.pushit_path, 'rubies')
       end
 
-      def rbenv_path
-        ::File.join(Pushit.pushit_path, 'rbenv')
-      end
-
       def prefix_path
         ::File.join(@rubies_path, version)
       end
@@ -122,6 +118,10 @@ class Chef
 
       def ruby_binary
         ::File.join(@bin_path, 'ruby')
+      end
+
+      def gem_binary
+        ::File.join(@bin_path, 'gem')
       end
 
       def bundle_binary

@@ -44,11 +44,6 @@
       "git": "git://github.com/opscode-cookbooks/postgresql.git",
       "ref": "5800238828b443725442fe510ec4f5308ed9ce8b"
     },
-    "rbenv": {
-      "locked_version": "0.7.3",
-      "git": "git://github.com/fnichol/chef-rbenv.git",
-      "ref": "0a3018634bafe58ad21c6ee271af015220e444b9"
-    },
     "ruby_build": {
       "locked_version": "0.8.1",
       "git": "git://github.com/fnichol/chef-ruby_build.git",
@@ -101,9 +96,6 @@
     },
     "yum-epel": {
       "locked_version": "0.3.4"
-    },
-    "java": {
-      "locked_version": "1.22.0"
     },
     "git": {
       "locked_version": "4.0.0"

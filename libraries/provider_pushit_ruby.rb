@@ -31,7 +31,6 @@ class Chef
 
         recipe_eval do
           @run_context.include_recipe('ruby_build::default')
-          @run_context.include_recipe('rbenv::user_install')
         end
 
         super(new_resource, run_context)
@@ -45,8 +44,11 @@ class Chef
 
       def action_create
         install_ruby
-        rbenv_global
-        rbenv_rehash
+
+        download_chruby
+        install_chruby
+        source_chruby
+
         install_gems
       end
 
@@ -68,42 +70,54 @@ class Chef
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
-      def rbenv_global
-        r = Chef::Resource::RbenvGlobal.new(
-          ruby.version,
+      def download_chruby
+        ssh_known_hosts_entry 'github.com'
+
+        r = Chef::Resource::Git.new(
+          "#{Chef::Config[:file_cache_path]}/chruby",
           run_context
         )
-        r.root_path ruby.rbenv_path
-        r.name ruby.version
-        r.user user.username
-        r.run_action(:create)
+        r.repository 'https://github.com/postmodern/chruby.git'
+        r.reference 'v0.3.8'
+        r.user 'root'
+        r.group 'root'
+        r.run_action(:sync)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
-      def rbenv_rehash
-        r = Chef::Resource::RbenvRehash.new(
-          ruby.version,
+      def install_chruby
+        r = Chef::Resource::Execute.new(
+          'Install chruby',
           run_context
         )
-        r.root_path ruby.rbenv_path
-        r.user user.username
+        r.command 'make install'
+        r.cwd "#{Chef::Config[:file_cache_path]}/chruby"
+        r.user 'root'
         r.run_action(:run)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
-      def install_gems
-        u = user
-        new_resource.gems.each do |gem|
-          r = rbenv_gem gem[:name] do
-            rbenv_version ruby.version
-            version gem[:version] if gem[:version]
-            user u.username
-          end
-          r.run_action(:install)
+      def source_chruby
+        template '/etc/profile.d/chruby.sh' do
+          source 'chruby.sh.erb'
+          cookbook 'pushit'
+          mode '0644'
+          variables(
+            :chruby_path => '/usr/local/share/chruby',
+            :rubies_path => ruby.rubies_path,
+            :default_ruby => ruby.version
+          )
+        end
+      end
 
-          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      def install_gems
+        new_resource.gems.each do |gem|
+          gem_package gem[:name] do
+            gem_binary ruby.gem_binary
+            version gem[:version] if gem[:version]
+          end
         end
       end
     end
