@@ -57,7 +57,6 @@ class Chef
           :default => [
             { :name => 'bundler' },
             { :name => 'foreman' },
-            { :name => 'rake', :version => '10.1.0' },
             { :name => 'unicorn' }
           ]
         )
