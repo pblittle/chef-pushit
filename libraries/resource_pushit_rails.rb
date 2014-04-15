@@ -32,16 +32,6 @@ class Chef
         @allowed_actions = [:create]
 
         @framework = 'rails'
-        @bundle_binary = nil
-        @unicorn_binary = nil
-      end
-
-      def bundle_binary(arg = nil)
-        set_or_return(
-          :bundle_binary,
-          arg,
-          :kind_of => [String]
-        )
       end
 
       def migrate(arg = nil)
@@ -67,14 +57,6 @@ class Chef
           arg,
           :kind_of => [String],
           :default => 'assets:precompile'
-        )
-      end
-
-      def unicorn_binary(arg = nil)
-        set_or_return(
-          :unicorn_binary,
-          arg,
-          :kind_of => [String]
         )
       end
 

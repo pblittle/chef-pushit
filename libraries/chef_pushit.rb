@@ -84,24 +84,22 @@ class Chef
       attr_accessor :rubies_path
       attr_accessor :prefix_path
       attr_accessor :bin_path
-      attr_accessor :gem_path
       attr_accessor :ruby_binary
+      attr_accessor :gem_binary
       attr_accessor :bundle_binary
       attr_accessor :foreman_binary
+      attr_accessor :unicorn_binary
 
-      def initialize(version)
+      def initialize(version = PUSHIT_RUBY_DEFAULT)
         @version = version
         @rubies_path = rubies_path
         @prefix_path = prefix_path
         @bin_path = bin_path
         @ruby_binary = ruby_binary
+        @gem_binary = gem_binary
         @bundle_binary = bundle_binary
         @foreman_binary = foreman_binary
         @unicorn_binary = unicorn_binary
-      end
-
-      def version
-        @version ||= PUSHIT_RUBY_DEFAULT
       end
 
       def rubies_path
@@ -121,11 +119,11 @@ class Chef
       end
 
       def gem_binary
-        ::File.join(@bin_path, 'gem')
+        "chruby-exec #{version} -- gem"
       end
 
       def bundle_binary
-        ::File.join(@bin_path, 'bundle')
+        "chruby-exec #{version} -- bundle"
       end
 
       def foreman_binary
@@ -134,10 +132,6 @@ class Chef
 
       def unicorn_binary
         ::File.join('unicorn')
-      end
-
-      def gem_path(executable)
-        ::File.join(bin_path, executable)
       end
     end
 

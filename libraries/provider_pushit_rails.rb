@@ -68,7 +68,7 @@ class Chef
         r.symlink_before_migrate({})
 
         r.migrate new_resource.migrate
-        r.migration_command "#{ruby.bundle_binary} exec ./bin/rake db:migrate --trace"
+        r.migration_command "#{ruby.bundle_binary} exec rake db:migrate --trace"
 
         app_config = config
 
