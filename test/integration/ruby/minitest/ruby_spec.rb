@@ -23,6 +23,12 @@ describe 'pushit_test::ruby' do
     ).include?('1.9.3-p448')
   end
 
+  it 'chruby.sh sources auto.sh' do
+    assert ::File.read(
+      '/etc/profile.d/chruby.sh'
+    ).include?('auto.sh')
+  end
+
   let(:rubies_path) { ::File.join('', 'opt', 'pushit', 'rubies') }
 
   it 'has created a rubies directory' do
