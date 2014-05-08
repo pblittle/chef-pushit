@@ -6,9 +6,9 @@
       "ref": "04b87c0c4ec0d7b38638bfb2690a70169ff06fe5"
     },
     "certificate": {
-      "locked_version": "0.5.1",
+      "locked_version": "0.5.3",
       "git": "git://github.com/atomic-penguin/cookbook-certificate.git",
-      "ref": "1264117b84a2eb1c1d8db468a531f3d8a0ddfd70"
+      "ref": "9e595e65463b2b904f115417dd44625cc1408067"
     },
     "monit": {
       "locked_version": "1.5.2",
@@ -21,7 +21,9 @@
       "ref": "39e91256be71c7091083851425a165193daea9d6"
     },
     "mysql": {
-      "locked_version": "4.0.10"
+      "locked_version": "5.2.3",
+      "git": "git@github.com:opscode-cookbooks/mysql.git",
+      "ref": "5ad63148bf74d75fb6c33e4fff3b60009e6e9cad"
     },
     "newrelic": {
       "locked_version": "0.2.6",
@@ -80,14 +82,8 @@
       "git": "git://github.com/btm/minitest-handler-cookbook.git",
       "ref": "88fe4f4ad18ad06d7b095faa73ef0d121f146f03"
     },
-    "openssl": {
-      "locked_version": "1.1.0"
-    },
-    "build-essential": {
-      "locked_version": "1.4.4"
-    },
     "curl": {
-      "locked_version": "1.1.0"
+      "locked_version": "2.0.0"
     },
     "bluepill": {
       "locked_version": "2.3.1"
@@ -95,14 +91,20 @@
     "rsyslog": {
       "locked_version": "1.12.2"
     },
+    "build-essential": {
+      "locked_version": "2.0.0"
+    },
     "ohai": {
       "locked_version": "1.1.12"
     },
     "yum-epel": {
-      "locked_version": "0.3.4"
+      "locked_version": "0.3.6"
+    },
+    "openssl": {
+      "locked_version": "1.1.0"
     },
     "git": {
-      "locked_version": "4.0.0"
+      "locked_version": "4.0.2"
     },
     "dmg": {
       "locked_version": "2.2.0"
@@ -111,16 +113,16 @@
       "locked_version": "1.30.2"
     },
     "chef_handler": {
-      "locked_version": "1.1.5"
+      "locked_version": "1.1.6"
     },
     "nodejs": {
       "locked_version": "1.3.0"
     },
     "database": {
-      "locked_version": "2.1.2"
+      "locked_version": "2.1.8"
     },
     "aws": {
-      "locked_version": "2.1.1"
+      "locked_version": "2.2.0"
     },
     "xfs": {
       "locked_version": "1.1.0"
@@ -129,7 +131,7 @@
       "locked_version": "0.0.2"
     },
     "ssh_known_hosts": {
-      "locked_version": "1.2.0"
+      "locked_version": "1.3.2"
     },
     "partial_search": {
       "locked_version": "1.0.8"
