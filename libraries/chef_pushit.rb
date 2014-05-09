@@ -90,16 +90,12 @@ class Chef
       attr_accessor :foreman_binary
       attr_accessor :unicorn_binary
 
-      def initialize(version = PUSHIT_RUBY_DEFAULT)
+      def initialize(version)
         @version = version
-        @rubies_path = rubies_path
-        @prefix_path = prefix_path
-        @bin_path = bin_path
-        @ruby_binary = ruby_binary
-        @gem_binary = gem_binary
-        @bundle_binary = bundle_binary
-        @foreman_binary = foreman_binary
-        @unicorn_binary = unicorn_binary
+      end
+
+      def version
+        @version ||= PUSHIT_RUBY_DEFAULT
       end
 
       def rubies_path
@@ -107,23 +103,23 @@ class Chef
       end
 
       def prefix_path
-        ::File.join(@rubies_path, version)
+        ::File.join(rubies_path, @version)
       end
 
       def bin_path
-        ::File.join(@prefix_path, 'bin')
+        ::File.join(prefix_path, 'bin')
       end
 
       def ruby_binary
-        ::File.join(@bin_path, 'ruby')
+        ::File.join(bin_path, 'ruby')
       end
 
       def gem_binary
-        "chruby-exec #{version} -- gem"
+        "/usr/local/bin/chruby-exec #{@version} -- gem"
       end
 
       def bundle_binary
-        "chruby-exec #{version} -- bundle"
+        "/usr/local/bin/chruby-exec #{@version} -- bundle"
       end
 
       def foreman_binary
@@ -136,16 +132,16 @@ class Chef
     end
 
     class Certs
-      def self.certs_path
+      def self.ssl_path
         ::File.join(Pushit.pushit_path, 'ssl')
       end
 
       def self.certs_directory
-        ::File.join(certs_path, 'certs')
+        ::File.join(ssl_path, 'certs')
       end
 
       def self.keys_directory
-        ::File.join(certs_path, 'private')
+        ::File.join(ssl_path, 'private')
       end
     end
   end
