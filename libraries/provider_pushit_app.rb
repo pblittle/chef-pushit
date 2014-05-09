@@ -19,8 +19,8 @@
 
 require 'chef/mixin/command'
 
-require File.expand_path('../chef_pushit', __FILE__)
-require File.expand_path('../provider_pushit_base', __FILE__)
+require ::File.expand_path('../chef_pushit', __FILE__)
+require ::File.expand_path('../provider_pushit_base', __FILE__)
 
 class Chef
   class Provider
@@ -30,6 +30,7 @@ class Chef
         @new_resource = new_resource
         @run_context = run_context
         @run_context.include_recipe('campfire-deployment::default')
+        @run_context.include_recipe('newrelic-deployment::default')
         @run_context.include_recipe('logrotate::global')
 
         super(new_resource, run_context)
@@ -57,6 +58,8 @@ class Chef
         create_ssl_cert(app.webserver_certificate) if app.webserver_certificate?
 
         create_vhost_config if app.webserver?
+        create_logrotate_config
+        create_monit_check
 
         create_dotenv
         create_deploy_revision
@@ -70,16 +73,13 @@ class Chef
       end
 
       def before_restart
-        create_logrotate_config
         create_service_config
         service_perform_action
       end
 
       def after_restart
-        if new_resource.environment != 'development'
-          # create_newrelic_notification
-          # create_campfire_notification(:announce_success)
-        end
+        create_newrelic_notification
+        # create_campfire_notification(:announce_success)
       end
 
       private
@@ -263,7 +263,25 @@ class Chef
         )
         r.provider Chef::Provider::Service::Upstart
         r.supports :status => true, :restart => true, :reload => true
-        r.action([:start, :enable])
+        r.run_action :nothing
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      end
+
+      def create_monit_check
+        r = Chef::Resource::PushitMonit.new(
+          new_resource.name,
+          run_context
+        )
+        r.check(
+          :name => new_resource.name,
+          :pid_file => app.upstart_pid,
+          :start_program => "/sbin/start #{new_resource.name}",
+          :stop_program => "/sbin/stop #{new_resource.name}",
+          :uid => 'root',
+          :gid => 'root'
+        )
+        r.run_action(:install)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
@@ -315,7 +333,7 @@ class Chef
         )
         r.owner user.username
         r.group user.group
-        r.cert_path Pushit::Certs.certs_path
+        r.cert_path Pushit::Certs.ssl_path
         r.cert_file "#{certificate}.pem"
         r.key_file "#{certificate}.key"
         r.chain_file "#{certificate}-bundle.crt"
@@ -334,6 +352,9 @@ class Chef
         r.revision app.version
         r.user app.config['owner']
         r.run_action(:create)
+        r.not_if do
+          app.environment == 'test'
+        end
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
@@ -353,6 +374,9 @@ class Chef
           application: new_resource.name
         )
         r.run_action(action)
+        r.not_if do
+          app.environment == 'test'
+        end
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end

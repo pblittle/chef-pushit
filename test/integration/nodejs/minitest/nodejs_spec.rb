@@ -18,7 +18,7 @@ describe 'pushit_test::nodejs' do
   end
 
   let(:upstart_config_path) do
-    ::File.join('', 'etc', 'init', 'nodejs-example-web.config')
+    ::File.join('', 'etc', 'init', 'nodejs-example.config')
   end
 
   it 'has created the base pushit directory' do

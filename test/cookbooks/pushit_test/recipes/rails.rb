@@ -21,20 +21,20 @@
 #
 
 include_recipe 'pushit_test::base'
-# include_recipe 'nodejs::install_from_source'
+include_recipe 'nodejs::install_from_source'
 
 app = 'rails-example'
 
-# pushit_ruby '1.9.3-p392'
+pushit_ruby '1.9.3-p392'
 
-# pushit_database app
+pushit_database app
 
 pushit_webserver 'nginx'
 
 pushit_rails app do
   deploy_action 'deploy'
   environment 'development'
-  precompile_assets false # true
+  precompile_assets true
   unicorn_worker_processes 1
   revision 'master'
 end

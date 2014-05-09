@@ -46,7 +46,7 @@ class Chef
           new_resource.name,
           run_context
         )
-        r.action 'force_deploy' # new_resource.deploy_action
+        r.action new_resource.deploy_action
         r.deploy_to app.path
 
         r.repository config['repo']

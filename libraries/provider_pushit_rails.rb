@@ -29,7 +29,6 @@ class Chef
       def initialize(new_resource, run_context = nil)
         @new_resource = new_resource
         @run_context = run_context
-        @run_context.include_recipe('mysql::ruby')
 
         @framework = 'rails'
 
@@ -47,7 +46,7 @@ class Chef
           new_resource.name,
           run_context
         )
-        r.action 'force_deploy' # new_resource.deploy_action
+        r.action new_resource.deploy_action
         r.deploy_to app.path
 
         r.repository config['repo']

@@ -1,9 +1,7 @@
 {
   "sources": {
     "campfire-deployment": {
-      "locked_version": "0.1.20",
-      "git": "git@github.com:pblittle/chef-campfire-deployment.git",
-      "ref": "04b87c0c4ec0d7b38638bfb2690a70169ff06fe5"
+      "path": "../chef-campfire-deployment"
     },
     "certificate": {
       "locked_version": "0.5.3",
@@ -31,9 +29,7 @@
       "ref": "054bcdf050bdca3c290db2170bf7a2b606aeb78f"
     },
     "newrelic-deployment": {
-      "locked_version": "0.1.7",
-      "git": "git@github.com:pblittle/chef-newrelic-deployment.git",
-      "ref": "538a2dd506c1eca5d760467bb7c9a34c0f9dbd8e"
+      "path": "../chef-newrelic-deployment"
     },
     "nginx": {
       "locked_version": "2.6.3",
