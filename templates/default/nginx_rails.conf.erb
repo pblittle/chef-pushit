@@ -30,8 +30,9 @@ server {
 
   try_files $uri /system/maintenance.html @app;
 
-  location = /proxy {
-    proxy_pass http://localhost:9000/;
+  location /proxy/ {
+    rewrite  ^/proxy/(.*)  /$1 break;
+    proxy_pass http://localhost:9000;
   }
 
   location @app {
