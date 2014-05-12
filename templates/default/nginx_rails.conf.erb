@@ -30,6 +30,10 @@ server {
 
   try_files $uri /system/maintenance.html @app;
 
+  location = /proxy {
+    proxy_pass http://localhost:9000/;
+  }
+
   location @app {
     proxy_connect_timeout 300;
     proxy_read_timeout 240;
