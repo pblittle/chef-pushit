@@ -1,4 +1,6 @@
-site :opscode
+source 'https://api.berkshelf.com'
+
+metadata
 
 # cookbook 'campfire-deployment', :github => 'pblittle/chef-campfire-deployment', :protocol => :ssh
 cookbook 'campfire-deployment', :path => '../chef-campfire-deployment'
@@ -7,7 +9,6 @@ cookbook 'certificate', :github => 'atomic-penguin/cookbook-certificate'
 cookbook 'monit', :github => 'phlipper/chef-monit'
 cookbook 'logrotate', :github => 'stevendanna/logrotate'
 cookbook 'mysql', :github => 'opscode-cookbooks/mysql'
-cookbook 'newrelic', :github => 'heavywater/chef-newrelic'
 
 # cookbook 'newrelic-deployment', :github => 'pblittle/chef-newrelic-deployment', :protocol => :ssh
 cookbook 'newrelic-deployment', :path => '../chef-newrelic-deployment'
@@ -18,8 +19,6 @@ cookbook 'postgresql', :github => 'opscode-cookbooks/postgresql'
 cookbook 'ruby_build', :github => 'fnichol/chef-ruby_build'
 cookbook 'ssh', :github => 'markolson/chef-ssh'
 cookbook 'sudo', :github => 'opscode-cookbooks/sudo'
-
-metadata
 
 group :integration do
   cookbook 'apt'
