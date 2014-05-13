@@ -29,6 +29,7 @@ class Chef
       def initialize(new_resource, run_context = nil)
         @new_resource = new_resource
         @run_context = run_context
+
         @run_context.include_recipe('campfire-deployment::default')
         @run_context.include_recipe('newrelic-deployment::default')
         @run_context.include_recipe('logrotate::global')
@@ -43,21 +44,23 @@ class Chef
       end
 
       def action_create
-        install_gem_dependencies
         create_directories
 
         if new_resource.framework == 'rails'
           create_shared_directories
+
           create_database_config if app.database?
           create_unicorn_config if app.webserver?
         end
 
+        install_ruby
         create_ruby_version
 
         create_ssl_cert(app.database_certificate) if app.database_certificate?
         create_ssl_cert(app.webserver_certificate) if app.webserver_certificate?
 
         create_vhost_config if app.webserver?
+
         create_logrotate_config
         create_monit_check
 
@@ -100,25 +103,13 @@ class Chef
         @ruby ||= app.ruby
       end
 
-      def install_gem_dependencies
-        app.gem_dependencies.each do |gem|
-          r = Chef::Resource::ChefGem.new(
-            gem,
-            run_context
-          )
-          r.run_action(:install)
-
-          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-        end
-      end
-
       def install_ruby
-        u = user
-        r = pushit_ruby app.ruby.version do
-          user u.username
-          group u.group
-          action :nothing
-        end
+        r = Chef::Resource::PushitRuby.new(
+          ruby.version,
+          run_context
+        )
+        r.user user.username
+        r.group user.group
         r.run_action(:create)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
@@ -235,15 +226,11 @@ class Chef
       end
 
       def foreman_export_service_config
-        foreman_binary = ruby.foreman_binary
-        foreman_export_flags = app.foreman_export_flags
-        release_path = app.release_path
-
         r = Chef::Resource::Execute.new(
-          "#{foreman_binary} export #{foreman_export_flags}",
+          "#{ruby.foreman_binary} export #{app.foreman_export_flags}",
           run_context
         )
-        r.cwd release_path
+        r.cwd app.release_path
         r.user 'root'
         r.group 'root'
         r.run_action :run

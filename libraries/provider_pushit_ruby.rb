@@ -114,10 +114,14 @@ class Chef
 
       def install_gems
         new_resource.gems.each do |gem|
-          gem_package gem[:name] do
+          r = gem_package gem[:name] do
             gem_binary ruby.gem_binary
             version gem[:version] if gem[:version]
+            action :nothing
           end
+          r.run_action(:install)
+
+          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
         end
       end
     end
