@@ -17,8 +17,8 @@
 # limitations under the License.
 #
 
-require File.expand_path('../chef_pushit', __FILE__)
-require File.expand_path('../provider_pushit_base', __FILE__)
+require ::File.expand_path('../chef_pushit', __FILE__)
+require ::File.expand_path('../provider_pushit_base', __FILE__)
 
 class Chef
   class Provider
@@ -27,6 +27,7 @@ class Chef
       def initialize(new_resource, run_context = nil)
         @new_resource = new_resource
         @run_context = run_context
+        @run_context.include_recipe('monit::default')
 
         super(new_resource, run_context)
       end
@@ -40,9 +41,8 @@ class Chef
       def action_install
         monit_monitrc new_resource.name do
           variables(new_resource.check)
-          template_source 'pushit_nodejs.monitrc.erb'
+          template_source 'pushit_app.monitrc.erb'
           template_cookbook 'pushit'
-          variables({ start_delay: 30 })
         end
       end
 

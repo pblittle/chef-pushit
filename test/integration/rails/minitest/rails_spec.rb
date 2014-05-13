@@ -10,7 +10,7 @@ describe 'pushit_test::rails' do
   let(:pushit_app_path) { ::File.join(pushit_path, 'apps', 'rails-example') }
 
   let(:pushit_pid_path) do
-    ::File.join(pushit_app_path, 'current', 'tmp', 'pids', 'upstart.pid')
+    ::File.join(pushit_app_path, 'shared', 'pids', 'upstart.pid')
   end
 
   let(:database_yaml_path) do

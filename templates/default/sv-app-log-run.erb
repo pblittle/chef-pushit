@@ -1,8 +1,0 @@
-#!/bin/sh
-
-set -e
-
-LOG=<%= @options['log_dir'] %>/<%= @options['service_name'] %>
-
-test -d "$LOG" || mkdir -p m2750 "$LOG" && chown <%= @options['user'] %> "$LOG"
-exec chpst -u <%= @options['user'] %> svlogd "$LOG"

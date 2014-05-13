@@ -5,9 +5,9 @@ require 'minitest/spec'
 
 describe 'pushit_test::nodejs' do
 
-  let(:pushit_path) { ::File.join('', 'opt', 'pushit', 'apps') }
+  let(:pushit_path) { ::File.join('', 'opt', 'pushit') }
 
-  let(:pushit_app_path) { ::File.join(pushit_path, 'nodejs-example') }
+  let(:pushit_app_path) { ::File.join(pushit_path, 'apps', 'nodejs-example') }
 
   let(:pushit_log_path) do
     ::File.join(pushit_app_path, 'shared', 'log', 'nodejs-example.log')
@@ -18,7 +18,7 @@ describe 'pushit_test::nodejs' do
   end
 
   let(:upstart_config_path) do
-    ::File.join('', 'etc', 'init', 'nodejs-example-web.config')
+    ::File.join('', 'etc', 'init', 'nodejs-example.config')
   end
 
   it 'has created the base pushit directory' do
