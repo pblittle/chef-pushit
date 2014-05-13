@@ -2,8 +2,8 @@ source 'https://api.berkshelf.com'
 
 metadata
 
-cookbook 'campfire-deployment', :github => 'pblittle/chef-campfire-deployment', :protocol => :ssh
-cookbook 'newrelic-deployment', :github => 'pblittle/chef-newrelic-deployment', :protocol => :ssh
+cookbook 'campfire-deployment', :git => 'git@github.com:pblittle/chef-campfire-deployment.git'
+cookbook 'newrelic-deployment', :git => 'git@github.com:pblittle/chef-newrelic-deployment.git'
 
 cookbook 'certificate', :github => 'atomic-penguin/cookbook-certificate'
 cookbook 'monit', :github => 'phlipper/chef-monit'

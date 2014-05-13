@@ -1,7 +1,8 @@
 DEPENDENCIES
   apt
   campfire-deployment
-    path: ../chef-campfire-deployment
+    git: git@github.com:pblittle/chef-campfire-deployment.git
+    revision: 04b87c0c4ec0d7b38638bfb2690a70169ff06fe5
   certificate
     git: git://github.com/atomic-penguin/cookbook-certificate.git
     revision: 9e595e65463b2b904f115417dd44625cc1408067
@@ -16,7 +17,8 @@ DEPENDENCIES
     revision: 3121b5376205637dda552b437eb153a73d1477ad
   mysql
   newrelic-deployment
-    path: ../chef-newrelic-deployment
+    git: git@github.com:pblittle/chef-newrelic-deployment.git
+    revision: 538a2dd506c1eca5d760467bb7c9a34c0f9dbd8e
   nginx
     git: git://github.com/opscode-cookbooks/nginx.git
     revision: f5a4fcffc390a027f32129c9b6c28860b5dfd6c3
