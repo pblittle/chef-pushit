@@ -115,19 +115,19 @@ class Chef
       end
 
       def gem_binary
-        "/usr/local/bin/chruby-exec #{@version} -- gem"
+        ::File.join(bin_path, 'gem')
       end
 
       def bundle_binary
-        "/usr/local/bin/chruby-exec #{@version} -- bundle"
+        ::File.join(bin_path, 'bundle')
       end
 
       def foreman_binary
-        ::File.join('foreman')
+        ::File.join(bin_path, 'foreman')
       end
 
       def unicorn_binary
-        ::File.join('unicorn')
+        ::File.join(bin_path, 'unicorn')
       end
     end
 
