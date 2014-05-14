@@ -11,7 +11,7 @@ long_description IO.read(
     'README.md'
   )
 )
-version '0.5.0'
+version '0.5.1'
 
 supports 'debian'
 supports 'ubuntu'

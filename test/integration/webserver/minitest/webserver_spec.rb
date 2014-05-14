@@ -13,8 +13,14 @@ describe 'pushit_test::webserver' do
     assert ::File.directory?(pushit_path)
   end
 
-  it 'has installed nginx' do
+  it 'has created the nginx install directory' do
     assert ::File.directory?(webserver_path)
+  end
+
+  it 'has installed nginx' do
+    assert system(
+      "#{webserver_path}/sbin/nginx -v"
+    )
   end
 
   it 'has created a log directory' do
