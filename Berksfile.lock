@@ -1,5 +1,7 @@
 DEPENDENCIES
   apt
+    git: git://github.com/opscode-cookbooks/apt.git
+    revision: bb1849257902070fd8f418b8bd349ae98bcbaf8e
   campfire-deployment
     git: git@github.com:pblittle/chef-campfire-deployment.git
     revision: 04b87c0c4ec0d7b38638bfb2690a70169ff06fe5
@@ -16,12 +18,15 @@ DEPENDENCIES
     git: git://github.com/phlipper/chef-monit.git
     revision: 3121b5376205637dda552b437eb153a73d1477ad
   mysql
+    git: git://github.com/opscode-cookbooks/mysql.git
+    revision: cd98e455b6372d8f8fea7c6ce20fd064c8fd2454
   newrelic-deployment
     git: git@github.com:pblittle/chef-newrelic-deployment.git
-    revision: 538a2dd506c1eca5d760467bb7c9a34c0f9dbd8e
+    revision: ecf9ff6ee7fef60ae72f0d50318a3a1c1a25f399
   nginx
     git: git://github.com/opscode-cookbooks/nginx.git
-    revision: f5a4fcffc390a027f32129c9b6c28860b5dfd6c3
+    revision: 506d98cdafe30210157dc90c529b92bae5ce7298
+    tag: v2.6.2
   postgresql
     git: git://github.com/opscode-cookbooks/postgresql.git
     revision: 3d894a76ccc96d2a5875aee8d9c7380aaecc76da
@@ -43,9 +48,11 @@ DEPENDENCIES
     git: git://github.com/opscode-cookbooks/sudo.git
     revision: d2902b4d6ea6fe2cf175d1921f0cb96b84e089bd
   yum
+    git: git://github.com/opscode-cookbooks/yum.git
+    revision: a42b643c39f04960b9f91bffcb5012473abe206f
 
 GRAPH
-  apt (2.3.10)
+  apt (2.3.11)
   aws (2.2.0)
   bluepill (2.3.1)
     rsyslog (>= 0.0.0)
@@ -73,13 +80,13 @@ GRAPH
     chef_handler (>= 0.0.0)
   monit (1.5.2)
     build-essential (>= 0.0.0)
-  mysql (5.2.6)
+  mysql (5.2.7)
   mysql-chef_gem (0.0.2)
     build-essential (>= 0.0.0)
     mysql (>= 0.0.0)
-  newrelic-deployment (0.1.7)
+  newrelic-deployment (0.2.0)
     curl (>= 0.0.0)
-  nginx (2.6.3)
+  nginx (2.6.2)
     apt (~> 2.2)
     bluepill (~> 2.3)
     build-essential (~> 2.0)
@@ -97,7 +104,7 @@ GRAPH
     apt (>= 1.9.0)
     build-essential (>= 0.0.0)
     openssl (>= 0.0.0)
-  pushit (0.4.194)
+  pushit (0.5.1)
     apt (>= 0.0.0)
     build-essential (>= 0.0.0)
     campfire-deployment (>= 0.0.0)
@@ -130,6 +137,6 @@ GRAPH
   windows (1.31.0)
     chef_handler (>= 0.0.0)
   xfs (1.1.0)
-  yum (3.2.0)
+  yum (3.2.1)
   yum-epel (0.3.6)
     yum (~> 3.0)
