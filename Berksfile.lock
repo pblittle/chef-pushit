@@ -114,7 +114,7 @@ GRAPH
     logrotate (>= 0.0.0)
     monit (>= 0.0.0)
     newrelic-deployment (>= 0.0.0)
-    nginx (>= 0.0.0)
+    nginx (= 2.6.2)
     nodejs (>= 0.0.0)
     rsyslog (>= 0.0.0)
     ruby_build (>= 0.0.0)
