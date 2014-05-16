@@ -47,19 +47,19 @@ describe 'pushit_test::ruby' do
 
   it 'has successfully installed bundler' do
     assert system(
-      'su - deploy -c "which bundle"'
+      'chruby-exec 1.9.3-p448 -- which bundle'
     )
   end
 
   it 'has successfully installed foreman' do
     assert system(
-      'su - deploy -c "which foreman"'
+      'chruby-exec 1.9.3-p448 -- which foreman'
     )
   end
 
   it 'has successfully installed unicorn' do
     assert system(
-      'su - deploy -c "which unicorn"'
+      'chruby-exec 1.9.3-p448 -- which unicorn'
     )
   end
 end

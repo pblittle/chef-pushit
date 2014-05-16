@@ -1,140 +1,142 @@
-{
-  "sources": {
-    "campfire-deployment": {
-      "locked_version": "0.1.20",
-      "git": "git@github.com:pblittle/chef-campfire-deployment.git",
-      "ref": "04b87c0c4ec0d7b38638bfb2690a70169ff06fe5"
-    },
-    "certificate": {
-      "locked_version": "0.5.3",
-      "git": "git://github.com/atomic-penguin/cookbook-certificate.git",
-      "ref": "9e595e65463b2b904f115417dd44625cc1408067"
-    },
-    "monit": {
-      "locked_version": "1.5.2",
-      "git": "git://github.com/phlipper/chef-monit.git",
-      "ref": "23756d508f8c10b8687213e0f9a3f4ae47f836ac"
-    },
-    "logrotate": {
-      "locked_version": "1.5.0",
-      "git": "git://github.com/stevendanna/logrotate.git",
-      "ref": "39e91256be71c7091083851425a165193daea9d6"
-    },
-    "mysql": {
-      "locked_version": "5.2.3",
-      "git": "git@github.com:opscode-cookbooks/mysql.git",
-      "ref": "5ad63148bf74d75fb6c33e4fff3b60009e6e9cad"
-    },
-    "newrelic": {
-      "locked_version": "0.2.6",
-      "git": "git://github.com/heavywater/chef-newrelic.git",
-      "ref": "054bcdf050bdca3c290db2170bf7a2b606aeb78f"
-    },
-    "newrelic-deployment": {
-      "locked_version": "0.1.7",
-      "git": "git@github.com:pblittle/chef-newrelic-deployment.git",
-      "ref": "538a2dd506c1eca5d760467bb7c9a34c0f9dbd8e"
-    },
-    "nginx": {
-      "locked_version": "2.6.3",
-      "git": "git://github.com/opscode-cookbooks/nginx.git",
-      "ref": "05b3a613f53a0b05c96f9206c5d67aa420f337fb"
-    },
-    "runit": {
-      "locked_version": "1.5.11",
-      "git": "git://github.com/opscode-cookbooks/runit.git",
-      "ref": "d54b9ade9311c3bdf242c9d6650b9fd761588247"
-    },
-    "postgresql": {
-      "locked_version": "3.3.4",
-      "git": "git://github.com/opscode-cookbooks/postgresql.git",
-      "ref": "5800238828b443725442fe510ec4f5308ed9ce8b"
-    },
-    "ruby_build": {
-      "locked_version": "0.8.1",
-      "git": "git://github.com/fnichol/chef-ruby_build.git",
-      "ref": "4d3361995a6953076951693eff1b326ab499fe1e"
-    },
-    "ssh": {
-      "locked_version": "0.6.5",
-      "git": "git://github.com/markolson/chef-ssh.git",
-      "ref": "52837a3f8c5e319d40f3dae917df329e6d95e7b3"
-    },
-    "sudo": {
-      "locked_version": "2.2.3",
-      "git": "git://github.com/opscode-cookbooks/sudo.git",
-      "ref": "6a616bcf0c7e26918103bca976064996dcd08350"
-    },
-    "pushit": {
-      "path": "."
-    },
-    "apt": {
-      "locked_version": "2.3.0"
-    },
-    "yum": {
-      "locked_version": "3.0.2"
-    },
-    "pushit_test": {
-      "path": "./test/cookbooks/pushit_test"
-    },
-    "minitest-handler": {
-      "locked_version": "1.1.5",
-      "git": "git://github.com/btm/minitest-handler-cookbook.git",
-      "ref": "88fe4f4ad18ad06d7b095faa73ef0d121f146f03"
-    },
-    "curl": {
-      "locked_version": "2.0.0"
-    },
-    "bluepill": {
-      "locked_version": "2.3.1"
-    },
-    "rsyslog": {
-      "locked_version": "1.12.2"
-    },
-    "build-essential": {
-      "locked_version": "2.0.2"
-    },
-    "ohai": {
-      "locked_version": "1.1.12"
-    },
-    "yum-epel": {
-      "locked_version": "0.3.6"
-    },
-    "openssl": {
-      "locked_version": "1.1.0"
-    },
-    "git": {
-      "locked_version": "4.0.2"
-    },
-    "dmg": {
-      "locked_version": "2.2.0"
-    },
-    "windows": {
-      "locked_version": "1.31.0"
-    },
-    "chef_handler": {
-      "locked_version": "1.1.6"
-    },
-    "nodejs": {
-      "locked_version": "1.3.0"
-    },
-    "database": {
-      "locked_version": "2.2.0"
-    },
-    "aws": {
-      "locked_version": "2.2.0"
-    },
-    "xfs": {
-      "locked_version": "1.1.0"
-    },
-    "mysql-chef_gem": {
-      "locked_version": "0.0.2"
-    },
-    "ssh_known_hosts": {
-      "locked_version": "1.3.2"
-    },
-    "partial_search": {
-      "locked_version": "1.0.8"
-    }
-  }
-}
+DEPENDENCIES
+  apt
+    git: git://github.com/opscode-cookbooks/apt.git
+    revision: bb1849257902070fd8f418b8bd349ae98bcbaf8e
+  campfire-deployment
+    git: git@github.com:pblittle/chef-campfire-deployment.git
+    revision: 04b87c0c4ec0d7b38638bfb2690a70169ff06fe5
+  certificate
+    git: git://github.com/atomic-penguin/cookbook-certificate.git
+    revision: 9e595e65463b2b904f115417dd44625cc1408067
+  logrotate
+    git: git://github.com/stevendanna/logrotate.git
+    revision: c8df8488d69c1d0a783a7115933a8c719ccd1798
+  minitest-handler
+    git: git://github.com/btm/minitest-handler-cookbook.git
+    revision: 927aea60705339db0d71de8e4d8314cb8f419fc3
+  monit
+    git: git://github.com/phlipper/chef-monit.git
+    revision: 3121b5376205637dda552b437eb153a73d1477ad
+  mysql
+    git: git://github.com/opscode-cookbooks/mysql.git
+    revision: cd98e455b6372d8f8fea7c6ce20fd064c8fd2454
+  newrelic-deployment
+    git: git@github.com:pblittle/chef-newrelic-deployment.git
+    revision: ecf9ff6ee7fef60ae72f0d50318a3a1c1a25f399
+  nginx
+    git: git://github.com/opscode-cookbooks/nginx.git
+    revision: 506d98cdafe30210157dc90c529b92bae5ce7298
+    tag: v2.6.2
+  postgresql
+    git: git://github.com/opscode-cookbooks/postgresql.git
+    revision: 3d894a76ccc96d2a5875aee8d9c7380aaecc76da
+  pushit
+    path: .
+    metadata: true
+  pushit_test
+    path: test/cookbooks/pushit_test
+  ruby_build
+    git: git://github.com/fnichol/chef-ruby_build.git
+    revision: 4d3361995a6953076951693eff1b326ab499fe1e
+  runit
+    git: git://github.com/opscode-cookbooks/runit.git
+    revision: d54b9ade9311c3bdf242c9d6650b9fd761588247
+  ssh
+    git: git://github.com/markolson/chef-ssh.git
+    revision: 1875a98c73343379670b90c587fae63c161e2b2a
+  sudo
+    git: git://github.com/opscode-cookbooks/sudo.git
+    revision: d2902b4d6ea6fe2cf175d1921f0cb96b84e089bd
+  yum
+    git: git://github.com/opscode-cookbooks/yum.git
+    revision: a42b643c39f04960b9f91bffcb5012473abe206f
+
+GRAPH
+  apt (2.3.11)
+  aws (2.2.0)
+  bluepill (2.3.1)
+    rsyslog (>= 0.0.0)
+  build-essential (2.0.2)
+  campfire-deployment (0.1.20)
+  certificate (0.5.3)
+  chef_handler (1.1.6)
+  curl (2.0.0)
+  database (2.2.0)
+    aws (>= 0.0.0)
+    mysql (>= 5.0.0)
+    mysql-chef_gem (>= 0.0.0)
+    postgresql (>= 1.0.0)
+    xfs (>= 0.0.0)
+  dmg (2.2.0)
+  git (4.0.2)
+    build-essential (>= 0.0.0)
+    dmg (>= 0.0.0)
+    runit (>= 1.0.0)
+    windows (>= 0.0.0)
+    yum (~> 3.0)
+    yum-epel (>= 0.0.0)
+  logrotate (1.5.0)
+  minitest-handler (1.2.1)
+    chef_handler (>= 0.0.0)
+  monit (1.5.2)
+    build-essential (>= 0.0.0)
+  mysql (5.2.7)
+  mysql-chef_gem (0.0.2)
+    build-essential (>= 0.0.0)
+    mysql (>= 0.0.0)
+  newrelic-deployment (0.2.0)
+    curl (>= 0.0.0)
+  nginx (2.6.2)
+    apt (~> 2.2)
+    bluepill (~> 2.3)
+    build-essential (~> 2.0)
+    ohai (~> 1.1)
+    runit (~> 1.2)
+    yum-epel (~> 0.3)
+  nodejs (1.3.0)
+    apt (>= 0.0.0)
+    build-essential (>= 0.0.0)
+    yum (>= 0.0.0)
+  ohai (1.1.12)
+  openssl (1.1.0)
+  partial_search (1.0.8)
+  postgresql (3.4.0)
+    apt (>= 1.9.0)
+    build-essential (>= 0.0.0)
+    openssl (>= 0.0.0)
+  pushit (0.5.2)
+    apt (>= 0.0.0)
+    build-essential (>= 0.0.0)
+    campfire-deployment (>= 0.0.0)
+    certificate (>= 0.0.0)
+    database (>= 0.0.0)
+    git (>= 0.0.0)
+    logrotate (>= 0.0.0)
+    monit (>= 0.0.0)
+    newrelic-deployment (>= 0.0.0)
+    nginx (= 2.6.2)
+    nodejs (>= 0.0.0)
+    rsyslog (>= 0.0.0)
+    ruby_build (>= 0.0.0)
+    runit (>= 0.0.0)
+    ssh (>= 0.0.0)
+    ssh_known_hosts (>= 0.0.0)
+    sudo (>= 0.0.0)
+  pushit_test (0.1.0)
+    pushit (>= 0.0.0)
+  rsyslog (1.12.2)
+  ruby_build (0.8.1)
+  runit (1.5.11)
+    build-essential (>= 0.0.0)
+    yum (~> 3.0)
+    yum-epel (>= 0.0.0)
+  ssh (0.6.6)
+  ssh_known_hosts (1.3.2)
+    partial_search (>= 0.0.0)
+  sudo (2.5.3)
+  windows (1.31.0)
+    chef_handler (>= 0.0.0)
+  xfs (1.1.0)
+  yum (3.2.1)
+  yum-epel (0.3.6)
+    yum (~> 3.0)

@@ -25,8 +25,6 @@ include_recipe 'nodejs::install_from_source'
 
 app = 'rails-example'
 
-pushit_ruby '1.9.3-p392'
-
 pushit_database app
 
 pushit_webserver 'nginx'

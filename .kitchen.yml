@@ -48,7 +48,7 @@ suites:
       pid: '/opt/pushit/nginx/run/nginx.pid'
       install_method: 'source'
       source:
-        version: '1.4.4'
+        version: '1.4.7'
         conf_path: '/opt/pushit/nginx/nginx.conf'
         sbin_path: '/opt/pushit/nginx/sbin/nginx'
 
