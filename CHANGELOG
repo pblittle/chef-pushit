@@ -1,0 +1,5 @@
+0.6.x
+=======
+0.6.0
+----------
+* COOK-8 - Added support for custom vhost templates on the pushit_app resources.

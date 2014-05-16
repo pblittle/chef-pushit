@@ -51,7 +51,7 @@ action :create do
   )
 
   template "#{new_resource.app_name}.conf" do
-    source new_resource.config_template || "nginx_#{config['framework']}.conf.erb"
+    source new_resource.config_source || "nginx_#{config['framework']}.conf.erb"
     path site_config
     cookbook new_resource.config_cookbook unless new_resource.config_cookbook.nil?
     owner 'root'
