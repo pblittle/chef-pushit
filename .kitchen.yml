@@ -23,6 +23,16 @@ platforms:
       server_root_password: 'password'
       tunable:
         lower_case_table_names: 1
+    nginx:
+      default_site_enabled: false
+      dir: '/opt/pushit/nginx'
+      log_dir: '/opt/pushit/nginx/log'
+      pid: '/opt/pushit/nginx/run/nginx.pid'
+      install_method: 'source'
+      source:
+        version: '1.4.4'
+        conf_path: '/opt/pushit/nginx/nginx.conf'
+        sbin_path: '/opt/pushit/nginx/sbin/nginx'
 
 suites:
 - name: user
@@ -40,17 +50,6 @@ suites:
     - recipe[pushit_test::webserver]
   data_bags_path:
     'test/data_bags'
-  attributes:
-    nginx:
-      default_site_enabled: false
-      dir: '/opt/pushit/nginx'
-      log_dir: '/opt/pushit/nginx/log'
-      pid: '/opt/pushit/nginx/run/nginx.pid'
-      install_method: 'source'
-      source:
-        version: '1.4.7'
-        conf_path: '/opt/pushit/nginx/nginx.conf'
-        sbin_path: '/opt/pushit/nginx/sbin/nginx'
 
 - name: database
   run_list:
@@ -84,17 +83,6 @@ suites:
     'test/data_bags'
   encrypted_data_bag_secret_key_path:
     'test/encrypted_data_bag_secret'
-  attributes:
-    nginx:
-      default_site_enabled: false
-      dir: '/opt/pushit/nginx'
-      log_dir: '/opt/pushit/nginx/log'
-      pid: '/opt/pushit/nginx/run/nginx.pid'
-      install_method: 'source'
-      source:
-        version: '1.4.4'
-        conf_path: '/opt/pushit/nginx/nginx.conf'
-        sbin_path: '/opt/pushit/nginx/sbin/nginx'
 
 - name: custom-vhost
   run_list:
@@ -104,14 +92,3 @@ suites:
     'test/data_bags'
   encrypted_data_bag_secret_key_path:
     'test/encrypted_data_bag_secret'
-  attributes:
-    nginx:
-      default_site_enabled: false
-      dir: '/opt/pushit/nginx'
-      log_dir: '/opt/pushit/nginx/log'
-      pid: '/opt/pushit/nginx/run/nginx.pid'
-      install_method: 'source'
-      source:
-        version: '1.4.4'
-        conf_path: '/opt/pushit/nginx/nginx.conf'
-        sbin_path: '/opt/pushit/nginx/sbin/nginx'
