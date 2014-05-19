@@ -24,7 +24,11 @@ include_recipe 'pushit_test::base'
 
 app = 'vhost'
 
-#pushit_webserver 'nginx'
+package 'nginx'
+
+service 'nginx' do
+  action [:enable, :start]
+end
 
 pushit_app app do
   deploy_action 'deploy'
