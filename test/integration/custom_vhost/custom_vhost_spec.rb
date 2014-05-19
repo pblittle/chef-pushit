@@ -6,8 +6,10 @@ require 'minitest/spec'
 describe 'pushit_test::custom_vhost' do
 
   it 'has used our custom template' do
-    assert system(
-      "grep -e \"TEST PASSES\" /opt/pushit/nginx/sites-enabled/rails-example.conf"
-    )
+    file('/opt/pushit/nginx/sites-enabled/rails-example.conf').must_include 'TEST PASSES'
+  end
+
+  it 'shouldnt pass this' do
+    file('/opt/pushit/nginx/sites-enabled/rails-example.conf').must_include 'TEST NO PASS'
   end
 end

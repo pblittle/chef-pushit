@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
 # Cookbook Name:: pushit_test
-# Recipe:: rails
+# Recipe:: custom_vhost
 #
 # Author:: P. Barrett Little (<barrett@barrettlittle.com>)
 #
@@ -24,11 +24,7 @@ include_recipe 'pushit_test::base'
 
 app = 'vhost'
 
-package 'nginx'
-
-service 'nginx' do
-  action [:enable, :start]
-end
+pushit_webserver 'nginx'
 
 pushit_app app do
   deploy_action 'deploy'
