@@ -64,7 +64,12 @@ class Chef
         r.user Etc.getpwnam(config['owner']).name
         r.group Etc.getgrnam(config['group']).name
 
-        r.symlink_before_migrate({})
+        r.symlink_before_migrate(
+          'env' => '.env',
+          'ruby-version' => '.ruby-version',
+          'config/database.yml' => 'config/database.yml',
+          'config/unicorn.rb' => 'config/unicorn.rb',
+        )
 
         r.migrate new_resource.migrate
         r.migration_command "#{ruby.bundle_binary} exec rake db:migrate --trace"
@@ -75,25 +80,9 @@ class Chef
         bundle_binary = ruby.bundle_binary
 
         r.before_migrate do
-          link "#{release_path}/.env" do
-            to "#{new_resource.shared_path}/env"
-          end if ::File.exists? "#{new_resource.shared_path}/env"
-
-          link "#{release_path}/.ruby-version" do
-            to "#{new_resource.shared_path}/ruby-version"
-          end if ::File.exists? "#{new_resource.shared_path}/ruby-version"
-
-          link "#{release_path}/config/database.yml" do
-            to "#{new_resource.shared_path}/config/database.yml"
-          end if ::File.exists? "#{new_resource.shared_path}/config/database.yml"
-
           link "#{release_path}/config/filestore.yml" do
             to "#{new_resource.shared_path}/config/filestore.yml"
           end if ::File.exists? "#{new_resource.shared_path}/config/filestore.yml"
-
-          link "#{release_path}/config/unicorn.rb" do
-            to "#{new_resource.shared_path}/config/unicorn.rb"
-          end if ::File.exists? "#{new_resource.shared_path}/config/unicorn.rb"
 
           bundle_flags = [
             '--binstubs',

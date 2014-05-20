@@ -81,6 +81,7 @@ class Chef
     class Ruby
 
       attr_accessor :version
+      attr_accessor :environment
       attr_accessor :rubies_path
       attr_accessor :prefix_path
       attr_accessor :bin_path
@@ -90,12 +91,19 @@ class Chef
       attr_accessor :foreman_binary
       attr_accessor :unicorn_binary
 
-      def initialize(version)
-        @version = version
+      def initialize(args = {})
+        args = { version: args } if args.is_a?(String)
+
+        @version = args[:version]
+        @environment = args[:environment]
       end
 
       def version
         @version ||= PUSHIT_RUBY_DEFAULT
+      end
+
+      def environment
+        @environment ||= {}
       end
 
       def rubies_path

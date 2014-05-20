@@ -26,6 +26,7 @@ class Chef
   module Pushit
     class User
 
+      attr_accessor :args
       attr_accessor :ssh_private_key, :ssh_public_key
       attr_accessor :ssh_deploy_keys
 
@@ -100,9 +101,11 @@ class Chef
       private
 
       def config_data
-        Chef::DataBagItem.load('users', username)
-      rescue
-        {}
+        @config_data || begin
+          Chef::DataBagItem.load('users', username)
+        rescue
+          {}
+        end
       end
     end
   end

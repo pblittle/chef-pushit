@@ -18,6 +18,7 @@
 #
 
 require 'chef/provider'
+require 'chef/mixin/command'
 
 require ::File.expand_path('../chef_pushit', __FILE__)
 

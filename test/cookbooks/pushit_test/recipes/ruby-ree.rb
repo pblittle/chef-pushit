@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
 # Cookbook Name:: pushit_test
-# Recipe:: rails
+# Recipe:: ruby-ree
 #
 # Author:: P. Barrett Little (<barrett@barrettlittle.com>)
 #
@@ -21,18 +21,9 @@
 #
 
 include_recipe 'pushit_test::base'
-include_recipe 'nodejs::install_from_source'
 
-app = 'rails-example'
-
-pushit_database app
-
-pushit_webserver 'nginx'
-
-pushit_rails app do
-  deploy_action 'deploy'
-  environment 'test'
-  precompile_assets true
-  unicorn_worker_processes 1
-  revision 'master'
+pushit_ruby 'ree-1.8.7-2012.02' do
+  environment({
+    'CONFIGURE_OPTS' => '--no-tcmalloc'
+  })
 end

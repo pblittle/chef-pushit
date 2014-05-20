@@ -17,9 +17,6 @@
 # limitations under the License.
 #
 
-require 'chef/mixin/command'
-
-require ::File.expand_path('../chef_pushit', __FILE__)
 require ::File.expand_path('../provider_pushit_base', __FILE__)
 
 class Chef
@@ -110,6 +107,7 @@ class Chef
           ruby.version,
           run_context
         )
+        r.environment ruby.environment
         r.user user.username
         r.group user.group
         r.run_action(:create)

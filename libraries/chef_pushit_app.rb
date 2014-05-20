@@ -27,28 +27,35 @@ class Chef
     class App
 
       def initialize(name)
-        @app = Pushit.app_data_bag(name)
+        @name = name
       end
 
       def apps_path
         ::File.join(Pushit.pushit_path, 'apps')
       end
 
+      def app
+        @app ||= Pushit.app_data_bag(@name)
+      end
+
       def config
-        data_bag_item = Chef::DataBagItem.load(PUSHIT_DATA_BAG, @app['id'])
-        data_bag_item || {}
+        @config ||= app
       end
 
       def user
-        @user ||= Pushit::User.new(@app['owner'])
+        @user ||= Pushit::User.new(app['owner'])
       end
 
       def ruby
-        @ruby ||= Pushit::Ruby.new(@app['ruby'])
+        @ruby ||= Pushit::Ruby.new(ruby_version)
+      end
+
+      def ruby_version
+        app['ruby'] || nil
       end
 
       def name
-        @name ||= @app['id']
+        @name ||= app['id']
       end
 
       def gem_dependencies
@@ -56,7 +63,7 @@ class Chef
       end
 
       def path
-        ::File.join(apps_path, @app['id'])
+        ::File.join(apps_path, app['id'])
       end
 
       def current_path
@@ -76,7 +83,6 @@ class Chef
       end
 
       def log_path
-        # "#{name}.log"
         ::File.join(shared_path, 'log')
       end
 
@@ -89,7 +95,7 @@ class Chef
       end
 
       def env_vars
-        config['env'] || {}
+        app['env'] || {}
       end
 
       def envfile
