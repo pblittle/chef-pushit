@@ -67,15 +67,6 @@ suites:
   data_bags_path:
     'test/data_bags'
 
-- name: app
-  run_list:
-    - recipe[minitest-handler]
-    - recipe[pushit_test::app]
-  data_bags_path:
-    'test/data_bags'
-  encrypted_data_bag_secret_key_path:
-    'test/encrypted_data_bag_secret'
-
 - name: nodejs
   run_list:
     - recipe[minitest-handler]
