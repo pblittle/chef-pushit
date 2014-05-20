@@ -68,6 +68,8 @@ class Chef
         create_deploy_revision
       end
 
+      def create_deploy_revision; end
+
       def before_migrate; end
 
       def before_symlink
@@ -294,7 +296,6 @@ class Chef
           new_resource.name,
           run_context
         )
-        r.config_type new_resource.framework
         r.http_port app.http_port
         r.server_name app.server_name
         r.upstream_port app.upstream_port
@@ -308,6 +309,8 @@ class Chef
           Pushit::Certs.keys_directory,
           "#{app.webserver_certificate}.key"
         )
+        r.config_cookbook new_resource.vhost_config_cookbook if new_resource.vhost_config_cookbook
+        r.config_source new_resource.vhost_config_source if new_resource.vhost_config_source
         r.run_action(:create)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?

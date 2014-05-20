@@ -24,16 +24,11 @@ actions :create
 default_action :create
 
 attribute :app_name, :kind_of => String, :name_attribute => true
-attribute :app_root, :kind_of => String, :default => nil
 
-attribute :config_cookbook, :kind_of => String, :default => 'pushit'
-attribute :config_path, :kind_of => String, :default => node['nginx']['dir']
-attribute :config_source, :kind_of => String, :default => 'nginx.conf.erb'
-attribute :config_type, :kind_of => String, :default => 'rails'
+attribute :config_cookbook, :kind_of => String
+attribute :config_source, :kind_of => String
 
 attribute :install_path, :kind_of => String, :default => node['nginx']['dir']
-
-attribute :log_path, :kind_of => String, :default => node['nginx']['log_dir']
 
 attribute :http_port, :kind_of => Integer, :default => 80
 attribute :https_port, :kind_of => Integer, :default => 443
