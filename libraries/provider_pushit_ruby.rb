@@ -47,7 +47,7 @@ class Chef
 
         download_chruby
         install_chruby
-        source_chruby
+        create_chruby_sh
 
         install_gems
       end
@@ -104,8 +104,8 @@ class Chef
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
-      def source_chruby
-        template '/etc/profile.d/chruby.sh' do
+      def create_chruby_sh
+        r = template '/etc/profile.d/chruby.sh' do
           source 'chruby.sh.erb'
           cookbook 'pushit'
           mode '0644'
@@ -114,7 +114,11 @@ class Chef
             :rubies_path => ruby.rubies_path,
             :default_ruby => new_resource.name
           )
+          action :nothing
         end
+        r.run_action(:create)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def install_gems
