@@ -344,7 +344,7 @@ class Chef
         r.api_key config['env']['NEW_RELIC_API_KEY']
         r.revision app.version
         r.user config['owner']
-        r.action(:nothing)
+        r.action(:create)
         r.only_if do
           (config.key?('env') &&
            config['env'].key?('NEW_RELIC_API_KEY') &&
