@@ -338,15 +338,18 @@ class Chef
 
       def create_newrelic_notification
         r = Chef::Resource::NewrelicDeployment.new(
-          app.config['env']['NEW_RELIC_APP_NAME'],
+          config['env']['NEW_RELIC_APP_NAME'],
           run_context
         )
-        r.api_key app.config['env']['NEW_RELIC_API_KEY']
+        r.api_key config['env']['NEW_RELIC_API_KEY']
         r.revision app.version
-        r.user app.config['owner']
+        r.user config['owner']
         r.run_action(:create)
-        r.not_if do
-          app.environment == 'test'
+        r.only_if do
+          (config.key?('env') &&
+           config['env'].key?('NEW_RELIC_API_KEY') &&
+           config['env'].key?('NEW_RELIC_APP_NAME')) &&
+            app.environment != 'test'
         end
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
