@@ -48,6 +48,10 @@ class Chef
         @pushit_path ||= PUSHIT_PATH
       end
 
+      def pushit_apps_path
+        @pushit_apps_path ||= ::File.join(pushit_path, 'apps')
+      end
+
       def whyrun_enabled?
         @whyrun_enabled ||= false
       end

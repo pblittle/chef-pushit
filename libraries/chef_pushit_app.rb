@@ -63,7 +63,7 @@ class Chef
       end
 
       def path
-        ::File.join(apps_path, app['id'])
+        ::File.join(Pushit.pushit_apps_path, config['id'])
       end
 
       def current_path
