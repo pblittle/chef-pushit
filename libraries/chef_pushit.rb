@@ -84,8 +84,9 @@ class Chef
 
     class Ruby
 
-      attr_accessor :version
-      attr_accessor :environment
+      attr_reader :version
+      attr_reader :environment
+
       attr_accessor :rubies_path
       attr_accessor :prefix_path
       attr_accessor :bin_path
@@ -98,16 +99,8 @@ class Chef
       def initialize(args = {})
         args = { version: args } if args.is_a?(String)
 
-        @version = args[:version]
-        @environment = args[:environment]
-      end
-
-      def version
-        @version ||= PUSHIT_RUBY_DEFAULT
-      end
-
-      def environment
-        @environment ||= {}
+        @version = args['version'] || PUSHIT_RUBY_DEFAULT
+        @environment = args['environment'] || {}
       end
 
       def rubies_path
@@ -115,7 +108,7 @@ class Chef
       end
 
       def prefix_path
-        ::File.join(rubies_path, @version)
+        ::File.join(rubies_path, version)
       end
 
       def bin_path
