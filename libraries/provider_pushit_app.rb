@@ -17,6 +17,7 @@
 # limitations under the License.
 #
 
+require ::File.expand_path('../chef_pushit', __FILE__)
 require ::File.expand_path('../provider_pushit_base', __FILE__)
 
 class Chef
@@ -46,8 +47,8 @@ class Chef
         if new_resource.framework == 'rails'
           create_shared_directories
 
-          create_database_config if app.database?
-          create_unicorn_config if app.webserver?
+          create_database_config if @app.database?
+          create_unicorn_config if @app.webserver?
         end
 
         install_ruby
@@ -134,7 +135,7 @@ class Chef
       end
 
       def create_directories
-        [app.apps_path, app.path, app.shared_path].each do |dir|
+        [app.path, app.shared_path].each do |dir|
           r = Chef::Resource::Directory.new(
             dir,
             run_context
@@ -352,9 +353,9 @@ class Chef
           new_resource.name,
           run_context
         )
-        r.account app.config['env']['CAMPFIRE_DEPLOYMENT_ACCOUNT']
-        r.token app.config['env']['CAMPFIRE_DEPLOYMENT_TOKEN']
-        r.room app.config['env']['CAMPFIRE_DEPLOYMENT_ROOM']
+        r.account config['env']['CAMPFIRE_DEPLOYMENT_ACCOUNT']
+        r.token config['env']['CAMPFIRE_DEPLOYMENT_TOKEN']
+        r.room config['env']['CAMPFIRE_DEPLOYMENT_ROOM']
         r.release(
           deployer: user.username,
           environment: new_resource.environment,
