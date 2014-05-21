@@ -30,20 +30,12 @@ class Chef
         @name = name
       end
 
-      def apps_path
-        ::File.join(Pushit.pushit_path, 'apps')
-      end
-
-      def app
-        @app ||= Pushit.app_data_bag(@name)
-      end
-
       def config
-        @config ||= app
+        @config ||= Pushit.app_data_bag(@name)
       end
 
       def user
-        @user ||= Pushit::User.new(app['owner'])
+        @user ||= Pushit::User.new(config['owner'])
       end
 
       def ruby
@@ -51,11 +43,11 @@ class Chef
       end
 
       def ruby_version
-        app['ruby'] || nil
+        config['ruby'] || PUSHIT_RUBY_DEFAULT
       end
 
       def name
-        @name ||= app['id']
+        @name ||= config['id']
       end
 
       def gem_dependencies
@@ -95,7 +87,7 @@ class Chef
       end
 
       def env_vars
-        app['env'] || {}
+        config['env'] || {}
       end
 
       def envfile
@@ -120,7 +112,7 @@ class Chef
         args << "-f #{procfile}"
         args << "-e #{envfile}"
         args << "-a #{name}"
-        args << "-u #{@app['owner']}"
+        args << "-u #{config['owner']}"
         args << "-l #{log_path}"
         args.join(' ')
       end
@@ -130,45 +122,45 @@ class Chef
       end
 
       def upstream_port
-        @app['webserver']['upstream_port'] || 8080
+        config['webserver']['upstream_port'] || 8080
       end
 
       def http_port
-        @app['webserver']['http_port'] || 80
+        config['webserver']['http_port'] || 80
       end
 
       def https_port
-        @app['webserver']['https_port'] || 443
+        config['webserver']['https_port'] || 443
       end
 
       def webserver?
-        @app['webserver'] && !@app['webserver'].empty?
+        config['webserver'] && !config['webserver'].empty?
       end
 
       def webserver_certificate?
-        self.webserver? && @app['webserver']['certificate'] &&
-          !@app['webserver']['certificate'].empty?
+        self.webserver? && config['webserver']['certificate'] &&
+          !config['webserver']['certificate'].empty?
       end
 
       def webserver_certificate
-        webserver_certificate? ? @app['webserver']['certificate'] : nil
+        webserver_certificate? ? config['webserver']['certificate'] : nil
       end
 
       def database?
-        @app['database'] && !@app['database'].empty?
+        config['database'] && !config['database'].empty?
       end
 
       def database_certificate?
-        self.database? && @app['database']['certificate'] &&
-          !@app['database']['certificate'].empty?
+        self.database? && config['database']['certificate'] &&
+          !config['database']['certificate'].empty?
       end
 
       def database_certificate
-        database_certificate? ? @app['database']['certificate'] : nil
+        database_certificate? ? config['database']['certificate'] : nil
       end
 
       def server_name
-        @app['webserver']['server_name'] || '_'
+        config['webserver']['server_name'] || '_'
       end
 
       def root
