@@ -95,12 +95,16 @@ class Chef
         @config ||= app.config
       end
 
-      def user
-        @user ||= app.user
+      def ruby
+        @ruby ||= begin
+          Pushit::Ruby.new(config['ruby'])
+        rescue
+          Pushit::Ruby.new
+        end
       end
 
-      def ruby
-        @ruby ||= app.ruby
+      def user
+        @user ||= app.user
       end
 
       def install_ruby
