@@ -53,14 +53,19 @@ class Chef
       end
 
       def ruby
-        @ruby ||= Pushit::Ruby.new(new_resource.name)
+        @ruby ||= Pushit::Ruby.new(
+          {
+            'version' => new_resource.name,
+            'environment' => new_resource.environment
+          }
+        )
       end
 
       private
 
       def install_ruby
-        r = ruby_build_ruby ruby.version do
-          definition ruby.version
+        r = ruby_build_ruby new_resource.name do
+          definition new_resource.name
           prefix_path ruby.prefix_path
           environment(new_resource.environment)
           action :nothing
@@ -107,7 +112,7 @@ class Chef
           variables(
             :chruby_path => '/usr/local/share/chruby',
             :rubies_path => ruby.rubies_path,
-            :default_ruby => ruby.version
+            :default_ruby => new_resource.name
           )
         end
       end
