@@ -91,7 +91,15 @@ class Chef
       end
 
       def env_vars
-        config['env'] || {}
+        config['env'] ||= {}
+        if ruby.bin_path
+          if config['env'].key?('PATH')
+            config['env']['PATH'] = "#{ruby.bin_path}:" + config['env']['PATH']
+          else
+            config.merge("PATH" => "#{ruby.bin_path}:$PATH")
+          end
+        end
+        config['env']
       end
 
       def envfile

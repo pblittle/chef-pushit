@@ -198,7 +198,7 @@ class Chef
         r.group config['group']
         r.mode '0644'
         r.variables(
-          :env => escape_env(app.env_vars)
+           :env => escape_env(app.env_vars + {'PATH' => ruby.bin_path})
         )
         r.run_action(:create)
 
