@@ -87,8 +87,10 @@ class Chef
           bundle_flags = [
             '--binstubs',
             '--deployment',
-            '--without test development',
-            "--shebang=#{ruby_binary}"
+            '--without development:test',
+            '--path vendor/bundle',
+            "--shebang=#{bundler_binstubs_path}",
+            '-j4'
           ].join(' ')
 
           bundle = Chef::Resource::Execute.new(

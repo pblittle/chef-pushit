@@ -71,7 +71,7 @@ class Chef
       end
 
       def vendor_path
-        ::File.join(path, 'vendor')
+        ::File.join(release_path, 'vendor')
       end
 
       def log_path
@@ -80,6 +80,10 @@ class Chef
 
       def pid_path
         ::File.join(shared_path, 'pids')
+      end
+
+      def bundler_binstubs_path
+        ::File.join(vendor_path, 'bundle', 'bin')
       end
 
       def upstart_pid
