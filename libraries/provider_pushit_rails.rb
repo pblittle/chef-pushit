@@ -72,12 +72,13 @@ class Chef
         )
 
         r.migrate new_resource.migrate
-        r.migration_command "#{ruby.bundle_binary} exec rake db:migrate --trace"
+        r.migration_command "#{ruby.rake_binary} db:migrate --trace"
 
         app_config = config
 
         ruby_binary = ruby.ruby_binary
         bundle_binary = ruby.bundle_binary
+        rake_binary = ruby.rake_binary
 
         r.before_migrate do
           link "#{release_path}/config/filestore.yml" do
@@ -114,7 +115,7 @@ class Chef
             'Precompile assets',
             run_context
           )
-          precompile.command "#{release_path}/bin/rake #{precompile_command}"
+          precompile.command "#{rake_binary} #{precompile_command}"
           precompile.cwd release_path
           precompile.user app_config['owner']
           precompile.environment new_resource.environment
