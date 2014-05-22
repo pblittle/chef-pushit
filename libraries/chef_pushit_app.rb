@@ -27,28 +27,27 @@ class Chef
     class App
 
       def initialize(name)
-        @app = Pushit.app_data_bag(name)
-      end
-
-      def apps_path
-        ::File.join(Pushit.pushit_path, 'apps')
+        @name = name
       end
 
       def config
-        data_bag_item = Chef::DataBagItem.load(PUSHIT_DATA_BAG, @app['id'])
-        data_bag_item || {}
+        @config ||= Pushit.app_data_bag(@name)
       end
 
       def user
-        @user ||= Pushit::User.new(@app['owner'])
+        @user ||= Pushit::User.new(config['owner'])
       end
 
       def ruby
-        @ruby ||= Pushit::Ruby.new(@app['ruby'])
+        @ruby ||= Pushit::Ruby.new(ruby_version)
+      end
+
+      def ruby_version
+        config['ruby'] || PUSHIT_RUBY_DEFAULT
       end
 
       def name
-        @name ||= @app['id']
+        @name ||= config['id']
       end
 
       def gem_dependencies
@@ -56,7 +55,7 @@ class Chef
       end
 
       def path
-        ::File.join(apps_path, @app['id'])
+        ::File.join(Pushit.pushit_apps_path, config['id'])
       end
 
       def current_path
@@ -72,16 +71,19 @@ class Chef
       end
 
       def vendor_path
-        ::File.join(path, 'vendor')
+        ::File.join(release_path, 'vendor')
       end
 
       def log_path
-        # "#{name}.log"
         ::File.join(shared_path, 'log')
       end
 
       def pid_path
         ::File.join(shared_path, 'pids')
+      end
+
+      def bundler_binstubs_path
+        ::File.join(vendor_path, 'bundle', 'bin')
       end
 
       def upstart_pid
@@ -114,7 +116,7 @@ class Chef
         args << "-f #{procfile}"
         args << "-e #{envfile}"
         args << "-a #{name}"
-        args << "-u #{@app['owner']}"
+        args << "-u #{config['owner']}"
         args << "-l #{log_path}"
         args.join(' ')
       end
@@ -124,45 +126,45 @@ class Chef
       end
 
       def upstream_port
-        @app['webserver']['upstream_port'] || 8080
+        config['webserver']['upstream_port'] || 8080
       end
 
       def http_port
-        @app['webserver']['http_port'] || 80
+        config['webserver']['http_port'] || 80
       end
 
       def https_port
-        @app['webserver']['https_port'] || 443
+        config['webserver']['https_port'] || 443
       end
 
       def webserver?
-        @app['webserver'] && !@app['webserver'].empty?
+        config['webserver'] && !config['webserver'].empty?
       end
 
       def webserver_certificate?
-        self.webserver? && @app['webserver']['certificate'] &&
-          !@app['webserver']['certificate'].empty?
+        self.webserver? && config['webserver']['certificate'] &&
+          !config['webserver']['certificate'].empty?
       end
 
       def webserver_certificate
-        webserver_certificate? ? @app['webserver']['certificate'] : nil
+        webserver_certificate? ? config['webserver']['certificate'] : nil
       end
 
       def database?
-        @app['database'] && !@app['database'].empty?
+        config['database'] && !config['database'].empty?
       end
 
       def database_certificate?
-        self.database? && @app['database']['certificate'] &&
-          !@app['database']['certificate'].empty?
+        self.database? && config['database']['certificate'] &&
+          !config['database']['certificate'].empty?
       end
 
       def database_certificate
-        database_certificate? ? @app['database']['certificate'] : nil
+        database_certificate? ? config['database']['certificate'] : nil
       end
 
       def server_name
-        @app['webserver']['server_name'] || '_'
+        config['webserver']['server_name'] || '_'
       end
 
       def root

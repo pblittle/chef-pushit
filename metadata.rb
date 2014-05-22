@@ -11,7 +11,7 @@ long_description IO.read(
     'README.md'
   )
 )
-version '0.6.0'
+version '0.7.6'
 
 supports 'debian'
 supports 'ubuntu'
@@ -24,7 +24,7 @@ depends 'logrotate'
 depends 'nodejs'
 depends 'database'
 depends 'newrelic-deployment'
-depends 'nginx', '= 2.6.2'
+depends 'nginx'
 depends 'rsyslog'
 depends 'ruby_build'
 depends 'runit'

@@ -48,6 +48,10 @@ class Chef
         @pushit_path ||= PUSHIT_PATH
       end
 
+      def pushit_apps_path
+        @pushit_apps_path ||= ::File.join(pushit_path, 'apps')
+      end
+
       def whyrun_enabled?
         @whyrun_enabled ||= false
       end
@@ -80,7 +84,9 @@ class Chef
 
     class Ruby
 
-      attr_accessor :version
+      attr_reader :version
+      attr_reader :environment
+
       attr_accessor :rubies_path
       attr_accessor :prefix_path
       attr_accessor :bin_path
@@ -90,12 +96,11 @@ class Chef
       attr_accessor :foreman_binary
       attr_accessor :unicorn_binary
 
-      def initialize(version)
-        @version = version
-      end
+      def initialize(args = {})
+        args = { version: args } if args.is_a?(String)
 
-      def version
-        @version ||= PUSHIT_RUBY_DEFAULT
+        @version = args['version'] || PUSHIT_RUBY_DEFAULT
+        @environment = args['environment'] || {}
       end
 
       def rubies_path
@@ -103,7 +108,7 @@ class Chef
       end
 
       def prefix_path
-        ::File.join(rubies_path, @version)
+        ::File.join(rubies_path, version)
       end
 
       def bin_path

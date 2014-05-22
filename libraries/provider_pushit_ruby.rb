@@ -47,20 +47,25 @@ class Chef
 
         download_chruby
         install_chruby
-        source_chruby
+        create_chruby_sh
 
         install_gems
       end
 
       def ruby
-        @ruby ||= Pushit::Ruby.new(new_resource.name)
+        @ruby ||= Pushit::Ruby.new(
+          {
+            'version' => new_resource.name,
+            'environment' => new_resource.environment
+          }
+        )
       end
 
       private
 
       def install_ruby
-        r = ruby_build_ruby ruby.version do
-          definition ruby.version
+        r = ruby_build_ruby new_resource.name do
+          definition new_resource.name
           prefix_path ruby.prefix_path
           environment(new_resource.environment)
           action :nothing
@@ -99,17 +104,21 @@ class Chef
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
-      def source_chruby
-        template '/etc/profile.d/chruby.sh' do
+      def create_chruby_sh
+        r = template '/etc/profile.d/chruby.sh' do
           source 'chruby.sh.erb'
           cookbook 'pushit'
           mode '0644'
           variables(
             :chruby_path => '/usr/local/share/chruby',
             :rubies_path => ruby.rubies_path,
-            :default_ruby => ruby.version
+            :default_ruby => new_resource.name
           )
+          action :nothing
         end
+        r.run_action(:create)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def install_gems

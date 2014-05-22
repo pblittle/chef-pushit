@@ -17,8 +17,6 @@
 # limitations under the License.
 #
 
-require 'chef/mixin/command'
-
 require ::File.expand_path('../chef_pushit', __FILE__)
 require ::File.expand_path('../provider_pushit_base', __FILE__)
 
@@ -49,8 +47,8 @@ class Chef
         if new_resource.framework == 'rails'
           create_shared_directories
 
-          create_database_config if app.database?
-          create_unicorn_config if app.webserver?
+          create_database_config if @app.database?
+          create_unicorn_config if @app.webserver?
         end
 
         install_ruby
@@ -97,12 +95,16 @@ class Chef
         @config ||= app.config
       end
 
-      def user
-        @user ||= app.user
+      def ruby
+        @ruby ||= begin
+          Pushit::Ruby.new(config['ruby'])
+        rescue
+          Pushit::Ruby.new
+        end
       end
 
-      def ruby
-        @ruby ||= app.ruby
+      def user
+        @user ||= app.user
       end
 
       def install_ruby
@@ -110,6 +112,7 @@ class Chef
           ruby.version,
           run_context
         )
+        r.environment ruby.environment
         r.user user.username
         r.group user.group
         r.run_action(:create)
@@ -136,7 +139,7 @@ class Chef
       end
 
       def create_directories
-        [app.apps_path, app.path, app.shared_path].each do |dir|
+        [app.path, app.shared_path].each do |dir|
           r = Chef::Resource::Directory.new(
             dir,
             run_context
@@ -335,15 +338,18 @@ class Chef
 
       def create_newrelic_notification
         r = Chef::Resource::NewrelicDeployment.new(
-          app.config['env']['NEW_RELIC_APP_NAME'],
+          config['env']['NEW_RELIC_APP_NAME'],
           run_context
         )
-        r.api_key app.config['env']['NEW_RELIC_API_KEY']
+        r.api_key config['env']['NEW_RELIC_API_KEY']
         r.revision app.version
-        r.user app.config['owner']
-        r.run_action(:create)
-        r.not_if do
-          app.environment == 'test'
+        r.user config['owner']
+        r.action(:create)
+        r.only_if do
+          (config.key?('env') &&
+           config['env'].key?('NEW_RELIC_API_KEY') &&
+           config['env'].key?('NEW_RELIC_APP_NAME')) &&
+            app.environment != 'test'
         end
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
@@ -354,9 +360,9 @@ class Chef
           new_resource.name,
           run_context
         )
-        r.account app.config['env']['CAMPFIRE_DEPLOYMENT_ACCOUNT']
-        r.token app.config['env']['CAMPFIRE_DEPLOYMENT_TOKEN']
-        r.room app.config['env']['CAMPFIRE_DEPLOYMENT_ROOM']
+        r.account config['env']['CAMPFIRE_DEPLOYMENT_ACCOUNT']
+        r.token config['env']['CAMPFIRE_DEPLOYMENT_TOKEN']
+        r.room config['env']['CAMPFIRE_DEPLOYMENT_ROOM']
         r.release(
           deployer: user.username,
           environment: new_resource.environment,

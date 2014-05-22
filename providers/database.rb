@@ -35,31 +35,31 @@ def whyrun_supported?
 end
 
 def app
-  @app ||= Chef::Pushit::App.new(new_resource.name)
-end
-
-def config
-  @config ||= app.config
+  @app ||= Pushit.app_data_bag(new_resource.name)
 end
 
 def environment
-  config['environment']
+  app['environment']
 end
 
-action :create do
-
-  if environment && config['database'].key?(environment)
-    database = config['database'][environment]
+def database
+  if environment && app['database'].key?(environment)
+    app['database'][environment]
   else
-    database = config['database']
+    app['database']
   end
+end
 
-  connection_details = {
+def connection_details
+  {
     :host => database['host'],
     :port => database['port'],
     :username => database['username'],
     :password => database['password']
   }
+end
+
+action :create do
 
   if database['host'] == 'localhost'
     run_context.node.set_unless['mysql']['server_debian_password'] =
