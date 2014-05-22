@@ -32,7 +32,7 @@ class Chef
     PUSHIT_PATH ||= ::File.join('', 'opt', 'pushit').freeze
     PUSHIT_DATA_BAG ||= 'pushit_apps'.freeze
     PUSHIT_RUBY_DEFAULT ||= '2.0.0-p353'
-    PUSHIT_GEM_DEPENDENCIES ||= %w{ bundler foreman rake unicorn }.freeze
+    PUSHIT_GEM_DEPENDENCIES ||= %w{ bundler foreman unicorn }.freeze
 
     class << self
 
@@ -94,7 +94,6 @@ class Chef
       attr_accessor :gem_binary
       attr_accessor :bundle_binary
       attr_accessor :foreman_binary
-      attr_accessor :rake_binary
       attr_accessor :unicorn_binary
 
       def initialize(args = {})
@@ -134,10 +133,6 @@ class Chef
 
       def unicorn_binary
         ::File.join(bin_path, 'unicorn')
-      end
-
-      def rake_binary
-        ::File.join(bin_path, 'rake')
       end
     end
 

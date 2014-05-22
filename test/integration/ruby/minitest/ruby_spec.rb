@@ -62,10 +62,4 @@ describe 'pushit_test::ruby' do
       'chruby-exec 1.9.3-p448 -- which unicorn'
     )
   end
-
-  it 'has successfully installed rake' do
-    assert system(
-      'chruby-exec 1.9.3-p448 -- which rake'
-    )
-  end
 end
