@@ -22,11 +22,14 @@
 
 node.default['authorization']['sudo']['include_sudoers_d'] = true
 
-node.default[:build_essential][:compiletime] = true
+node.default[:build_essential][:compile_time] = true
 
 node.default[:mysql][:remove_anonymous_users] = true
 node.default[:mysql][:remove_test_database] = true
 node.default[:mysql][:tunable][:lower_case_table_names] = 1
+
+node.override['nginx']['version'] = '1.4.4'
+node.override['nginx']['source']['version'] = '1.4.4'
 
 node.default['nginx']['init_style'] = 'upstart'
 node.default['nginx']['install_method'] = 'source'
@@ -34,8 +37,6 @@ node.default['nginx']['default_site_enabled'] = false
 node.default['nginx']['dir'] = '/opt/pushit/nginx'
 node.default['nginx']['log_dir'] = '/opt/pushit/nginx/log'
 node.default['nginx']['binary'] = '/opt/pushit/nginx/sbin/nginx'
-node.default['nginx']['version'] = '1.4.6'
-node.default['nginx']['source']['version'] = '1.4.6'
 node.default['nginx']['source']['modules'] = [
   'nginx::http_gzip_static_module',
   'nginx::http_ssl_module',

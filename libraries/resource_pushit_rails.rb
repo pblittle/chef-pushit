@@ -34,22 +34,6 @@ class Chef
         @framework = 'rails'
       end
 
-      def config_source(arg = nill)
-        set_or_return(
-          :config_source,
-          arg,
-          :kind_of => String
-        )
-      end
-
-      def config_cookbook(arg = nill)
-        set_or_return(
-          :config_cookbook,
-          arg,
-          :kind_of => String
-        )
-      end
-
       def migrate(arg = nil)
         set_or_return(
           :migrate,

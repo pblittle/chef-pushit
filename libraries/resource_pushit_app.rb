@@ -91,6 +91,22 @@ class Chef
           :default => []
         )
       end
+
+      def vhost_config_source(arg = nil)
+        set_or_return(
+          :vhost_config_source,
+          arg,
+          :kind_of => String
+        )
+      end
+
+      def vhost_config_cookbook(arg = nil)
+        set_or_return(
+          :vhost_config_cookbook,
+          arg,
+          :kind_of => String
+        )
+      end
     end
   end
 end
