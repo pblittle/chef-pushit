@@ -70,8 +70,12 @@ class Chef
         ::File.join(path, 'shared')
       end
 
+      def shared_directories
+        %w{ cached-copy config system vendor_bundle }
+      end
+
       def vendor_path
-        ::File.join(release_path, 'vendor')
+        ::File.join(shared_path, 'vendor_bundle')
       end
 
       def log_path
@@ -86,12 +90,31 @@ class Chef
         ::File.join(vendor_path, 'bundle', 'bin')
       end
 
+      def bundle_flags
+        [
+         '--binstubs',
+         '--deployment',
+         '--without development:test',
+         '--path vendor/bundle',
+         "--shebang=#{bundler_binstubs_path}",
+         '-j4'
+        ].join(' ')
+      end
+
       def upstart_pid
         ::File.join(pid_path, 'upstart.pid')
       end
 
       def env_vars
-        config['env'] || {}
+        config['env'] ||= {}
+        if ruby.bin_path
+          if config['env'].key?('PATH')
+            config['env']['PATH'] = "#{ruby.bin_path}:" + config['env']['PATH']
+          else
+            config.merge("PATH" => "#{ruby.bin_path}:$PATH")
+          end
+        end
+        config['env']
       end
 
       def envfile

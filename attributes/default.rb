@@ -46,3 +46,5 @@ node.default['nginx']['gzip_static'] = 'on'
 
 node.default[:nodejs][:version] = '0.10.26'
 node.default[:nodejs][:npm] = '1.4.7'
+
+include_attribute 'nginx::source'

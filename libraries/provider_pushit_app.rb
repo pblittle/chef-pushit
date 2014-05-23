@@ -47,7 +47,11 @@ class Chef
         if new_resource.framework == 'rails'
           create_shared_directories
 
-          create_database_config if @app.database?
+          if @app.database?
+            create_database_config
+            create_filestore_config
+          end
+
           create_unicorn_config if @app.webserver?
         end
 
@@ -155,7 +159,7 @@ class Chef
       end
 
       def create_shared_directories
-        %w{ cached-copy config system vendor_bundle }.each do |dir|
+        app.shared_directories.each do |dir|
           r = Chef::Resource::Directory.new(
             ::File.join(app.shared_path, dir),
             run_context
@@ -300,6 +304,7 @@ class Chef
           run_context
         )
         r.http_port app.http_port
+        r.https_port app.https_port
         r.server_name app.server_name
         r.upstream_port app.upstream_port
         r.upstream_socket app.upstream_socket

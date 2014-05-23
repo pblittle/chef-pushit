@@ -42,6 +42,9 @@ class Chef
       def create_deploy_revision
         app_provider = self
 
+        owner = config['owner']
+        group = config['group']
+
         r = Chef::Resource::DeployRevision.new(
           new_resource.name,
           run_context
@@ -61,47 +64,29 @@ class Chef
 
         r.environment new_resource.environment
 
-        r.user Etc.getpwnam(config['owner']).name
-        r.group Etc.getgrnam(config['group']).name
+        r.user Etc.getpwnam(owner).name
+        r.group Etc.getgrnam(group).name
 
         r.symlink_before_migrate(
           'env' => '.env',
           'ruby-version' => '.ruby-version',
           'config/database.yml' => 'config/database.yml',
+          'config/filestore.yml' => 'config/filestore.yml',
           'config/unicorn.rb' => 'config/unicorn.rb',
         )
 
         r.migrate new_resource.migrate
         r.migration_command 'bundle exec rake db:migrate'
 
-        app_config = config
-
         bundle_binary = ruby.bundle_binary
-        bundler_binstubs_path = app.bundler_binstubs_path
+        bundle_flags = app.bundle_flags
 
         r.before_migrate do
-          link "#{release_path}/config/filestore.yml" do
-            to "#{new_resource.shared_path}/config/filestore.yml"
-          end if ::File.exists? "#{new_resource.shared_path}/config/filestore.yml"
-
-          bundle_flags = [
-            '--binstubs',
-            '--deployment',
-            '--without development:test',
-            '--path vendor/bundle',
-            "--shebang=#{bundler_binstubs_path}",
-            '-j4'
-          ].join(' ')
-
-          bundle = Chef::Resource::Execute.new(
-            'Install gems',
-            run_context
-          )
-          bundle.command "#{bundle_binary} install #{bundle_flags}"
-          bundle.cwd release_path
-          bundle.user app_config['owner']
-          bundle.environment new_resource.environment
-          bundle.run_action(:run)
+          execute "#{bundle_binary} install #{bundle_flags}" do
+            cwd release_path
+            user owner
+            environment new_resource.environment
+          end
         end
 
         r.before_symlink do
@@ -112,15 +97,12 @@ class Chef
         precompile_command = new_resource.precompile_command
 
         r.before_restart do
-          precompile = Chef::Resource::Execute.new(
-            'Precompile assets',
-            run_context
-          )
-          precompile.command "bundle exec rake #{precompile_command}"
-          precompile.cwd release_path
-          precompile.user app_config['owner']
-          precompile.environment new_resource.environment
-          precompile.run_action(:run) if precompile_assets
+          execute "bundle exec rake #{precompile_command}" do
+            cwd release_path
+            user owner
+            environment new_resource.environment
+            action :nothing
+          end.run_action(:run) if precompile_assets
 
           app_provider.send(:before_restart)
         end
@@ -143,10 +125,6 @@ class Chef
           database = config['database']
         end
 
-        sslkey = database['options'] && database['options']['sslkey'] ? database['options']['sslkey'] : ''
-        sslcert = database['options'] && database['options']['sslcert'] ? database['options']['sslcert'] : ''
-        sslca = database['options'] && database['options']['sslca'] ? database['options']['sslca'] : ''
-
         r = Chef::Resource::Template.new(
           ::File.join(app.shared_path, 'config', 'database.yml'),
           run_context
@@ -167,20 +145,36 @@ class Chef
             :options => database['options'] || [],
             :reconnect => database['reconnect']
           },
-          :environment => new_resource.environment
+          :environment => environment
         )
         r.run_action(:create)
 
-        fs_yaml = Chef::Resource::Template.new(
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      end
+
+      def create_filestore_config
+        environment = new_resource.environment
+
+        if environment && config['database'].key?(environment)
+          database = config['database'][environment]
+        else
+          database = config['database']
+        end
+
+        sslkey = database['options'] && database['options']['sslkey'] ? database['options']['sslkey'] : ''
+        sslcert = database['options'] && database['options']['sslcert'] ? database['options']['sslcert'] : ''
+        sslca = database['options'] && database['options']['sslca'] ? database['options']['sslca'] : ''
+
+        r = Chef::Resource::Template.new(
           ::File.join(app.shared_path, 'config', 'filestore.yml'),
           run_context
         )
-        fs_yaml.source 'filestore.yml.erb'
-        fs_yaml.cookbook 'pushit'
-        fs_yaml.owner config['owner']
-        fs_yaml.group config['group']
-        fs_yaml.mode '0644'
-        fs_yaml.variables(
+        r.source 'filestore.yml.erb'
+        r.cookbook 'pushit'
+        r.owner config['owner']
+        r.group config['group']
+        r.mode '0644'
+        r.variables(
           :database => {
             :adapter => database['adapter'],
             :database => database['name'],
@@ -191,9 +185,11 @@ class Chef
             :sslcert => sslcert,
             :sslca => sslca
           },
-          :environment => new_resource.environment
+          :environment => environment
         )
-        fs_yaml.run_action(:create)
+        r.run_action(:create)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
       def worker_processes
