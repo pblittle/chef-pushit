@@ -20,8 +20,6 @@
 # limitations under the License.
 #
 
-use_inline_resources
-
 def load_current_resource
   @current_resource = Chef::Resource::PushitVhost.new(
     new_resource.name
@@ -75,4 +73,6 @@ action :create do
   end
 
   nginx_site "#{new_resource.app_name}.conf"
+
+  new_resource.updated_by_last_action(true)
 end
