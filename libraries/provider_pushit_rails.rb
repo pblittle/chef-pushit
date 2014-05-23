@@ -99,7 +99,7 @@ class Chef
         r.before_restart do
           execute "bundle exec rake #{precompile_command}" do
             cwd release_path
-            user config_owner
+            user owner
             environment new_resource.environment
             action :nothing
           end.run_action(:run) if precompile_assets
