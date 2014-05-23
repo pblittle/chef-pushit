@@ -304,6 +304,7 @@ class Chef
           run_context
         )
         r.http_port app.http_port
+        r.https_port app.https_port
         r.server_name app.server_name
         r.upstream_port app.upstream_port
         r.upstream_socket app.upstream_socket
