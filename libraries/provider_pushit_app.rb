@@ -321,6 +321,8 @@ class Chef
           Pushit::Certs.keys_directory,
           "#{app.webserver_certificate}.key"
         )
+        r.config_cookbook new_resource.vhost_config_cookbook if new_resource.vhost_config_cookbook
+        r.config_source new_resource.vhost_config_source if new_resource.vhost_config_source
         r.run_action(:create)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
