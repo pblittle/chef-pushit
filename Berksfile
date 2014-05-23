@@ -10,7 +10,7 @@ cookbook 'monit', :github => 'phlipper/chef-monit'
 cookbook 'logrotate', :github => 'stevendanna/logrotate'
 cookbook 'mysql', :github => 'opscode-cookbooks/mysql'
 
-cookbook 'nginx', :github => 'opscode-cookbooks/nginx', :tag => 'v2.6.2'
+cookbook 'nginx', :git => 'git@github.com:opscode-cookbooks/nginx.git', :tag => 'v2.6.2'
 cookbook 'runit', :github => 'opscode-cookbooks/runit'
 cookbook 'postgresql', :github => 'opscode-cookbooks/postgresql'
 cookbook 'ruby_build', :github => 'fnichol/chef-ruby_build'

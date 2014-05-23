@@ -24,7 +24,7 @@ DEPENDENCIES
     git: git@github.com:pblittle/chef-newrelic-deployment.git
     revision: ecf9ff6ee7fef60ae72f0d50318a3a1c1a25f399
   nginx
-    git: git://github.com/opscode-cookbooks/nginx.git
+    git: git@github.com:opscode-cookbooks/nginx.git
     revision: 506d98cdafe30210157dc90c529b92bae5ce7298
     tag: v2.6.2
   postgresql
@@ -104,7 +104,7 @@ GRAPH
     apt (>= 1.9.0)
     build-essential (>= 0.0.0)
     openssl (>= 0.0.0)
-  pushit (0.7.5)
+  pushit (0.7.8)
     apt (>= 0.0.0)
     build-essential (>= 0.0.0)
     campfire-deployment (>= 0.0.0)
