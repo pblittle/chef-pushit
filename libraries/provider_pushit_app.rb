@@ -65,6 +65,8 @@ class Chef
         create_deploy_revision
       end
 
+      def create_deploy_revision; end
+
       def before_migrate; end
 
       def before_symlink
