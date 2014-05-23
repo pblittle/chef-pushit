@@ -70,9 +70,7 @@ class Chef
         create_deploy_revision
       end
 
-      def create_deploy_revision
-        raise NotImplementedError, "must be implemented by subclass"
-      end
+      def create_deploy_revision; end
 
       def before_migrate; end
 
