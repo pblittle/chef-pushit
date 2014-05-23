@@ -23,7 +23,7 @@
 include_recipe 'pushit_test::base'
 
 pushit_ruby 'ree-1.8.7-2012.02' do
-  environment({
+  environment(
     'CONFIGURE_OPTS' => '--no-tcmalloc'
-  })
+  )
 end

@@ -31,5 +31,5 @@ pushit_app app do
   environment 'development'
   revision 'master'
   vhost_config_cookbook 'pushit_test'
-  vhost_config_source   'custom_vhost.conf.erb'
+  vhost_config_source 'custom_vhost.conf.erb'
 end
