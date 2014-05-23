@@ -47,7 +47,11 @@ class Chef
         if new_resource.framework == 'rails'
           create_shared_directories
 
-          create_database_config if @app.database?
+          if @app.database?
+            create_database_config
+            create_filestore_config
+          end
+
           create_unicorn_config if @app.webserver?
         end
 
@@ -66,7 +70,9 @@ class Chef
         create_deploy_revision
       end
 
-      def create_deploy_revision; end
+      def create_deploy_revision
+        raise NotImplementedError, "must be implemented by subclass"
+      end
 
       def before_migrate; end
 
@@ -155,7 +161,7 @@ class Chef
       end
 
       def create_shared_directories
-        %w{ cached-copy config system vendor_bundle }.each do |dir|
+        app.shared_directories.each do |dir|
           r = Chef::Resource::Directory.new(
             ::File.join(app.shared_path, dir),
             run_context
@@ -198,7 +204,7 @@ class Chef
         r.group config['group']
         r.mode '0644'
         r.variables(
-           :env => escape_env(app.env_vars)
+          :env => escape_env(app.env_vars)
         )
         r.run_action(:create)
 

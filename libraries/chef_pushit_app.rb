@@ -70,8 +70,12 @@ class Chef
         ::File.join(path, 'shared')
       end
 
+      def shared_directories
+        %w{ cached-copy config system vendor_bundle }
+      end
+
       def vendor_path
-        ::File.join(release_path, 'vendor')
+        ::File.join(shared_path, 'vendor_bundle')
       end
 
       def log_path
@@ -84,6 +88,17 @@ class Chef
 
       def bundler_binstubs_path
         ::File.join(vendor_path, 'bundle', 'bin')
+      end
+
+      def bundle_flags
+        [
+         '--binstubs',
+         '--deployment',
+         '--without development:test',
+         '--path vendor/bundle',
+         "--shebang=#{bundler_binstubs_path}",
+         '-j4'
+        ].join(' ')
       end
 
       def upstart_pid
