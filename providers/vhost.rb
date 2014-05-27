@@ -20,8 +20,6 @@
 # limitations under the License.
 #
 
-#use_inline_resources
-
 def load_current_resource
   @current_resource = Chef::Resource::PushitVhost.new(
     new_resource.name
@@ -52,8 +50,8 @@ action :create do
 
   template "#{new_resource.app_name}.conf" do
     source new_resource.config_source || "nginx_#{config['framework']}.conf.erb"
-    path site_config
     cookbook new_resource.config_cookbook
+    path site_config
     owner 'root'
     group 'root'
     mode '0644'
