@@ -8,8 +8,8 @@ group 'integration' do
   gem 'kitchen-vagrant'
   gem 'minitest-chef-handler'
   gem 'pry'
+  gem 'rubocop'
   gem 'tailor'
   gem 'test-kitchen'
   gem 'vagrant-wrapper'
 end
-
