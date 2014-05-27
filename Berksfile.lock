@@ -27,6 +27,9 @@ DEPENDENCIES
     git: git@github.com:opscode-cookbooks/nginx.git
     revision: 506d98cdafe30210157dc90c529b92bae5ce7298
     tag: v2.6.2
+  nodejs
+    git: git@github.com:mdxp/nodejs-cookbook.git
+    revision: e2415cd8c4e03dccf21d7ef6ca31e1c5c81467ca
   postgresql
     git: git://github.com/opscode-cookbooks/postgresql.git
     revision: 3d894a76ccc96d2a5875aee8d9c7380aaecc76da
@@ -96,7 +99,7 @@ GRAPH
   nodejs (1.3.0)
     apt (>= 0.0.0)
     build-essential (>= 0.0.0)
-    yum (>= 0.0.0)
+    yum-epel (>= 0.0.0)
   ohai (1.1.12)
   openssl (1.1.0)
   partial_search (1.0.8)
