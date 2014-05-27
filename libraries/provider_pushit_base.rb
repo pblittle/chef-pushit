@@ -20,16 +20,19 @@
 require 'chef/provider'
 require 'chef/mixin/command'
 
-require ::File.expand_path('../chef_pushit', __FILE__)
+require_relative 'chef_pushit'
 
 class Chef
   class Provider
     class PushitBase < Chef::Provider
 
-      attr_accessor :pushit_user
+      include Chef::Pushit
+
+      attr_accessor :user
 
       def initialize(new_resource, run_context = nil)
-        create_user
+        create_pushit_user
+        install_gem_dependencies
       end
 
       def whyrun_supported?
@@ -42,7 +45,7 @@ class Chef
 
       private
 
-      def create_user
+      def create_pushit_user
         r = Chef::Resource::PushitUser.new(
           user.username,
           run_context
@@ -58,6 +61,18 @@ class Chef
         r.run_action(:create)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      end
+
+      def install_gem_dependencies
+        PUSHIT_GEM_DEPENDENCIES.each do |gem|
+          r = chef_gem gem[:name] do
+            version gem[:version] if gem[:version]
+            action :nothing
+          end
+          r.run_action(:install)
+
+          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        end
       end
     end
   end

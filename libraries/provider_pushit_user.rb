@@ -19,8 +19,8 @@
 
 require 'chef/provider'
 
-require ::File.expand_path('../chef_pushit', __FILE__)
-require ::File.expand_path('../chef_pushit_user', __FILE__)
+require_relative 'chef_pushit'
+require_relative 'chef_pushit_user'
 
 class Chef
   class Provider

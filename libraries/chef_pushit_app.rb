@@ -20,7 +20,7 @@
 # limitations under the License.
 #
 
-require ::File.expand_path('../chef_pushit', __FILE__)
+require_relative 'chef_pushit'
 
 class Chef
   module Pushit
@@ -39,19 +39,13 @@ class Chef
       end
 
       def ruby
-        @ruby ||= Pushit::Ruby.new(ruby_version)
-      end
+        ruby_version = config['ruby'] || {}
 
-      def ruby_version
-        config['ruby'] || PUSHIT_RUBY_DEFAULT
+        @ruby ||= Pushit::Ruby.new(ruby_version)
       end
 
       def name
         @name ||= config['id']
-      end
-
-      def gem_dependencies
-        @gem_dependencies ||= PUSHIT_GEM_DEPENDENCIES
       end
 
       def path
@@ -71,11 +65,7 @@ class Chef
       end
 
       def shared_directories
-        %w{ cached-copy config system vendor_bundle }
-      end
-
-      def vendor_path
-        ::File.join(shared_path, 'vendor_bundle')
+        %w{ cached-copy config system }
       end
 
       def log_path
@@ -86,19 +76,35 @@ class Chef
         ::File.join(shared_path, 'pids')
       end
 
+      def vendor_path
+        ::File.join('.', 'vendor')
+      end
+
+      def bundle_path
+        ::File.join(vendor_path, 'bundle')
+      end
+
       def bundler_binstubs_path
-        ::File.join(vendor_path, 'bundle', 'bin')
+        ::File.join(bundle_path, 'bin')
       end
 
       def bundle_flags
         [
-         '--binstubs',
-         '--deployment',
-         '--without development:test',
-         '--path vendor/bundle',
-         "--shebang=#{bundler_binstubs_path}",
-         '-j4'
+          '--binstubs',
+          '--deployment',
+          '--without development:test',
+          "--path #{bundle_path}",
+          "--shebang=#{bundler_binstubs_path}",
+          '-j4'
         ].join(' ')
+      end
+
+      def before_migrate_symlinks
+        {
+          'config/database.yml' => 'config/database.yml',
+          'config/filestore.yml' => 'config/filestore.yml',
+          'config/unicorn.rb' => 'config/unicorn.rb'
+        }
       end
 
       def upstart_pid
@@ -106,15 +112,8 @@ class Chef
       end
 
       def env_vars
-        config['env'] ||= {}
-        if ruby.bin_path
-          if config['env'].key?('PATH')
-            config['env']['PATH'] = "#{ruby.bin_path}:" + config['env']['PATH']
-          else
-            config.merge("PATH" => "#{ruby.bin_path}:$PATH")
-          end
-        end
-        config['env']
+        env = config['env'] || {}
+        env.merge("PATH" => "$PATH:#{ruby.bin_path}") if ruby.bin_path
       end
 
       def envfile
@@ -135,7 +134,7 @@ class Chef
 
       def foreman_export_flags
         args = []
-        args << "upstart /etc/init"
+        args << 'upstart /etc/init'
         args << "-f #{procfile}"
         args << "-e #{envfile}"
         args << "-a #{name}"
@@ -175,6 +174,10 @@ class Chef
 
       def database?
         config['database'] && !config['database'].empty?
+      end
+
+      def database
+        self.database? ? config['database'] : nil
       end
 
       def database_certificate?

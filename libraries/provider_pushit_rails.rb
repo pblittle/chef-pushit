@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-require File.expand_path('../provider_pushit_app', __FILE__)
+require_relative 'provider_pushit_app'
 
 class Chef
   class Provider
@@ -28,7 +28,9 @@ class Chef
 
       def initialize(new_resource, run_context = nil)
         @new_resource = new_resource
+
         @run_context = run_context
+        @run_context.include_recipe('nodejs::install_from_source')
 
         @framework = 'rails'
 
@@ -69,19 +71,26 @@ class Chef
 
         r.symlink_before_migrate(
           'env' => '.env',
-          'ruby-version' => '.ruby-version',
-          'config/database.yml' => 'config/database.yml',
-          'config/filestore.yml' => 'config/filestore.yml',
-          'config/unicorn.rb' => 'config/unicorn.rb',
+          'ruby-version' => '.ruby-version'
         )
 
         r.migrate new_resource.migrate
-        r.migration_command 'bundle exec rake db:migrate'
+        r.migration_command '#{bundle_binary} exec rake db:migrate'
 
         bundle_binary = ruby.bundle_binary
         bundle_flags = app.bundle_flags
 
+        before_migrate_symlinks = app.before_migrate_symlinks
+        shared_path = app.shared_path
+
         r.before_migrate do
+          before_migrate_symlinks.each do |directory, target|
+            _directory = ::File.join(shared_path, directory)
+            _target = ::File.join(release_path, target)
+
+            FileUtils.ln_sf(_directory, _target)
+          end
+
           execute "#{bundle_binary} install #{bundle_flags}" do
             cwd release_path
             user owner
@@ -97,7 +106,7 @@ class Chef
         precompile_command = new_resource.precompile_command
 
         r.before_restart do
-          execute "bundle exec rake #{precompile_command}" do
+          execute "#{bundle_binary} exec rake #{precompile_command}" do
             cwd release_path
             user owner
             environment new_resource.environment
@@ -117,14 +126,6 @@ class Chef
       end
 
       def create_database_config
-        environment = new_resource.environment
-
-        if environment && config['database'].key?(environment)
-          database = config['database'][environment]
-        else
-          database = config['database']
-        end
-
         r = Chef::Resource::Template.new(
           ::File.join(app.shared_path, 'config', 'database.yml'),
           run_context
@@ -136,16 +137,16 @@ class Chef
         r.mode '0644'
         r.variables(
           :database => {
-            :adapter => database['adapter'],
-            :database => database['name'],
-            :encoding => database['encoding'],
-            :host => database['host'],
-            :username => database['username'],
-            :password => database['password'],
-            :options => database['options'] || [],
-            :reconnect => database['reconnect']
+            :adapter => app.database['adapter'],
+            :database => app.database['name'],
+            :encoding => app.database['encoding'],
+            :host => app.database['host'],
+            :username => app.database['username'],
+            :password => app.database['password'],
+            :options => app.database['options'] || [],
+            :reconnect => app.database['reconnect']
           },
-          :environment => environment
+          :environment => new_resource.environment
         )
         r.run_action(:create)
 
@@ -153,17 +154,10 @@ class Chef
       end
 
       def create_filestore_config
-        environment = new_resource.environment
 
-        if environment && config['database'].key?(environment)
-          database = config['database'][environment]
-        else
-          database = config['database']
-        end
-
-        sslkey = database['options'] && database['options']['sslkey'] ? database['options']['sslkey'] : ''
-        sslcert = database['options'] && database['options']['sslcert'] ? database['options']['sslcert'] : ''
-        sslca = database['options'] && database['options']['sslca'] ? database['options']['sslca'] : ''
+        sslkey = app.database['options'] && app.database['options']['sslkey'] ? app.database['options']['sslkey'] : ''
+        sslcert = app.database['options'] && app.database['options']['sslcert'] ? app.database['options']['sslcert'] : ''
+        sslca = app.database['options'] && app.database['options']['sslca'] ? app.database['options']['sslca'] : ''
 
         r = Chef::Resource::Template.new(
           ::File.join(app.shared_path, 'config', 'filestore.yml'),
@@ -176,16 +170,16 @@ class Chef
         r.mode '0644'
         r.variables(
           :database => {
-            :adapter => database['adapter'],
-            :database => database['name'],
-            :host => database['host'],
-            :username => database['username'],
-            :password => database['password'],
+            :adapter => app.database['adapter'],
+            :database => app.database['name'],
+            :host => app.database['host'],
+            :username => app.database['username'],
+            :password => app.database['password'],
             :sslkey => sslkey,
             :sslcert => sslcert,
             :sslca => sslca
           },
-          :environment => environment
+          :environment => new_resource.environment
         )
         r.run_action(:create)
 

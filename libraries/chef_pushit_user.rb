@@ -20,7 +20,7 @@
 # limitations under the License.
 #
 
-require ::File.expand_path('../chef_pushit', __FILE__)
+require_relative 'chef_pushit'
 
 class Chef
   module Pushit

@@ -49,19 +49,6 @@ class Chef
         )
       end
 
-      def gems(arg = nil)
-        set_or_return(
-          :gems,
-          arg,
-          :kind_of => [Array],
-          :default => [
-            { :name => 'bundler' },
-            { :name => 'foreman' },
-            { :name => 'unicorn' }
-          ]
-        )
-      end
-
       def prefix_path(arg = nil)
         set_or_return(
           :prefix_path,

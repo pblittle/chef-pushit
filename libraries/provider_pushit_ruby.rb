@@ -17,8 +17,7 @@
 # limitations under the License.
 #
 
-require File.expand_path('../chef_pushit', __FILE__)
-require File.expand_path('../provider_pushit_base', __FILE__)
+require_relative 'provider_pushit_base'
 
 class Chef
   class Provider
@@ -48,8 +47,6 @@ class Chef
         download_chruby
         install_chruby
         create_chruby_sh
-
-        install_gems
       end
 
       def ruby
@@ -119,19 +116,6 @@ class Chef
         r.run_action(:create)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-      end
-
-      def install_gems
-        new_resource.gems.each do |gem|
-          r = gem_package gem[:name] do
-            gem_binary ruby.gem_binary
-            version gem[:version] if gem[:version]
-            action :nothing
-          end
-          r.run_action(:install)
-
-          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-        end
       end
     end
   end
