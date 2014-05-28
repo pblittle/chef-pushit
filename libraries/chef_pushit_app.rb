@@ -76,12 +76,8 @@ class Chef
         ::File.join(shared_path, 'pids')
       end
 
-      def vendor_path
-        ::File.join('.', 'vendor')
-      end
-
       def bundle_path
-        ::File.join(vendor_path, 'bundle')
+        ::File.join('vendor', 'bundle')
       end
 
       def bundler_binstubs_path
