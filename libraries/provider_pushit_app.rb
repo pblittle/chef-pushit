@@ -26,8 +26,12 @@ class Chef
 
       def initialize(new_resource, run_context = nil)
         @new_resource = new_resource
-
         @run_context = run_context
+
+        recipe_eval do
+          @run_context.include_recipe('nodejs::install_from_source')
+        end
+
         @run_context.include_recipe('campfire-deployment::default')
         @run_context.include_recipe('newrelic-deployment::default')
         @run_context.include_recipe('logrotate::global')

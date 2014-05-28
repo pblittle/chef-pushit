@@ -28,9 +28,7 @@ class Chef
 
       def initialize(new_resource, run_context = nil)
         @new_resource = new_resource
-
         @run_context = run_context
-        @run_context.include_recipe('nodejs::install_from_source')
 
         @framework = 'rails'
 
@@ -91,10 +89,13 @@ class Chef
             FileUtils.ln_sf(_directory, _target)
           end
 
-          execute "#{bundle_binary} install #{bundle_flags}" do
-            cwd release_path
-            user owner
-            environment new_resource.environment
+          require 'bundler'
+
+          command = "install #{bundle_flags}"
+
+          Bundler.with_clean_env do
+            output = `"#{bundle_binary}" #{command}`
+            print output
           end
         end
 
@@ -102,18 +103,20 @@ class Chef
           app_provider.send(:before_symlink)
         end
 
-        app_env_vars = escape_env(app.env_vars)
-
         precompile_assets = new_resource.precompile_assets
         precompile_command = new_resource.precompile_command
 
         r.before_restart do
-          execute "#{bundle_binary} exec rake #{precompile_command}" do
-            cwd release_path
-            user owner
-            environment app_env_vars
-            action :nothing
-          end.run_action(:run) if precompile_assets
+          if precompile_assets
+            require 'bundler'
+
+            command = "exec rake #{precompile_command}"
+
+            Bundler.with_clean_env do
+              output = `"#{bundle_binary}" #{command}`
+              print output
+            end
+          end
 
           app_provider.send(:before_restart)
         end

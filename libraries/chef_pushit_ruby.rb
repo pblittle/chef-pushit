@@ -36,7 +36,6 @@ class Chef
       attr_accessor :bin_path
       attr_accessor :ruby_binary
       attr_accessor :gem_binary
-      attr_accessor :bundle_binary
       attr_accessor :foreman_binary
       attr_accessor :unicorn_binary
 
@@ -71,16 +70,25 @@ class Chef
         ::File.join('', 'opt', 'chef', 'embedded', 'bin')
       end
 
-      def bundle_binary
-        ::File.join(embedded_path, 'bundle')
-      end
-
       def foreman_binary
         ::File.join(embedded_path, 'foreman')
       end
 
       def unicorn_binary
         ::File.join(embedded_path, 'unicorn')
+      end
+
+      def bundle_binary
+        ::File.join(embedded_path, 'bundle')
+      end
+
+      def bundle_command(command)
+        require 'bundler'
+
+        Bundler.with_clean_env do
+          output = `"#{bundle_binary}" #{command}`
+          print output
+        end
       end
     end
   end

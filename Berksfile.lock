@@ -107,7 +107,7 @@ GRAPH
     apt (>= 1.9.0)
     build-essential (>= 0.0.0)
     openssl (>= 0.0.0)
-  pushit (0.8.4)
+  pushit (0.8.5)
     apt (>= 0.0.0)
     build-essential (>= 0.0.0)
     campfire-deployment (>= 0.0.0)
