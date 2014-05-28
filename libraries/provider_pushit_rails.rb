@@ -102,6 +102,8 @@ class Chef
           app_provider.send(:before_symlink)
         end
 
+        app_env_vars = escape_env(app.env_vars)
+
         precompile_assets = new_resource.precompile_assets
         precompile_command = new_resource.precompile_command
 
@@ -109,7 +111,7 @@ class Chef
           execute "#{bundle_binary} exec rake #{precompile_command}" do
             cwd release_path
             user owner
-            environment new_resource.environment
+            environment app_env_vars
             action :nothing
           end.run_action(:run) if precompile_assets
 

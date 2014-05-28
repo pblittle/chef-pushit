@@ -30,7 +30,7 @@ class Chef
     PUSHIT_PATH ||= ::File.join('', 'opt', 'pushit').freeze
     PUSHIT_DATA_BAG ||= 'pushit_apps'.freeze
     PUSHIT_GEM_DEPENDENCIES ||= [
-      { :name => 'bundler', :version => '1.2.5' },
+      { :name => 'bundler', :version => '1.6.2' },
       { :name => 'foreman', :version => '0.67.0' },
       { :name => 'unicorn', :version => '4.8.3' }
     ].freeze
