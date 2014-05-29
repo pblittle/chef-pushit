@@ -58,6 +58,14 @@ class Chef
         ::File.join(prefix_path, 'bin')
       end
 
+      def embedded_bin_path
+        ::File.join('', 'opt', 'chef', 'embedded', 'bin')
+      end
+
+      def deployment_bin_paths
+        %w[embedded_bin_path bin_path].join(':')
+      end
+
       def ruby_binary
         ::File.join(bin_path, 'ruby')
       end
@@ -66,20 +74,16 @@ class Chef
         ::File.join(bin_path, 'gem')
       end
 
-      def embedded_path
-        ::File.join('', 'opt', 'chef', 'embedded', 'bin')
-      end
-
       def foreman_binary
-        ::File.join(embedded_path, 'foreman')
+        ::File.join(embedded_bin_path, 'foreman')
       end
 
       def unicorn_binary
-        ::File.join(embedded_path, 'unicorn')
+        ::File.join(embedded_bin_path, 'unicorn')
       end
 
       def bundle_binary
-        ::File.join(embedded_path, 'bundle')
+        ::File.join(embedded_bin_path, 'bundle')
       end
 
       def bundle_command(command)

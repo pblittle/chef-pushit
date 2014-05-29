@@ -44,22 +44,4 @@ describe 'pushit_test::ruby' do
       "#{mri_binary} -v | grep -e '1.9.3p448'"
     )
   end
-
-  it 'has successfully installed bundler' do
-    assert system(
-      'chruby-exec 1.9.3-p448 -- which bundle'
-    )
-  end
-
-  it 'has successfully installed foreman' do
-    assert system(
-      'chruby-exec 1.9.3-p448 -- which foreman'
-    )
-  end
-
-  it 'has successfully installed unicorn' do
-    assert system(
-      'chruby-exec 1.9.3-p448 -- which unicorn'
-    )
-  end
 end

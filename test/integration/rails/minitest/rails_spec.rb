@@ -7,7 +7,9 @@ describe 'pushit_test::rails' do
 
   let(:pushit_path) { ::File.join('', 'opt', 'pushit') }
 
-  let(:pushit_app_path) { ::File.join(pushit_path, 'apps', 'rails-example') }
+  let(:pushit_app) { 'rails-example' }
+
+  let(:pushit_app_path) { ::File.join(pushit_path, 'apps', pushit_app) }
 
   let(:pushit_pid_path) do
     ::File.join(pushit_app_path, 'shared', 'pids', 'upstart.pid')
@@ -15,6 +17,18 @@ describe 'pushit_test::rails' do
 
   let(:database_yaml_path) do
     ::File.join(pushit_app_path, 'current', 'config', 'database.yml')
+  end
+
+  let(:dotenv_path) do
+    ::File.join(pushit_app_path, 'current', '.env')
+  end
+
+  let(:ruby_bin_path) do
+    ::File.join(pushit_path, 'rubies', 'ree-1.8.7-2012.02', 'bin')
+  end
+
+  let(:embedded_ruby_bin_path) do
+    ::File.join('.', 'opt', 'chef', 'embedded', 'bin')
   end
 
   it 'has created the base pushit directory' do
@@ -35,6 +49,18 @@ describe 'pushit_test::rails' do
     assert File.symlink?(
       ::File.join(pushit_app_path, 'current')
     )
+  end
+
+  it 'has symlinked the .env file' do
+    assert ::File.symlink?(dotenv_path)
+  end
+
+  it 'has included the embedded ruby bin path in .env' do
+    assert ::File.read(dotenv_path).include?(embedded_ruby_bin_path)
+  end
+
+  it 'has included the ruby bin path in .env' do
+    assert ::File.read(dotenv_path).include?(ruby_bin_path)
   end
 
   it 'has created database.yml' do
@@ -65,13 +91,13 @@ describe 'pushit_test::rails' do
 
   it 'has created a service config' do
     assert File.file?(
-      ::File.join('', 'etc', 'init', 'rails-example.conf')
+      ::File.join('', 'etc', 'init', "#{pushit_app}.conf")
     )
   end
 
-  it 'starts the rails-example service after converge' do
+  it 'starts the rails app service after converge' do
     assert system(
-      "service rails-example status | grep -e $(cat #{pushit_pid_path})"
+      "service #{pushit_app} status | grep -e $(cat #{pushit_pid_path})"
     )
   end
 end
