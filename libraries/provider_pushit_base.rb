@@ -28,7 +28,7 @@ class Chef
 
       include Chef::Pushit
 
-      attr_accessor :user
+      attr_reader :user
 
       def initialize(new_resource, run_context = nil)
         create_pushit_user

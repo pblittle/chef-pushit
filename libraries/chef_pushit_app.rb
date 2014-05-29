@@ -109,7 +109,7 @@ class Chef
 
       def env_vars
         env = config['env'] || {}
-        env.merge("PATH" => "$PATH:#{ruby.deployment_bin_paths}")
+        env.merge(ruby.env_vars)
       end
 
       def envfile

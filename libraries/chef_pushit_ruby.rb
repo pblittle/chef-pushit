@@ -58,6 +58,15 @@ class Chef
         [embedded_bin_path, bin_path].join(':')
       end
 
+      def env_vars
+        {
+          'BUNDLE_GEMFILE' => '',
+          'LANG' => 'en_US.UTF-8',
+          'PATH' => "$PATH:#{deployment_bin_paths}",
+          'RUBYOPT' => ''
+        }
+      end
+
       def ruby_binary
         ::File.join(bin_path, 'ruby')
       end
