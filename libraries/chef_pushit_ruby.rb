@@ -31,16 +31,8 @@ class Chef
       attr_reader :version
       attr_reader :environment
 
-      attr_accessor :rubies_path
-      attr_accessor :prefix_path
-      attr_accessor :bin_path
-      attr_accessor :ruby_binary
-      attr_accessor :gem_binary
-      attr_accessor :foreman_binary
-      attr_accessor :unicorn_binary
-
       def initialize(args = {})
-        args = { version: args } if args.is_a?(String)
+        args = { version => args } if args.is_a?(String)
 
         @version = args['version'] || PUSHIT_RUBY_DEFAULT
         @environment = args['environment'] || {}
