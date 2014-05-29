@@ -48,13 +48,13 @@ def create_webserver_config
     owner 'root'
     group 'root'
     mode '0644'
-    variables({
+    variables(
       :user => new_resource.user,
       :group => new_resource.group,
       :log_path => new_resource.log_path,
       :pid_file => new_resource.pid_file,
       :config_path => new_resource.config_path
-    })
+    )
   end
 
   new_resource.updated_by_last_action(true) if r.updated_by_last_action?
