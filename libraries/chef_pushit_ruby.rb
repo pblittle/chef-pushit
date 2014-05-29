@@ -63,7 +63,7 @@ class Chef
       end
 
       def deployment_bin_paths
-        %w[embedded_bin_path bin_path].join(':')
+        [embedded_bin_path, bin_path].join(':')
       end
 
       def ruby_binary
