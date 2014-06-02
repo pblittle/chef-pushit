@@ -202,11 +202,11 @@ class Chef
         r.owner pushit_user.username
         r.group Etc.getgrnam(pushit_user.group).gid
         r.mode '0600'
-        r.variables({
+        r.variables(
           :ssh_key_data => key['data']
-        })
+        )
         r.run_action(:create)
-        r.not_if { ::File.exists?(deploy_key) }
+        r.not_if { ::File.exist?(deploy_key) }
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
@@ -225,12 +225,12 @@ class Chef
         r.owner pushit_user.username
         r.group Etc.getgrnam(pushit_user.group).gid
         r.mode '0755'
-        r.variables({
+        r.variables(
           :ssh_key_dir => pushit_user.ssh_directory,
           :ssh_key_name => key['name']
-        })
+        )
         r.run_action(:create)
-        r.not_if { ::File.exists?(deploy_wrapper) }
+        r.not_if { ::File.exist?(deploy_wrapper) }
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
@@ -244,9 +244,11 @@ class Chef
         username = pushit_user.username
 
         ssh_config host_key_alias do
-          options 'User' => 'git',
+          options(
+            'User' => 'git',
             'HostName' => host_name,
             'IdentityFile' => identity_file
+          )
           user username
           path config_file
           not_if { `grep #{identity_file} #{config_file}` }

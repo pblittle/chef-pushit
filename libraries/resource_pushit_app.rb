@@ -51,7 +51,7 @@ class Chef
           arg,
           :kind_of => [String],
           :required => true,
-          :equal_to => %w{ nodejs rails }
+          :equal_to => %w( nodejs rails )
         )
       end
 

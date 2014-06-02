@@ -56,10 +56,11 @@ class Chef
         r.revision new_resource.revision
         r.shallow_clone true
 
-        r.ssh_wrapper "#{app.user.ssh_directory}/#{config['deploy_key']}_deploy_wrapper.sh" do
-          only_if do
-            config['deploy_key'] && !config['deploy_key'].empty?
-          end
+        if config['deploy_key'] && !config['deploy_key'].empty?
+          wrapper = "#{config['deploy_key']}_deploy_wrapper.sh"
+          wrapper_path = ::File.join(app.user.ssh_directory, wrapper)
+
+          r.ssh_wrapper wrapper_path
         end
 
         r.environment new_resource.environment
@@ -67,37 +68,35 @@ class Chef
         r.user Etc.getpwnam(owner).name
         r.group Etc.getgrnam(group).name
 
-        r.symlink_before_migrate(
-          'env' => '.env',
-          'ruby-version' => '.ruby-version'
-        )
+        r.symlink_before_migrate({})
 
-        r.migrate new_resource.migrate
-        r.migration_command '#{bundle_binary} exec rake db:migrate'
-
-        bundle_binary = ruby.bundle_binary
+        bundle_binary = app.bundle_binary
         bundle_flags = app.bundle_flags
 
         before_migrate_symlinks = app.before_migrate_symlinks
-        shared_path = app.shared_path
 
         r.before_migrate do
-          before_migrate_symlinks.each do |directory, target|
-            _directory = ::File.join(shared_path, directory)
-            _target = ::File.join(release_path, target)
+          app_provider.send(:create_dotenv)
 
-            FileUtils.ln_sf(_directory, _target)
+          before_migrate_symlinks.each do |file, link|
+            link "#{release_path}/#{link}" do
+              to "#{new_resource.shared_path}/#{file}"
+              owner owner
+              group group
+            end if ::File.exist? "#{new_resource.shared_path}/#{file}"
           end
 
           require 'bundler'
 
-          command = "install #{bundle_flags}"
-
           Bundler.with_clean_env do
-            output = `"#{bundle_binary}" #{command}`
-            print output
+            bundle_install_command = "sudo su - deploy -c 'cd #{release_path} && #{bundle_binary} install #{bundle_flags}'"
+
+            system(bundle_install_command)
           end
         end
+
+        r.migrate new_resource.migrate
+        r.migration_command '#{bundle_binary} exec rake db:migrate'
 
         r.before_symlink do
           app_provider.send(:before_symlink)
@@ -108,12 +107,12 @@ class Chef
 
         r.before_restart do
           if precompile_assets
+
             require 'bundler'
-
-            command = "exec rake #{precompile_command}"
-
             Bundler.with_clean_env do
-              output = `"#{bundle_binary}" #{command}`
+              bundle_precompile_command = "exec rake #{precompile_command}"
+
+              output = `"#{bundle_binary}" #{bundle_precompile_command}`
               print output
             end
           end
@@ -199,7 +198,7 @@ class Chef
         end
 
         unless worker_count && worker_count > 0
-          raise StandardError, 'Unicorn worker count must be a positive integer'
+          fail StandardError, 'Unicorn worker count must be a positive integer'
         end
 
         worker_count

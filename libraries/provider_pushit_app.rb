@@ -70,7 +70,6 @@ class Chef
         create_logrotate_config
         create_monit_check
 
-        create_dotenv
         create_deploy_revision
       end
 
@@ -179,7 +178,7 @@ class Chef
       end
 
       def create_writable_directories
-        %w{ log pids sockets }.each do |dir|
+        %w( log pids sockets ).each do |dir|
           r = Chef::Resource::Directory.new(
             ::File.join(app.shared_path, dir),
             run_context
@@ -240,7 +239,7 @@ class Chef
 
       def foreman_export_service_config
         r = Chef::Resource::Execute.new(
-          "#{ruby.foreman_binary} export #{app.foreman_export_flags}",
+          "#{app.foreman_binary} export #{app.foreman_export_flags}",
           run_context
         )
         r.cwd app.release_path
@@ -297,7 +296,7 @@ class Chef
           path log_path
           frequency 'daily'
           rotate 180
-          options %w{ missingok dateext delaycompress notifempty compress }
+          options %w( missingok dateext delaycompress notifempty compress )
           create "644 #{username} #{group}"
         end
       end

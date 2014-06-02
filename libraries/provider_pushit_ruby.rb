@@ -47,14 +47,14 @@ class Chef
         download_chruby
         install_chruby
         create_chruby_sh
+
+        install_gems
       end
 
       def ruby
         @ruby ||= Pushit::Ruby.new(
-          {
-            'version' => new_resource.name,
-            'environment' => new_resource.environment
-          }
+          'version' => new_resource.name,
+          'environment' => new_resource.environment
         )
       end
 
@@ -114,6 +114,20 @@ class Chef
           action :nothing
         end
         r.run_action(:create)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      end
+    end
+
+    def install_gems
+      [{ :name => 'bundler' }].each do |gem|
+        r = gem_package gem[:name] do
+          version gem[:version] if gem[:version]
+          gem_binary ruby.gem_binary
+          options('--no-ri --no-rdoc')
+          action :nothing
+        end
+        r.run_action(:install)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end

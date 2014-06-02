@@ -50,50 +50,12 @@ class Chef
         ::File.join(prefix_path, 'bin')
       end
 
-      def embedded_bin_path
-        ::File.join('', 'opt', 'chef', 'embedded', 'bin')
-      end
-
-      def deployment_bin_paths
-        [embedded_bin_path, bin_path].join(':')
-      end
-
-      def env_vars
-        {
-          'BUNDLE_GEMFILE' => '',
-          'LANG' => 'en_US.UTF-8',
-          'PATH' => "$PATH:#{deployment_bin_paths}",
-          'RUBYOPT' => ''
-        }
-      end
-
       def ruby_binary
         ::File.join(bin_path, 'ruby')
       end
 
       def gem_binary
         ::File.join(bin_path, 'gem')
-      end
-
-      def foreman_binary
-        ::File.join(embedded_bin_path, 'foreman')
-      end
-
-      def unicorn_binary
-        ::File.join(embedded_bin_path, 'unicorn')
-      end
-
-      def bundle_binary
-        ::File.join(embedded_bin_path, 'bundle')
-      end
-
-      def bundle_command(command)
-        require 'bundler'
-
-        Bundler.with_clean_env do
-          output = `"#{bundle_binary}" #{command}`
-          print output
-        end
       end
     end
   end
