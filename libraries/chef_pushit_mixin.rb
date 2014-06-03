@@ -73,7 +73,7 @@ class Chef
         end
 
         def bundle_binary
-          ::File.join(bin_path, 'bundle')
+          'bundle'
         end
 
         def embedded_bin_path
