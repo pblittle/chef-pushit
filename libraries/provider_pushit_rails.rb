@@ -89,8 +89,9 @@ class Chef
           end
 
           Dir.chdir release_path do
-            command = "sudo su - deploy -c '#{bundle_binary} install #{bundle_flags}'"
             begin
+              command = "sudo su - deploy -c 'cd #{release_path} && #{bundle_binary} install #{bundle_flags}'"
+
               Bundler.clean_system(command)
             rescue => e
               Chef::Log.debug(e.backtrace)
@@ -110,7 +111,6 @@ class Chef
 
         r.before_restart do
           if precompile_assets
-
             Bundler.with_clean_env do
               command = "#{bundle_binary} exec rake #{precompile_command}"
               system(command)
