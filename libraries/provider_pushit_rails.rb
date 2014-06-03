@@ -109,9 +109,13 @@ class Chef
 
         r.before_restart do
           if precompile_assets
-            Bundler.with_clean_env do
-              command = "#{bundle_binary} exec rake #{precompile_command}"
-              system(command)
+
+            bundle_precompile_command = "cd #{release_path} && #{bundle_binary} exec rake #{precompile_command}"
+
+            begin
+              Bundler.clean_system(bundle_precompile_command)
+            rescue => e
+              Chef::Log.debug(e.backtrace)
             end
           end
 
