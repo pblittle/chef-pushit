@@ -24,7 +24,7 @@ describe 'pushit_test::rails' do
   end
 
   let(:ruby_bin_path) do
-    ::File.join(pushit_path, 'rubies', 'ree-1.8.7-2012.02', 'bin')
+    ::File.join(pushit_path, 'rubies', '2.1.1', 'bin')
   end
 
   let(:embedded_ruby_bin_path) do
@@ -81,6 +81,18 @@ describe 'pushit_test::rails' do
     assert ::File.read(
       database_yaml_path
     ).include?('foo: bar')
+  end
+
+  it 'has created bundler binstubs' do
+    assert File.directory?(
+      ::File.join(pushit_app_path, 'current', 'bin')
+    )
+  end
+
+  it 'has vendored the bundled gems' do
+    assert File.directory?(
+      ::File.join(pushit_app_path, 'current', 'vendor', 'bundle', 'ruby', '2.1.0', 'gems')
+    )
   end
 
   it 'has created a pids directory' do

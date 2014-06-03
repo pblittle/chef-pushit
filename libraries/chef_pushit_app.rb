@@ -78,6 +78,14 @@ class Chef
         ::File.join(pid_path, 'upstart.pid')
       end
 
+      def bin_paths
+        [
+          ruby.bin_path,
+          bundler_binstubs_path,
+          bin_path
+        ].join(':')
+      end
+
       def env_vars
         e = config['env'] || {}
         e.merge(bundle_env_vars)

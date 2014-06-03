@@ -33,6 +33,7 @@ pushit_rails app do
   deploy_action 'deploy'
   environment 'test'
   precompile_assets true
+  migrate true
   unicorn_worker_processes 1
   revision 'master'
 end

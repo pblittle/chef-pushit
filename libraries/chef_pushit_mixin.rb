@@ -54,7 +54,7 @@ class Chef
             '--without development:test',
             "--path #{bundle_path}",
             "--binstubs #{bundler_binstubs_path}",
-            '--gemfile Gemfile',
+            "--gemfile #{gemfile_path}",
             '-j4'
           ].join(' ')
         end
@@ -69,14 +69,7 @@ class Chef
         end
 
         def bin_path
-          'bin'
-        end
-
-        def bin_paths
-          [
-            bundler_binstubs_path,
-            bin_path
-          ].join(':')
+          ::File.join('.', 'bin')
         end
 
         def bundle_binary
