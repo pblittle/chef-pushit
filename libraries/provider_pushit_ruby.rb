@@ -105,7 +105,7 @@ class Chef
         r = template '/etc/profile.d/chruby.sh' do
           source 'chruby.sh.erb'
           cookbook 'pushit'
-          mode '0644'
+          mode '0755'
           variables(
             :chruby_path => '/usr/local/share/chruby',
             :rubies_path => ruby.rubies_path,
