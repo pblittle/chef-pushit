@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+require 'bundler'
+
 require_relative 'provider_pushit_app'
 
 class Chef
@@ -86,12 +88,9 @@ class Chef
             end if ::File.exist? "#{new_resource.shared_path}/#{file}"
           end
 
-          require 'bundler'
-
           Bundler.with_clean_env do
-            bundle_install_command = "sudo su - deploy -c 'cd #{release_path} && #{bundle_binary} install #{bundle_flags}'"
-
-            system(bundle_install_command)
+            command = "sudo su - deploy -c 'cd #{release_path} && #{bundle_binary} install #{bundle_flags}'"
+            system(command)
           end
         end
 
@@ -108,12 +107,9 @@ class Chef
         r.before_restart do
           if precompile_assets
 
-            require 'bundler'
             Bundler.with_clean_env do
-              bundle_precompile_command = "exec rake #{precompile_command}"
-
-              output = `"#{bundle_binary}" #{bundle_precompile_command}`
-              print output
+              command = "#{bundle_binary} exec rake #{precompile_command}"
+              system(command)
             end
           end
 
