@@ -69,7 +69,7 @@ class Chef
         end
 
         def bin_path
-          ::File.join('.', 'bin')
+          'bin'
         end
 
         def bundle_binary
