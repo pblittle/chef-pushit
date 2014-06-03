@@ -61,7 +61,7 @@ class Chef
 
         def bundle_env_vars
           {
-            'BUNDLE_GEMFILE' => gemfile_path,
+            'BUNDLE_GEMFILE' => '',
             'LANG' => 'en_US.UTF-8',
             'PATH' => "$PATH:#{bin_paths}",
             'RUBYOPT' => ''
