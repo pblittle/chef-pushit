@@ -32,7 +32,7 @@ class Chef
       attr_reader :environment
 
       def initialize(args = {})
-        args = { version => args } if args.is_a?(String)
+        args = { 'version' => args } if args.is_a?(String)
 
         @version = args['version'] || PUSHIT_RUBY_DEFAULT
         @environment = args['environment'] || {}
