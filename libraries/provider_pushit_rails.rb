@@ -88,9 +88,13 @@ class Chef
             end if ::File.exist? "#{new_resource.shared_path}/#{file}"
           end
 
-          Bundler.with_clean_env do
-            command = "sudo su - deploy -c 'cd #{release_path} && #{bundle_binary} install #{bundle_flags}'"
-            system(command)
+          Dir.chdir release_path do
+            command = "sudo su - deploy -c '#{bundle_binary} install #{bundle_flags}'"
+            begin
+              Bundler.clean_system(command)
+            rescue => e
+              Chef::Log.debug(e.backtrace)
+            end
           end
         end
 
