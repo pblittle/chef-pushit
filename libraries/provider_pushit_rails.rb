@@ -93,7 +93,7 @@ class Chef
           begin
             Bundler.clean_system(bundle_install_command)
           rescue => e
-            Chef::Log.debug(e.backtrace)
+            Chef::Log.warn(e.backtrace)
           end
         end
 
@@ -110,12 +110,14 @@ class Chef
         r.before_restart do
           if precompile_assets
 
-            bundle_precompile_command = "cd #{release_path} && #{bundle_binary} exec rake #{precompile_command}"
+            bundle_precompile_command = "sudo su - deploy -c 'cd #{release_path} && #{bundle_binary} exec rake #{precompile_command}'"
+
+            Chef::Log.warn bundle_precompile_command
 
             begin
               Bundler.clean_system(bundle_precompile_command)
             rescue => e
-              Chef::Log.debug(e.backtrace)
+              Chef::Log.warn(e.backtrace)
             end
           end
 
