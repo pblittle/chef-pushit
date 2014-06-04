@@ -44,7 +44,7 @@ class Chef
         end
 
         def installed?
-          run("#{node_binary} -v") && $?.success?
+          system("#{node_binary} -v") && $?.success?
         end
       end
     end
