@@ -22,9 +22,6 @@
 
 include_recipe 'pushit_test::base'
 
-include_recipe 'nodejs::install_from_source'
-include_recipe 'nodejs::npm'
-
 pushit_nodejs 'nodejs-example' do
   environment 'production'
   script_file 'server.js'

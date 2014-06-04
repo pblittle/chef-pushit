@@ -21,7 +21,6 @@
 #
 
 include_recipe 'pushit_test::base'
-include_recipe 'nodejs::install_from_source'
 
 app = 'rails-example'
 
