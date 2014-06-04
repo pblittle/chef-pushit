@@ -82,7 +82,8 @@ class Chef
         [
           ruby.bin_path,
           bundler_binstubs_path,
-          bin_path
+          bin_path,
+          nodejs_bin_path
         ].join(':')
       end
 

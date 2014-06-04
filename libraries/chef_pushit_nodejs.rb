@@ -25,21 +25,27 @@ require_relative 'chef_pushit'
 class Chef
   module Pushit
     class Nodejs
+      class << self
 
-      def self.prefix_path
-        ::File.join('', 'usr', 'local')
-      end
+        def prefix_path
+          ::File.join('', 'usr', 'local')
+        end
 
-      def self.bin_path
-        ::File.join(prefix_path, 'bin')
-      end
+        def bin_path
+          ::File.join(prefix_path, 'bin')
+        end
 
-      def self.node_binary
-        ::File.join(bin_path, 'node')
-      end
+        def node_binary
+          ::File.join(bin_path, 'node')
+        end
 
-      def self.npm_binary
-        ::File.join(bin_path, 'npm')
+        def npm_binary
+          ::File.join(bin_path, 'npm')
+        end
+
+        def installed?
+          run("#{node_binary} -v") && $?.success?
+        end
       end
     end
   end

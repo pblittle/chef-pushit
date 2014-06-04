@@ -72,6 +72,10 @@ class Chef
           'bin'
         end
 
+        def nodejs_bin_path
+          Pushit::Nodejs.bin_path if Pushit::Nodejs.installed?
+        end
+
         def bundle_binary
           'bundle'
         end
