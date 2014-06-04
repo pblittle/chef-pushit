@@ -45,7 +45,7 @@ class Chef
         end
 
         def bundler_binstubs_path
-          ::File.join(bundle_path, 'bin')
+          bin_path
         end
 
         def bundle_flags
