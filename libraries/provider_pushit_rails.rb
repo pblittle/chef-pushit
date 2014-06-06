@@ -88,7 +88,7 @@ class Chef
             end if ::File.exist? "#{new_resource.shared_path}/#{file}"
           end
 
-          bundle_install_command = "sudo su - deploy -c 'cd #{release_path} && #{bundle_binary} install #{bundle_flags}'"
+          bundle_install_command = "sudo su - #{owner} -c 'cd #{release_path} && #{bundle_binary} install #{bundle_flags}'"
 
           begin
             Bundler.clean_system(bundle_install_command)
@@ -110,7 +110,7 @@ class Chef
         r.before_restart do
           if precompile_assets
 
-            bundle_precompile_command = "sudo su - deploy -c 'cd #{release_path} && #{bundle_binary} exec rake #{precompile_command}'"
+            bundle_precompile_command = "sudo su - #{owner} -c 'cd #{release_path} && source ./.env && #{bundle_binary} exec rake #{precompile_command}'"
 
             Chef::Log.warn bundle_precompile_command
 
