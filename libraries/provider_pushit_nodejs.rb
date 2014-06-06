@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-require File.expand_path('../provider_pushit_app', __FILE__)
+require_relative 'provider_pushit_app'
 
 class Chef
   class Provider
@@ -42,6 +42,9 @@ class Chef
       def create_deploy_revision
         app_provider = self
 
+        owner = config['owner']
+        group = config['group']
+
         r = Chef::Resource::DeployRevision.new(
           new_resource.name,
           run_context
@@ -59,8 +62,8 @@ class Chef
 
         r.environment new_resource.environment
 
-        r.user Etc.getpwnam(config['owner']).name
-        r.group Etc.getgrnam(config['group']).name
+        r.user Etc.getpwnam(owner).name
+        r.group Etc.getgrnam(group).name
 
         r.symlink_before_migrate({})
         r.symlinks(
@@ -70,16 +73,7 @@ class Chef
         )
 
         r.before_migrate do
-          npm = Chef::Resource::Execute.new(
-            "Install #{new_resource.name} dependencies",
-            run_context
-          )
-          npm.command "#{Pushit::Nodejs.npm_binary} install"
-          npm.cwd release_path
-          npm.user 'root'
-          npm.group 'root'
-          npm.environment new_resource.environment
-          npm.run_action :run
+          app_provider.send(:before_migrate)
         end
 
         r.before_symlink do
@@ -95,6 +89,20 @@ class Chef
         end
 
         r.run_action(new_resource.deploy_action)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      end
+
+      def before_migrate
+        r = Chef::Resource::Execute.new(
+          "Install #{new_resource.name} dependencies",
+          run_context
+        )
+        r.command "#{Pushit::Nodejs.npm_binary} install"
+        r.cwd app.release_path
+        r.user 'root'
+        r.group 'root'
+        r.run_action :run
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end

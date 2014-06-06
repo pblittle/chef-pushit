@@ -17,8 +17,7 @@
 # limitations under the License.
 #
 
-require File.expand_path('../chef_pushit', __FILE__)
-require File.expand_path('../provider_pushit_base', __FILE__)
+require_relative 'provider_pushit_base'
 
 class Chef
   class Provider
@@ -54,10 +53,8 @@ class Chef
 
       def ruby
         @ruby ||= Pushit::Ruby.new(
-          {
-            'version' => new_resource.name,
-            'environment' => new_resource.environment
-          }
+          'version' => new_resource.name,
+          'environment' => new_resource.environment
         )
       end
 
@@ -108,7 +105,7 @@ class Chef
         r = template '/etc/profile.d/chruby.sh' do
           source 'chruby.sh.erb'
           cookbook 'pushit'
-          mode '0644'
+          mode '0755'
           variables(
             :chruby_path => '/usr/local/share/chruby',
             :rubies_path => ruby.rubies_path,
@@ -120,18 +117,19 @@ class Chef
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
+    end
 
-      def install_gems
-        new_resource.gems.each do |gem|
-          r = gem_package gem[:name] do
-            gem_binary ruby.gem_binary
-            version gem[:version] if gem[:version]
-            action :nothing
-          end
-          r.run_action(:install)
-
-          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+    def install_gems
+      [{ :name => 'bundler' }].each do |gem|
+        r = gem_package gem[:name] do
+          version gem[:version] if gem[:version]
+          gem_binary ruby.gem_binary
+          options('--no-ri --no-rdoc')
+          action :nothing
         end
+        r.run_action(:install)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
     end
   end

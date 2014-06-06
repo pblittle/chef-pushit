@@ -20,11 +20,13 @@
 # limitations under the License.
 #
 
-require ::File.expand_path('../chef_pushit', __FILE__)
+require_relative 'chef_pushit'
 
 class Chef
   module Pushit
     class App
+
+      include Mixin::App
 
       def initialize(name)
         @name = name
@@ -39,19 +41,13 @@ class Chef
       end
 
       def ruby
-        @ruby ||= Pushit::Ruby.new(ruby_version)
-      end
+        ruby_version = config['ruby'] || {}
 
-      def ruby_version
-        config['ruby'] || PUSHIT_RUBY_DEFAULT
+        @ruby ||= Pushit::Ruby.new(ruby_version)
       end
 
       def name
         @name ||= config['id']
-      end
-
-      def gem_dependencies
-        @gem_dependencies ||= PUSHIT_GEM_DEPENDENCIES
       end
 
       def path
@@ -70,14 +66,6 @@ class Chef
         ::File.join(path, 'shared')
       end
 
-      def shared_directories
-        %w{ cached-copy config system vendor_bundle }
-      end
-
-      def vendor_path
-        ::File.join(shared_path, 'vendor_bundle')
-      end
-
       def log_path
         ::File.join(shared_path, 'log')
       end
@@ -86,35 +74,22 @@ class Chef
         ::File.join(shared_path, 'pids')
       end
 
-      def bundler_binstubs_path
-        ::File.join(vendor_path, 'bundle', 'bin')
-      end
-
-      def bundle_flags
-        [
-         '--binstubs',
-         '--deployment',
-         '--without development:test',
-         '--path vendor/bundle',
-         "--shebang=#{bundler_binstubs_path}",
-         '-j4'
-        ].join(' ')
-      end
-
       def upstart_pid
         ::File.join(pid_path, 'upstart.pid')
       end
 
+      def bin_paths
+        [
+          ruby.bin_path,
+          bundler_binstubs_path,
+          bin_path,
+          nodejs_bin_path
+        ].join(':')
+      end
+
       def env_vars
-        config['env'] ||= {}
-        if ruby.bin_path
-          if config['env'].key?('PATH')
-            config['env']['PATH'] = "#{ruby.bin_path}:" + config['env']['PATH']
-          else
-            config.merge("PATH" => "#{ruby.bin_path}:$PATH")
-          end
-        end
-        config['env']
+        e = config['env'] || {}
+        e.merge(bundle_env_vars)
       end
 
       def envfile
@@ -126,7 +101,7 @@ class Chef
       end
 
       def procfile?
-        ::File.exists?(procfile)
+        ::File.exist?(procfile)
       end
 
       def service_config
@@ -135,7 +110,7 @@ class Chef
 
       def foreman_export_flags
         args = []
-        args << "upstart /etc/init"
+        args << 'upstart /etc/init'
         args << "-f #{procfile}"
         args << "-e #{envfile}"
         args << "-a #{name}"
@@ -175,6 +150,10 @@ class Chef
 
       def database?
         config['database'] && !config['database'].empty?
+      end
+
+      def database
+        self.database? ? config['database'] : nil
       end
 
       def database_certificate?

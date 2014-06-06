@@ -28,6 +28,10 @@ class Chef
         @new_resource = new_resource
         @run_context = run_context
 
+        recipe_eval do
+          @run_context.include_recipe('nodejs::install_from_source')
+        end
+
         @run_context.include_recipe('campfire-deployment::default')
         @run_context.include_recipe('newrelic-deployment::default')
         @run_context.include_recipe('logrotate::global')
@@ -47,6 +51,9 @@ class Chef
         if new_resource.framework == 'rails'
           create_shared_directories
 
+          install_ruby
+          create_ruby_version
+
           if @app.database?
             create_database_config
             create_filestore_config
@@ -54,9 +61,6 @@ class Chef
 
           create_unicorn_config if @app.webserver?
         end
-
-        install_ruby
-        create_ruby_version
 
         create_ssl_cert(app.database_certificate) if app.database_certificate?
         create_ssl_cert(app.webserver_certificate) if app.webserver_certificate?
@@ -66,7 +70,6 @@ class Chef
         create_logrotate_config
         create_monit_check
 
-        create_dotenv
         create_deploy_revision
       end
 
@@ -85,7 +88,7 @@ class Chef
       end
 
       def after_restart
-        create_newrelic_notification
+        # create_newrelic_notification
         # create_campfire_notification(:announce_success)
       end
 
@@ -175,7 +178,7 @@ class Chef
       end
 
       def create_writable_directories
-        %w{ log pids sockets }.each do |dir|
+        %w( log pids sockets ).each do |dir|
           r = Chef::Resource::Directory.new(
             ::File.join(app.shared_path, dir),
             run_context
@@ -236,7 +239,7 @@ class Chef
 
       def foreman_export_service_config
         r = Chef::Resource::Execute.new(
-          "#{ruby.foreman_binary} export #{app.foreman_export_flags}",
+          "#{app.foreman_binary} export #{app.foreman_export_flags}",
           run_context
         )
         r.cwd app.release_path
@@ -293,7 +296,7 @@ class Chef
           path log_path
           frequency 'daily'
           rotate 180
-          options %w{ missingok dateext delaycompress notifempty compress }
+          options %w( missingok dateext delaycompress notifempty compress )
           create "644 #{username} #{group}"
         end
       end
@@ -342,20 +345,18 @@ class Chef
       end
 
       def create_newrelic_notification
-        r = Chef::Resource::NewrelicDeployment.new(
-          config['env']['NEW_RELIC_APP_NAME'],
-          run_context
-        )
-        r.api_key config['env']['NEW_RELIC_API_KEY']
-        r.revision app.version
-        r.user config['owner']
-        r.action(:create)
-        r.only_if do
-          (config.key?('env') &&
-           config['env'].key?('NEW_RELIC_API_KEY') &&
-           config['env'].key?('NEW_RELIC_APP_NAME')) &&
-            app.environment != 'test'
-        end
+        r = newrelic_deployment config['env']['NEW_RELIC_APP_NAME'] do
+          api_key config['env']['NEW_RELIC_API_KEY']
+          revision app.version
+          user config['owner']
+          action :nothing
+          only_if do
+            (config.key?('env') &&
+             config['env'].key?('NEW_RELIC_API_KEY') &&
+             config['env'].key?('NEW_RELIC_APP_NAME')) &&
+              config['environment'] != 'test'
+          end
+        end.run_action(:create)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end

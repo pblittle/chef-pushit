@@ -45,6 +45,7 @@ node.default['nginx']['source']['modules'] = [
 ]
 node.default['nginx']['gzip_static'] = 'on'
 
+node.default[:nodejs][:install_method] = 'source'
 node.default[:nodejs][:version] = '0.10.26'
 node.default[:nodejs][:npm] = '1.4.7'
 

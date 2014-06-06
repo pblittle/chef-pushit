@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
-# Cookbook Name:: pushit_test
-# Recipe:: rails
+# Cookbook Name:: pushit
+# Library:: chef_pushit_nodejs
 #
 # Author:: P. Barrett Little (<barrett@barrettlittle.com>)
 #
@@ -20,19 +20,33 @@
 # limitations under the License.
 #
 
-include_recipe 'pushit_test::base'
+require_relative 'chef_pushit'
 
-app = 'rails-example'
+class Chef
+  module Pushit
+    class Nodejs
+      class << self
 
-pushit_database app
+        def prefix_path
+          ::File.join('', 'usr', 'local')
+        end
 
-pushit_webserver 'nginx'
+        def bin_path
+          ::File.join(prefix_path, 'bin')
+        end
 
-pushit_rails app do
-  deploy_action 'deploy'
-  environment 'test'
-  precompile_assets true
-  migrate true
-  unicorn_worker_processes 1
-  revision 'master'
+        def node_binary
+          ::File.join(bin_path, 'node')
+        end
+
+        def npm_binary
+          ::File.join(bin_path, 'npm')
+        end
+
+        def installed?
+          system("#{node_binary} -v") && $?.success?
+        end
+      end
+    end
+  end
 end

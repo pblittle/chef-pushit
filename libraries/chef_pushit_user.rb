@@ -20,7 +20,7 @@
 # limitations under the License.
 #
 
-require ::File.expand_path('../chef_pushit', __FILE__)
+require_relative 'chef_pushit'
 
 class Chef
   module Pushit
@@ -31,7 +31,7 @@ class Chef
       attr_accessor :ssh_deploy_keys
 
       def initialize(args = {})
-        args = { username: args } if args.is_a?(String)
+        args = { :username => args } if args.is_a?(String)
         @args = args
 
         @ssh_private_key = ssh_private_key

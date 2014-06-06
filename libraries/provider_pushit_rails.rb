@@ -17,7 +17,9 @@
 # limitations under the License.
 #
 
-require File.expand_path('../provider_pushit_app', __FILE__)
+require 'bundler'
+
+require_relative 'provider_pushit_app'
 
 class Chef
   class Provider
@@ -56,10 +58,11 @@ class Chef
         r.revision new_resource.revision
         r.shallow_clone true
 
-        r.ssh_wrapper "#{app.user.ssh_directory}/#{config['deploy_key']}_deploy_wrapper.sh" do
-          only_if do
-            config['deploy_key'] && !config['deploy_key'].empty?
-          end
+        if config['deploy_key'] && !config['deploy_key'].empty?
+          wrapper = "#{config['deploy_key']}_deploy_wrapper.sh"
+          wrapper_path = ::File.join(app.user.ssh_directory, wrapper)
+
+          r.ssh_wrapper wrapper_path
         end
 
         r.environment new_resource.environment
@@ -67,27 +70,35 @@ class Chef
         r.user Etc.getpwnam(owner).name
         r.group Etc.getgrnam(group).name
 
-        r.symlink_before_migrate(
-          'env' => '.env',
-          'ruby-version' => '.ruby-version',
-          'config/database.yml' => 'config/database.yml',
-          'config/filestore.yml' => 'config/filestore.yml',
-          'config/unicorn.rb' => 'config/unicorn.rb',
-        )
+        r.symlink_before_migrate({})
 
-        r.migrate new_resource.migrate
-        r.migration_command 'bundle exec rake db:migrate'
-
-        bundle_binary = ruby.bundle_binary
+        bundle_binary = app.bundle_binary
         bundle_flags = app.bundle_flags
 
+        before_migrate_symlinks = app.before_migrate_symlinks
+
         r.before_migrate do
-          execute "#{bundle_binary} install #{bundle_flags}" do
-            cwd release_path
-            user owner
-            environment new_resource.environment
+          app_provider.send(:create_dotenv)
+
+          before_migrate_symlinks.each do |file, link|
+            link "#{release_path}/#{link}" do
+              to "#{new_resource.shared_path}/#{file}"
+              owner owner
+              group group
+            end if ::File.exist? "#{new_resource.shared_path}/#{file}"
+          end
+
+          bundle_install_command = "sudo su - deploy -c 'cd #{release_path} && #{bundle_binary} install #{bundle_flags}'"
+
+          begin
+            Bundler.clean_system(bundle_install_command)
+          rescue => e
+            Chef::Log.warn(e.backtrace)
           end
         end
+
+        r.migrate new_resource.migrate
+        r.migration_command '#{bundle_binary} exec rake db:migrate'
 
         r.before_symlink do
           app_provider.send(:before_symlink)
@@ -97,12 +108,18 @@ class Chef
         precompile_command = new_resource.precompile_command
 
         r.before_restart do
-          execute "bundle exec rake #{precompile_command}" do
-            cwd release_path
-            user owner
-            environment new_resource.environment
-            action :nothing
-          end.run_action(:run) if precompile_assets
+          if precompile_assets
+
+            bundle_precompile_command = "sudo su - deploy -c 'cd #{release_path} && #{bundle_binary} exec rake #{precompile_command}'"
+
+            Chef::Log.warn bundle_precompile_command
+
+            begin
+              Bundler.clean_system(bundle_precompile_command)
+            rescue => e
+              Chef::Log.warn(e.backtrace)
+            end
+          end
 
           app_provider.send(:before_restart)
         end
@@ -117,14 +134,6 @@ class Chef
       end
 
       def create_database_config
-        environment = new_resource.environment
-
-        if environment && config['database'].key?(environment)
-          database = config['database'][environment]
-        else
-          database = config['database']
-        end
-
         r = Chef::Resource::Template.new(
           ::File.join(app.shared_path, 'config', 'database.yml'),
           run_context
@@ -136,16 +145,16 @@ class Chef
         r.mode '0644'
         r.variables(
           :database => {
-            :adapter => database['adapter'],
-            :database => database['name'],
-            :encoding => database['encoding'],
-            :host => database['host'],
-            :username => database['username'],
-            :password => database['password'],
-            :options => database['options'] || [],
-            :reconnect => database['reconnect']
+            :adapter => app.database['adapter'],
+            :database => app.database['name'],
+            :encoding => app.database['encoding'],
+            :host => app.database['host'],
+            :username => app.database['username'],
+            :password => app.database['password'],
+            :options => app.database['options'] || [],
+            :reconnect => app.database['reconnect']
           },
-          :environment => environment
+          :environment => new_resource.environment
         )
         r.run_action(:create)
 
@@ -153,17 +162,10 @@ class Chef
       end
 
       def create_filestore_config
-        environment = new_resource.environment
 
-        if environment && config['database'].key?(environment)
-          database = config['database'][environment]
-        else
-          database = config['database']
-        end
-
-        sslkey = database['options'] && database['options']['sslkey'] ? database['options']['sslkey'] : ''
-        sslcert = database['options'] && database['options']['sslcert'] ? database['options']['sslcert'] : ''
-        sslca = database['options'] && database['options']['sslca'] ? database['options']['sslca'] : ''
+        sslkey = app.database['options'] && app.database['options']['sslkey'] ? app.database['options']['sslkey'] : ''
+        sslcert = app.database['options'] && app.database['options']['sslcert'] ? app.database['options']['sslcert'] : ''
+        sslca = app.database['options'] && app.database['options']['sslca'] ? app.database['options']['sslca'] : ''
 
         r = Chef::Resource::Template.new(
           ::File.join(app.shared_path, 'config', 'filestore.yml'),
@@ -176,16 +178,16 @@ class Chef
         r.mode '0644'
         r.variables(
           :database => {
-            :adapter => database['adapter'],
-            :database => database['name'],
-            :host => database['host'],
-            :username => database['username'],
-            :password => database['password'],
+            :adapter => app.database['adapter'],
+            :database => app.database['name'],
+            :host => app.database['host'],
+            :username => app.database['username'],
+            :password => app.database['password'],
             :sslkey => sslkey,
             :sslcert => sslcert,
             :sslca => sslca
           },
-          :environment => environment
+          :environment => new_resource.environment
         )
         r.run_action(:create)
 
@@ -200,7 +202,7 @@ class Chef
         end
 
         unless worker_count && worker_count > 0
-          raise StandardError, 'Unicorn worker count must be a positive integer'
+          fail StandardError, 'Unicorn worker count must be a positive integer'
         end
 
         worker_count

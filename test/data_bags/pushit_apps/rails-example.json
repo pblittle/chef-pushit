@@ -2,13 +2,10 @@
     "id": "rails-example",
     "owner": "deploy",
     "group": "deploy",
-    "repo": "https://github.com/heroku/ruby-rails-sample",
+    "repo": "https://github.com/heroku/ruby-rails-sample.git",
     "framework": "rails",
     "ruby": {
-        "version": "ree-1.8.7-2012.02",
-        "environment": {
-            "CONFIGURE_OPTS": "--no-tcmalloc"
-        }
+        "version": "2.1.1"
     },
     "environment": "test",
     "webserver": {

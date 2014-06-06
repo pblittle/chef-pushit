@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
-# Cookbook Name:: pushit_test
-# Recipe:: rails
+# Cookbook Name:: pushit
+# Library:: chef_pushit_certs
 #
 # Author:: P. Barrett Little (<barrett@barrettlittle.com>)
 #
@@ -20,19 +20,23 @@
 # limitations under the License.
 #
 
-include_recipe 'pushit_test::base'
+require_relative 'chef_pushit'
 
-app = 'rails-example'
+class Chef
+  module Pushit
+    class Certs
 
-pushit_database app
+      def self.ssl_path
+        ::File.join(Pushit.pushit_path, 'ssl')
+      end
 
-pushit_webserver 'nginx'
+      def self.certs_directory
+        ::File.join(ssl_path, 'certs')
+      end
 
-pushit_rails app do
-  deploy_action 'deploy'
-  environment 'test'
-  precompile_assets true
-  migrate true
-  unicorn_worker_processes 1
-  revision 'master'
+      def self.keys_directory
+        ::File.join(ssl_path, 'private')
+      end
+    end
+  end
 end

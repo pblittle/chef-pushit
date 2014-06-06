@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-require File.expand_path('../resource_pushit_app', __FILE__)
+require_relative 'resource_pushit_app'
 
 class Chef
   class Resource

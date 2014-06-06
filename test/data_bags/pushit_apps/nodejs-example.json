@@ -2,7 +2,7 @@
     "id": "nodejs-example",
     "owner": "deploy",
     "group": "deploy",
-    "repo": "https://github.com/twilson63/node-cloudq.git",
+    "repo": "https://github.com/heroku/node-js-sample.git",
     "framework": "nodejs",
     "environment": "test",
     "env": {
