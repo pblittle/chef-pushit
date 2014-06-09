@@ -55,8 +55,8 @@ class Chef
         @adapter ||= @args['adapter']
       end
 
-      def database
-        @database ||= @args['database']
+      def name
+        @name ||= @args['name']
       end
 
       def host
