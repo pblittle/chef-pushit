@@ -76,7 +76,7 @@ class Chef
       end
 
       def encoding
-        @encoding ||= @args['encoding'] || 'utf-8'
+        @encoding ||= @args['encoding'] || 'utf8'
       end
 
       def sslkey
