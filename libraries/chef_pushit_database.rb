@@ -39,7 +39,7 @@ class Chef
       def config
         {
           :adapter => adapter,
-          :name => name,
+          :database => name,
           :host => host,
           :port => port,
           :username => username,
