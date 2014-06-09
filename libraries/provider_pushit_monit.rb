@@ -17,8 +17,8 @@
 # limitations under the License.
 #
 
-require ::File.expand_path('../chef_pushit', __FILE__)
-require ::File.expand_path('../provider_pushit_base', __FILE__)
+require_relative 'chef_pushit'
+require_relative 'provider_pushit_base'
 
 class Chef
   class Provider
