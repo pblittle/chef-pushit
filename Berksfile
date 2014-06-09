@@ -2,6 +2,8 @@ source 'https://api.berkshelf.com'
 
 metadata
 
+cookbook 'build-essential', :github => 'opscode-cookbooks/build-essential'
+
 cookbook 'campfire-deployment', :git => 'git@github.com:pblittle/chef-campfire-deployment.git'
 cookbook 'newrelic-deployment', :git => 'git@github.com:pblittle/chef-newrelic-deployment.git'
 

@@ -22,7 +22,7 @@
 
 node.default['authorization']['sudo']['include_sudoers_d'] = true
 
-node.default[:build_essential][:compile_time] = true
+node.default['build-essential']['compile_time'] = true
 
 node.default[:mysql][:remove_anonymous_users] = true
 node.default[:mysql][:remove_test_database] = true

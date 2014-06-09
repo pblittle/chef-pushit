@@ -2,6 +2,9 @@ DEPENDENCIES
   apt
     git: git://github.com/opscode-cookbooks/apt.git
     revision: ac1917c66a9d67fb4a0afeffaa92195b7385887e
+  build-essential
+    git: git://github.com/opscode-cookbooks/build-essential.git
+    revision: 400968913bfa8a4a5c9783b383c3b63899f2fe72
   campfire-deployment
     git: git@github.com:pblittle/chef-campfire-deployment.git
     revision: 04b87c0c4ec0d7b38638bfb2690a70169ff06fe5
@@ -10,7 +13,7 @@ DEPENDENCIES
     revision: 9e595e65463b2b904f115417dd44625cc1408067
   logrotate
     git: git://github.com/stevendanna/logrotate.git
-    revision: c8df8488d69c1d0a783a7115933a8c719ccd1798
+    revision: 0e9e512e42674759a2a472e2df203c2a174069e5
   minitest-handler
     git: git://github.com/btm/minitest-handler-cookbook.git
     revision: 00ce9c9c49a83bbf7d5cfa92a1aa2f147df60f36
@@ -59,7 +62,7 @@ GRAPH
   aws (2.2.2)
   bluepill (2.3.1)
     rsyslog (>= 0.0.0)
-  build-essential (2.0.2)
+  build-essential (2.0.5)
   campfire-deployment (0.1.20)
   certificate (0.5.3)
   chef_handler (1.1.6)
@@ -78,7 +81,7 @@ GRAPH
     windows (>= 0.0.0)
     yum (~> 3.0)
     yum-epel (>= 0.0.0)
-  logrotate (1.5.0)
+  logrotate (1.6.0)
   minitest-handler (1.2.1)
     chef_handler (>= 0.0.0)
   monit (1.5.2)
@@ -107,7 +110,7 @@ GRAPH
     apt (>= 1.9.0)
     build-essential (>= 0.0.0)
     openssl (>= 0.0.0)
-  pushit (0.9.0)
+  pushit (0.9.1)
     apt (>= 0.0.0)
     build-essential (>= 0.0.0)
     campfire-deployment (>= 0.0.0)
