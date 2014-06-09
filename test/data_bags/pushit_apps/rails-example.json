@@ -14,7 +14,7 @@
     },
     "database": {
         "host": "localhost",
-        "adapter": "mysql2",
+        "adapter": "postgresql",
         "name": "rails-example",
         "username": "root",
         "password": "password",

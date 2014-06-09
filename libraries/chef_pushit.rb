@@ -31,8 +31,10 @@ class Chef
     PUSHIT_GROUP ||= 'deploy'.freeze
     PUSHIT_PATH ||= ::File.join('', 'opt', 'pushit').freeze
     PUSHIT_DATA_BAG ||= 'pushit_apps'.freeze
+
     PUSHIT_GEM_DEPENDENCIES ||= [
-      { :name => 'foreman', :version => '0.67.0' },
+      { :name => 'bundler', :version => '1.6.2' },
+      { :name => 'foreman', :version => '0.71.0' },
       { :name => 'unicorn', :version => '4.8.3' }
     ].freeze
 
@@ -51,7 +53,7 @@ class Chef
       end
 
       def pushit_apps_path
-        @pushit_apps_path ||= ::File.join(pushit_path, 'apps')
+        @pushit_apps_path ||= ::File.join(@pushit_path, 'apps')
       end
 
       def whyrun_enabled?

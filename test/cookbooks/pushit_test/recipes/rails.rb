@@ -21,14 +21,11 @@
 #
 
 include_recipe 'pushit_test::base'
-
-app = 'rails-example'
-
-pushit_database app
+include_recipe 'postgresql::client'
 
 pushit_webserver 'nginx'
 
-pushit_rails app do
+pushit_rails 'rails-example' do
   deploy_action 'deploy'
   environment 'test'
   precompile_assets true

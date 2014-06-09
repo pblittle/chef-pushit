@@ -26,15 +26,18 @@ class Chef
   module Pushit
     class Ruby
 
-      PUSHIT_RUBY_DEFAULT ||= '2.0.0-p481'
+      RUBY_DEFAULT_VERSION ||= '2.0.0-p481'
+      BUNDLER_DEFAULT_VERSION ||= '1.6.2'
 
       attr_reader :version
       attr_reader :environment
+      attr_reader :bundler_version
 
       def initialize(args = {})
         args = { 'version' => args } if args.is_a?(String)
 
-        @version = args['version'] || PUSHIT_RUBY_DEFAULT
+        @version = args['version'] || RUBY_DEFAULT_VERSION
+        @bundler_version = args['bundler_version'] || BUNDLER_DEFAULT_VERSION
         @environment = args['environment'] || {}
       end
 

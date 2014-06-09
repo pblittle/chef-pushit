@@ -27,8 +27,8 @@ describe 'pushit_test::rails' do
     ::File.join(pushit_path, 'rubies', '2.1.1', 'bin')
   end
 
-  let(:embedded_ruby_bin_path) do
-    ::File.join('.', 'opt', 'chef', 'embedded', 'bin')
+  let(:bundler_binstubs_path) do
+    ::File.join(pushit_app_path, 'current', 'bin')
   end
 
   it 'has created the base pushit directory' do
@@ -53,10 +53,6 @@ describe 'pushit_test::rails' do
 
   it 'has symlinked the .env file' do
     assert ::File.symlink?(dotenv_path)
-  end
-
-  it 'has included the embedded ruby bin path in .env' do
-    assert ::File.read(dotenv_path).include?(embedded_ruby_bin_path)
   end
 
   it 'has included the ruby bin path in .env' do
@@ -85,7 +81,7 @@ describe 'pushit_test::rails' do
 
   it 'has created bundler binstubs' do
     assert File.directory?(
-      ::File.join(pushit_app_path, 'current', 'bin')
+      ::File.join(bundler_binstubs_path)
     )
   end
 

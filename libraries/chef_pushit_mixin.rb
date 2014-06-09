@@ -45,7 +45,7 @@ class Chef
         end
 
         def bundler_binstubs_path
-          bin_path
+          'bin'
         end
 
         def bundle_flags
@@ -63,13 +63,9 @@ class Chef
           {
             'BUNDLE_GEMFILE' => '',
             'LANG' => 'en_US.UTF-8',
-            'PATH' => "$PATH:#{bin_paths}",
+            'PATH' => "#{bin_paths}:$PATH",
             'RUBYOPT' => ''
           }
-        end
-
-        def bin_path
-          'bin'
         end
 
         def nodejs_bin_path

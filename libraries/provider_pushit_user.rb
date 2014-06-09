@@ -238,7 +238,7 @@ class Chef
       def create_ssh_config(key)
         key_name = key['name']
         host_key_alias = key_name.gsub('id_rsa_', '')
-        host_name = 'github.com'
+
         identity_file = ::File.join(pushit_user.ssh_directory, key_name)
         config_file = ::File.join(pushit_user.ssh_directory, 'config')
         username = pushit_user.username
@@ -246,12 +246,11 @@ class Chef
         ssh_config host_key_alias do
           options(
             'User' => 'git',
-            'HostName' => host_name,
+            'HostName' => 'github.com',
             'IdentityFile' => identity_file
           )
           user username
           path config_file
-          not_if { `grep #{identity_file} #{config_file}` }
         end
       end
     end

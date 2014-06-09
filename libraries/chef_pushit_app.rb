@@ -33,7 +33,7 @@ class Chef
       end
 
       def config
-        @config ||= Pushit.app_data_bag(@name)
+        @config ||= Chef::Pushit.app_data_bag(@name)
       end
 
       def user
@@ -42,8 +42,12 @@ class Chef
 
       def ruby
         ruby_version = config['ruby'] || {}
-
         @ruby ||= Pushit::Ruby.new(ruby_version)
+      end
+
+      def database
+        database_config = config['database'] || {}
+        @database ||= Pushit::Database.new(database_config)
       end
 
       def name
@@ -82,7 +86,6 @@ class Chef
         [
           ruby.bin_path,
           bundler_binstubs_path,
-          bin_path,
           nodejs_bin_path
         ].join(':')
       end
@@ -104,8 +107,15 @@ class Chef
         ::File.exist?(procfile)
       end
 
-      def service_config
-        ::File.join('', 'etc', 'init', "#{name}.conf")
+      def procfile_default_entry(framework)
+        case framework
+        when 'rails'
+          'web: bundle exec unicorn -p $PORT -c ./config/unicorn.rb'
+        when 'nodejs'
+          'web: npm start'
+        else
+          raise "Unknown pushit framework '#{framework}"
+        end
       end
 
       def foreman_export_flags
@@ -148,21 +158,13 @@ class Chef
         webserver_certificate? ? config['webserver']['certificate'] : nil
       end
 
-      def database?
-        config['database'] && !config['database'].empty?
-      end
-
-      def database
-        self.database? ? config['database'] : nil
-      end
-
       def database_certificate?
-        self.database? && config['database']['certificate'] &&
-          !config['database']['certificate'].empty?
+        @database &&
+          (@database.sslkey && @database.sslcert && @database.sslca)
       end
 
       def database_certificate
-        database_certificate? ? config['database']['certificate'] : nil
+        @database.certificate
       end
 
       def server_name

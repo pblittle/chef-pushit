@@ -106,40 +106,6 @@ class Chef
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
-
-      def export_upstart_config
-        r = Chef::Resource::Template.new(
-          app.service_config,
-          run_context
-        )
-        r.source "#{@framework}.upstart.conf.erb"
-        r.cookbook 'pushit'
-        r.user config['owner']
-        r.group config['group']
-        r.mode '0644'
-        r.variables(
-          :instance => new_resource.name,
-          :env_path => Pushit::Nodejs.bin_path,
-          :app_path => app.release_path,
-          :log_path => app.log_path,
-          :pid_file => app.upstart_pid,
-          :exec => new_resource.node_binary,
-          :script_path => ::File.join(
-            app.release_path, new_resource.script_file
-          ),
-          :user => config['owner'],
-          :group => config['group'],
-          :env => escape_env(config['env'])
-        )
-        r.run_action(:create)
-        r.notifies(
-          :restart,
-          "service[#{new_resource.name}]",
-          :delayed
-        )
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-      end
     end
   end
 end

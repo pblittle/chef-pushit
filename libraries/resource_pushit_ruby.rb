@@ -49,6 +49,14 @@ class Chef
         )
       end
 
+      def bundler_version(arg = nil)
+        set_or_return(
+          :bundler_version,
+          arg,
+          :kind_of => [String]
+        )
+      end
+
       def prefix_path(arg = nil)
         set_or_return(
           :prefix_path,

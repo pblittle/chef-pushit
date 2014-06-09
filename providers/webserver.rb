@@ -71,7 +71,7 @@ def create_logrotate_config
     path ::File.join(log_dir, '*.log')
     frequency 'daily'
     rotate 180
-    options %w{ missingok dateext delaycompress notifempty compress }
+    options %w( missingok dateext delaycompress notifempty compress )
     create "644 #{username} #{group}"
   end
 end

@@ -1,11 +1,5 @@
 <%= @environment %>:
-  adapter: <%= @database[:adapter] %>
-  database: <%= @database[:database] %>
-  host: <%= @database[:host] %>
-  username: <%= @database[:username] %>
-  password: <%= @database[:password] %>
-  encoding: <%= @database[:encoding] || 'utf8' %>
-  reconnect: <%= @database[:reconnect] || true %>
-<%- @database[:options].each do |key, value| %>
+<%- @database.each do |key, value| %>
   <%= key %>: <%= value %>
 <%- end %>
+  reconnect: true

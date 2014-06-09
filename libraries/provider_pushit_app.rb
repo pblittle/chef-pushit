@@ -54,7 +54,7 @@ class Chef
           install_ruby
           create_ruby_version
 
-          if @app.database?
+          if @app.database
             create_database_config
             create_filestore_config
           end
@@ -83,7 +83,9 @@ class Chef
       end
 
       def before_restart
+        create_procfile_if_missing
         create_service_config
+
         service_perform_action
       end
 
@@ -92,7 +94,7 @@ class Chef
         # create_campfire_notification(:announce_success)
       end
 
-      private
+      protected
 
       def app
         @app ||= Pushit::App.new(new_resource.name)
@@ -196,8 +198,8 @@ class Chef
 
       def create_dotenv
         r = Chef::Resource::Template.new(
-          ::File.join(app.shared_path, 'env'),
-          run_context
+            ::File.join(app.shared_path, 'env'),
+            run_context
         )
         r.source 'env.erb'
         r.cookbook 'pushit'
@@ -205,8 +207,8 @@ class Chef
         r.group config['group']
         r.mode '0644'
         r.variables(
-          :env => escape_env(app.env_vars)
-        )
+                    :env => escape_env(app.env_vars)
+                   )
         r.run_action(:create)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
@@ -230,14 +232,6 @@ class Chef
       end
 
       def create_service_config
-        if app.procfile?
-          foreman_export_service_config
-        else
-          export_upstart_config
-        end
-      end
-
-      def foreman_export_service_config
         r = Chef::Resource::Execute.new(
           "#{app.foreman_binary} export #{app.foreman_export_flags}",
           run_context
@@ -246,11 +240,6 @@ class Chef
         r.user 'root'
         r.group 'root'
         r.run_action :run
-        r.notifies(
-          :restart,
-          "service[#{new_resource.name}]",
-          :delayed
-        )
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
@@ -339,6 +328,20 @@ class Chef
         r.key_file "#{certificate}.key"
         r.chain_file "#{certificate}-bundle.crt"
         r.nginx_cert false
+        r.run_action(:create)
+
+        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      end
+
+      def create_procfile_if_missing
+        r = Chef::Resource::File.new(
+          app.procfile,
+          run_context
+        )
+        r.content app.procfile_default_entry(new_resource.framework)
+        r.owner user.username
+        r.group user.group
+        r.not_if { app.procfile? }
         r.run_action(:create)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?

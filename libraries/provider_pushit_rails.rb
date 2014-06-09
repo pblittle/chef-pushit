@@ -78,6 +78,7 @@ class Chef
         before_migrate_symlinks = app.before_migrate_symlinks
 
         r.before_migrate do
+          Chef::Log.warn 'create_dotenv: ' + DateTime.now.to_s
           app_provider.send(:create_dotenv)
 
           before_migrate_symlinks.each do |file, link|
@@ -91,8 +92,10 @@ class Chef
           bundle_install_command = "sudo su - #{owner} -c 'cd #{release_path} && #{bundle_binary} install #{bundle_flags}'"
 
           begin
+            Chef::Log.warn bundle_install_command + DateTime.now.to_s
             Bundler.clean_system(bundle_install_command)
           rescue => e
+            Chef::Log.warn 'fail ' + bundle_install_command + DateTime.now.to_s
             Chef::Log.warn(e.backtrace)
           end
         end
@@ -117,7 +120,7 @@ class Chef
             begin
               Bundler.clean_system(bundle_precompile_command)
             rescue => e
-              Chef::Log.warn(e.backtrace)
+              Chef::Log.warn e.backtrace
             end
           end
 
@@ -144,16 +147,7 @@ class Chef
         r.group config['group']
         r.mode '0644'
         r.variables(
-          :database => {
-            :adapter => app.database['adapter'],
-            :database => app.database['name'],
-            :encoding => app.database['encoding'],
-            :host => app.database['host'],
-            :username => app.database['username'],
-            :password => app.database['password'],
-            :options => app.database['options'] || [],
-            :reconnect => app.database['reconnect']
-          },
+          :database => app.database.to_hash,
           :environment => new_resource.environment
         )
         r.run_action(:create)
@@ -162,11 +156,6 @@ class Chef
       end
 
       def create_filestore_config
-
-        sslkey = app.database['options'] && app.database['options']['sslkey'] ? app.database['options']['sslkey'] : ''
-        sslcert = app.database['options'] && app.database['options']['sslcert'] ? app.database['options']['sslcert'] : ''
-        sslca = app.database['options'] && app.database['options']['sslca'] ? app.database['options']['sslca'] : ''
-
         r = Chef::Resource::Template.new(
           ::File.join(app.shared_path, 'config', 'filestore.yml'),
           run_context
@@ -177,16 +166,7 @@ class Chef
         r.group config['group']
         r.mode '0644'
         r.variables(
-          :database => {
-            :adapter => app.database['adapter'],
-            :database => app.database['name'],
-            :host => app.database['host'],
-            :username => app.database['username'],
-            :password => app.database['password'],
-            :sslkey => sslkey,
-            :sslcert => sslcert,
-            :sslca => sslca
-          },
+          :database => app.database.to_hash,
           :environment => new_resource.environment
         )
         r.run_action(:create)
@@ -231,43 +211,6 @@ class Chef
           :working_directory => app.current_path
         )
         r.run_action(:create)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-      end
-
-      def export_upstart_config
-        r = Chef::Resource::Template.new(
-          app.service_config,
-          run_context
-        )
-        r.source "#{@framework}.upstart.conf.erb"
-        r.cookbook 'pushit'
-        r.user config['owner']
-        r.group config['group']
-        r.mode '0644'
-        r.variables(
-          :instance => new_resource.name,
-          :env_path => ruby.bin_path,
-          :app_path => app.release_path,
-          :log_path => app.log_path,
-          :pid_file => app.upstart_pid,
-          :config_file => ::File.join(
-            app.shared_path, 'config', 'unicorn.rb'
-          ),
-          :exec => ::File.join(
-            app.release_path, 'bin', 'unicorn'
-          ),
-          :user => config['owner'],
-          :group => config['group'],
-          :env => escape_env(config['env']),
-          :environment => escape_env(config['env'])['RACK_ENV']
-        )
-        r.run_action(:create)
-        r.notifies(
-          :restart,
-          "service[#{new_resource.name}]",
-          :delayed
-        )
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end

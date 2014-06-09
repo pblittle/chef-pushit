@@ -35,6 +35,8 @@ class Chef
         install_gem_dependencies
       end
 
+      def load_current_resource; end
+
       def whyrun_supported?
         Pushit.whyrun_enabled?
       end
