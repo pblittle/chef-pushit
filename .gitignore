@@ -21,3 +21,5 @@ bin/*
 # Misc
 .DS_Store
 tmp
+
+Berksfile.lock
