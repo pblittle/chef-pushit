@@ -12,14 +12,14 @@ DEPENDENCIES
     git: git://github.com/atomic-penguin/cookbook-certificate.git
     revision: 9e595e65463b2b904f115417dd44625cc1408067
   logrotate
-    git: git://github.com/stevendanna/logrotate.git
+    git: git@github.com:stevendanna/logrotate.git
     revision: 0e9e512e42674759a2a472e2df203c2a174069e5
   minitest-handler
     git: git://github.com/btm/minitest-handler-cookbook.git
     revision: 00ce9c9c49a83bbf7d5cfa92a1aa2f147df60f36
   monit
-    git: git://github.com/phlipper/chef-monit.git
-    revision: 8eed614112a2078a6c3ba4d488c5d44252bbadc1
+    git: git@github.com:phlipper/chef-monit.git
+    revision: 6a7a7607347f267e7d4f2d60d2d7392709c9f245
   mysql
     git: git://github.com/opscode-cookbooks/mysql.git
     revision: 4b70e99730ab4a7ce6c1dd7a35654a764fb6e0fe
@@ -84,7 +84,7 @@ GRAPH
   logrotate (1.6.0)
   minitest-handler (1.2.1)
     chef_handler (>= 0.0.0)
-  monit (1.5.2)
+  monit (1.5.3)
     build-essential (>= 0.0.0)
   mysql (5.2.13)
   mysql-chef_gem (0.0.2)

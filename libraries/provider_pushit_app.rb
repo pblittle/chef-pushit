@@ -30,11 +30,11 @@ class Chef
 
         recipe_eval do
           @run_context.include_recipe('nodejs::install_from_source')
+          @run_context.include_recipe('logrotate::global')
         end
 
         @run_context.include_recipe('campfire-deployment::default')
         @run_context.include_recipe('newrelic-deployment::default')
-        @run_context.include_recipe('logrotate::global')
 
         super(new_resource, run_context)
       end
@@ -275,7 +275,7 @@ class Chef
       end
 
       def create_logrotate_config
-        log_path = app.log_path
+        log_path = app.logrotate_logs_path
         name = app.name
         username = user.username
         group = user.group

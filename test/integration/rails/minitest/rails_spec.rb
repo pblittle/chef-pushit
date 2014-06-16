@@ -27,6 +27,10 @@ describe 'pushit_test::rails' do
     ::File.join(pushit_path, 'rubies', '2.1.1', 'bin')
   end
 
+  let(:pushit_app_log_path) do
+    ::File.join(pushit_app_path, 'shared', 'log')
+  end
+
   let(:bundler_binstubs_path) do
     ::File.join(pushit_app_path, 'current', 'bin')
   end
@@ -40,9 +44,7 @@ describe 'pushit_test::rails' do
   end
 
   it 'has created a log directory' do
-    assert File.directory?(
-      ::File.join(pushit_app_path, 'shared', 'log')
-    )
+    assert File.directory?(pushit_app_log_path)
   end
 
   it 'has symlinked the current release' do
@@ -107,5 +109,11 @@ describe 'pushit_test::rails' do
     assert system(
       "service #{pushit_app} status | grep -e $(cat #{pushit_pid_path})"
     )
+  end
+
+  it 'manages the application logs with logrotate' do
+    assert ::File.read(
+      "/etc/logrotate.d/#{pushit_app}"
+    ).include?(pushit_app_log_path)
   end
 end

@@ -18,7 +18,7 @@
         "name": "rails-example",
         "username": "root",
         "password": "password",
-        "port": 3306,
+        "port": 5432,
         "options": {
             "foo": "bar"
         },

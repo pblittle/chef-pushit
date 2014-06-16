@@ -8,8 +8,8 @@ cookbook 'campfire-deployment', :git => 'git@github.com:pblittle/chef-campfire-d
 cookbook 'newrelic-deployment', :git => 'git@github.com:pblittle/chef-newrelic-deployment.git'
 
 cookbook 'certificate', :github => 'atomic-penguin/cookbook-certificate'
-cookbook 'monit', :github => 'phlipper/chef-monit'
-cookbook 'logrotate', :github => 'stevendanna/logrotate'
+cookbook 'monit', :git => 'git@github.com:phlipper/chef-monit.git'
+cookbook 'logrotate', :git => 'git@github.com:stevendanna/logrotate.git'
 cookbook 'mysql', :github => 'opscode-cookbooks/mysql'
 
 cookbook 'nodejs', :git => 'git@github.com:mdxp/nodejs-cookbook.git'

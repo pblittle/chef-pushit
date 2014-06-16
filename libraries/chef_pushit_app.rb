@@ -74,6 +74,10 @@ class Chef
         ::File.join(shared_path, 'log')
       end
 
+      def logrotate_logs_path
+        ::File.join(log_path, '*.log')
+      end
+
       def pid_path
         ::File.join(shared_path, 'pids')
       end
