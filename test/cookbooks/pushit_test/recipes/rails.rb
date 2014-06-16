@@ -21,7 +21,9 @@
 #
 
 include_recipe 'pushit_test::base'
-include_recipe 'postgresql::client'
+
+include_recipe 'postgresql::server'
+include_recipe 'database::postgresql'
 
 pushit_webserver 'nginx'
 
