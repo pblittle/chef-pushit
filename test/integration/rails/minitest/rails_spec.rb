@@ -115,7 +115,7 @@ describe 'pushit_test::rails' do
 
   it 'starts the rails app service after converge' do
     assert system(
-      "service #{pushit_app} status | grep -e $(cat #{pushit_pid_path})"
+      "service #{pushit_app} status | grep -e 'start/running'"
     )
   end
 
