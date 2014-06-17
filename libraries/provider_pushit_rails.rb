@@ -77,8 +77,10 @@ class Chef
 
         before_migrate_symlinks = app.before_migrate_symlinks
 
+        r.migrate new_resource.migrate
+        r.migration_command '#{bundle_binary} exec rake db:migrate'
+
         r.before_migrate do
-          Chef::Log.warn 'create_dotenv: ' + DateTime.now.to_s
           app_provider.send(:create_dotenv)
 
           before_migrate_symlinks.each do |file, link|
@@ -98,10 +100,9 @@ class Chef
             Chef::Log.warn 'fail ' + bundle_install_command + DateTime.now.to_s
             Chef::Log.warn(e.backtrace)
           end
-        end
 
-        r.migrate new_resource.migrate
-        r.migration_command '#{bundle_binary} exec rake db:migrate'
+          app_provider.send(:before_migrate)
+        end
 
         r.before_symlink do
           app_provider.send(:before_symlink)
