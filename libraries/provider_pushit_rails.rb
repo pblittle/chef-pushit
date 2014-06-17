@@ -17,8 +17,6 @@
 # limitations under the License.
 #
 
-require 'bundler'
-
 require_relative 'provider_pushit_app'
 
 class Chef
@@ -42,6 +40,8 @@ class Chef
       private
 
       def create_deploy_revision
+        require 'bundler'
+
         app_provider = self
 
         owner = config['owner']
