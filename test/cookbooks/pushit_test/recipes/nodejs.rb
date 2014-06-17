@@ -22,6 +22,8 @@
 
 include_recipe 'pushit_test::base'
 
+pushit_webserver 'nginx'
+
 pushit_nodejs 'nodejs-example' do
   environment 'production'
   script_file 'server.js'
