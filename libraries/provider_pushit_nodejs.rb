@@ -57,7 +57,10 @@ class Chef
         r.shallow_clone true
 
         if config['deploy_key'] && !config['deploy_key'].empty?
-          r.ssh_wrapper "#{app.user.ssh_directory}/#{config['deploy_key']}_deploy_wrapper.sh"
+          wrapper = "#{config['deploy_key']}_deploy_wrapper.sh"
+          wrapper_path = ::File.join(app.user.ssh_directory, wrapper)
+
+          r.ssh_wrapper wrapper_path
         end
 
         r.environment new_resource.environment
