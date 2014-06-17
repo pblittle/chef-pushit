@@ -15,6 +15,10 @@ describe 'pushit_test::rails' do
     ::File.join(pushit_app_path, 'shared', 'pids', 'upstart.pid')
   end
 
+  let(:upstart_config_path) do
+    ::File.join('', 'etc', 'init', "#{pushit_app}.conf")
+  end
+
   let(:database_yaml_path) do
     ::File.join(pushit_app_path, 'current', 'config', 'database.yml')
   end
@@ -45,6 +49,10 @@ describe 'pushit_test::rails' do
 
   it 'has created a log directory' do
     assert File.directory?(pushit_app_log_path)
+  end
+
+  it 'has created an upstart config file' do
+    assert File.file?(upstart_config_path)
   end
 
   it 'has symlinked the current release' do

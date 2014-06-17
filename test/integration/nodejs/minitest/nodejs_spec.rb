@@ -7,18 +7,20 @@ describe 'pushit_test::nodejs' do
 
   let(:pushit_path) { ::File.join('', 'opt', 'pushit') }
 
-  let(:pushit_app_path) { ::File.join(pushit_path, 'apps', 'nodejs-example') }
+  let(:pushit_app) { 'nodejs-example' }
 
-  let(:pushit_log_path) do
-    ::File.join(pushit_app_path, 'shared', 'log', 'nodejs-example.log')
-  end
+  let(:pushit_app_path) { ::File.join(pushit_path, 'apps', pushit_app) }
 
   let(:pushit_pid_path) do
     ::File.join(pushit_app_path, 'shared', 'pids', 'upstart.pid')
   end
 
+  let(:pushit_app_log_path) do
+    ::File.join(pushit_app_path, 'shared', 'log')
+  end
+
   let(:upstart_config_path) do
-    ::File.join('', 'etc', 'init', 'nodejs-example.config')
+    ::File.join('', 'etc', 'init', "#{pushit_app}.conf")
   end
 
   it 'has created the base pushit directory' do
@@ -30,11 +32,17 @@ describe 'pushit_test::nodejs' do
   end
 
   it 'has created a log file' do
-    assert File.file?(pushit_log_path)
+    assert File.file?(pushit_app_log_path)
   end
 
   it 'has created an upstart config file' do
     assert File.file?(upstart_config_path)
+  end
+
+  it 'has symlinked the current release' do
+    assert File.symlink?(
+      ::File.join(pushit_app_path, 'current')
+    )
   end
 
   it 'has created a pids directory' do
@@ -57,13 +65,19 @@ describe 'pushit_test::nodejs' do
 
   it 'has created a service config' do
     assert File.file?(
-      ::File.join('', 'etc', 'init', 'nodejs-example.conf')
+      ::File.join('', 'etc', 'init', "#{pushit_app}.conf")
     )
   end
 
-  it 'starts the nodejs-example service after converge' do
+  it 'starts the nodejs aoo service after converge' do
     assert system(
-      "service nodejs-example status | grep -e $(cat #{pushit_pid_path})"
+      "service #{pushit_app} status | grep -e $(cat #{pushit_pid_path})"
+    )
+  end
+
+  it 'uses monit to monitor the unicorn workers' do
+    assert system(
+      "Process '#{pushit_app}'\r\n  status Running\r\n  monitoring status  Monitored"
     )
   end
 end
