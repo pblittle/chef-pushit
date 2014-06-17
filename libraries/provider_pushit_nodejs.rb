@@ -86,6 +86,7 @@ class Chef
             end if ::File.exist? "#{new_resource.shared_path}/#{file}"
           end
 
+          app_provider.send(:npm_install)
           app_provider.send(:before_migrate)
         end
 
@@ -106,7 +107,7 @@ class Chef
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
-      def before_migrate
+      def npm_install
         r = Chef::Resource::Execute.new(
           "Install #{new_resource.name} dependencies",
           run_context
