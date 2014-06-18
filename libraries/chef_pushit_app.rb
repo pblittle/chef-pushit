@@ -125,9 +125,10 @@ class Chef
       def foreman_export_flags
         args = []
         args << 'upstart /etc/init'
-        args << "-f #{procfile}"
         args << "-e #{envfile}"
         args << "-a #{name}"
+        args << "-d #{release_path}"
+        args << "-r #{pid_path}"
         args << "-u #{config['owner']}"
         args << "-l #{log_path}"
         args.join(' ')
