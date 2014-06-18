@@ -51,15 +51,6 @@ class Chef
           :default => Pushit::Nodejs.npm_binary
         )
       end
-
-      def script_file(arg = nil)
-        set_or_return(
-          :script_file,
-          arg,
-          :kind_of => [String],
-          :default => 'server.js'
-        )
-      end
     end
   end
 end
