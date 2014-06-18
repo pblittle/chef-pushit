@@ -118,7 +118,7 @@ class Chef
         when 'nodejs'
           'web: npm start'
         else
-          raise "Unknown pushit framework '#{framework}"
+          fail "Unknown pushit framework '#{framework}"
         end
       end
 
