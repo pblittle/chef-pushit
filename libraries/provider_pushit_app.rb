@@ -89,10 +89,7 @@ class Chef
         service_perform_action
       end
 
-      def after_restart
-        # create_newrelic_notification
-        # create_campfire_notification(:announce_success)
-      end
+      def after_restart; end
 
       protected
 
