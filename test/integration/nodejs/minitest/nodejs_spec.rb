@@ -16,7 +16,11 @@ describe 'pushit_test::nodejs' do
   end
 
   let(:pushit_app_log_path) do
-    ::File.join(pushit_app_path, 'shared', 'log', 'web-1.log')
+    ::File.join(pushit_app_path, 'shared', 'log')
+  end
+
+  let(:logrotate_logs_path) do
+    ::File.join(pushit_app_log_path, '*.log')
   end
 
   let(:upstart_config_path) do
@@ -78,6 +82,6 @@ describe 'pushit_test::nodejs' do
   it 'manages the application logs with logrotate' do
     assert ::File.read(
       "/etc/logrotate.d/#{pushit_app}"
-    ).include?(pushit_app_log_path)
+    ).include?(logrotate_logs_path)
   end
 end
