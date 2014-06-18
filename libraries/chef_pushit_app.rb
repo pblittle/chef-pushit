@@ -185,10 +185,10 @@ class Chef
       end
 
       def version
-        if ::File.directory?(::File.join(cached_copy_dir, '.git'))
-          Dir.chdir(cached_copy_dir) do
-            `git rev-parse HEAD`.chomp
-          end
+        return unless ::File.directory?(::File.join(cached_copy_dir, '.git'))
+
+        Dir.chdir(cached_copy_dir) do
+          `git rev-parse HEAD`.chomp
         end
       end
     end
