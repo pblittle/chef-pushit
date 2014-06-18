@@ -31,8 +31,8 @@ describe 'pushit_test::nodejs' do
     assert File.directory?(pushit_app_path)
   end
 
-  it 'has created a log file' do
-    assert File.file?(pushit_app_log_path)
+  it 'has created a log directory' do
+    assert File.directory?(pushit_app_log_path)
   end
 
   it 'has created an upstart config file' do
@@ -75,9 +75,9 @@ describe 'pushit_test::nodejs' do
     )
   end
 
-  it 'uses monit to monitor the unicorn workers' do
-    assert system(
-      "Process '#{pushit_app}'\r\n  status Running\r\n  monitoring status  Monitored"
-    )
+  it 'manages the application logs with logrotate' do
+    assert ::File.read(
+      "/etc/logrotate.d/#{pushit_app}"
+    ).include?(pushit_app_log_path)
   end
 end
