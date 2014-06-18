@@ -28,6 +28,10 @@ node.default[:mysql][:remove_anonymous_users] = true
 node.default[:mysql][:remove_test_database] = true
 node.default[:mysql][:tunable][:lower_case_table_names] = 1
 
+node.default[:nodejs][:install_method] = 'source'
+node.default[:nodejs][:version] = '0.10.29'
+node.default[:nodejs][:npm] = '1.4.15'
+
 node.override['nginx']['version'] = '1.4.4'
 node.override['nginx']['source']['version'] = '1.4.4'
 node.override['nginx']['openssl_source']['version']  = '1.0.1g'
@@ -44,9 +48,5 @@ node.default['nginx']['source']['modules'] = [
   'nginx::http_stub_status_module'
 ]
 node.default['nginx']['gzip_static'] = 'on'
-
-node.default[:nodejs][:install_method] = 'source'
-node.default[:nodejs][:version] = '0.10.26'
-node.default[:nodejs][:npm] = '1.4.7'
 
 include_attribute 'nginx::source'

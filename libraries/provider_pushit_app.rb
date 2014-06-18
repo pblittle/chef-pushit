@@ -89,10 +89,7 @@ class Chef
         service_perform_action
       end
 
-      def after_restart
-        # create_newrelic_notification
-        # create_campfire_notification(:announce_success)
-      end
+      def after_restart; end
 
       protected
 
@@ -198,8 +195,8 @@ class Chef
 
       def create_dotenv
         r = Chef::Resource::Template.new(
-            ::File.join(app.shared_path, 'env'),
-            run_context
+          ::File.join(app.shared_path, 'env'),
+          run_context
         )
         r.source 'env.erb'
         r.cookbook 'pushit'
@@ -207,8 +204,8 @@ class Chef
         r.group config['group']
         r.mode '0644'
         r.variables(
-                    :env => escape_env(app.env_vars)
-                   )
+          :env => escape_env(app.env_vars)
+        )
         r.run_action(:create)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
