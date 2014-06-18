@@ -16,7 +16,7 @@ describe 'pushit_test::nodejs' do
   end
 
   let(:pushit_app_log_path) do
-    ::File.join(pushit_app_path, 'shared', 'log')
+    ::File.join(pushit_app_path, 'shared', 'log', 'web-1.log')
   end
 
   let(:upstart_config_path) do
@@ -72,12 +72,6 @@ describe 'pushit_test::nodejs' do
   it 'starts the nodejs app service after converge' do
     assert system(
       "service #{pushit_app} status | grep -e 'start/running'"
-    )
-  end
-
-  it 'uses monit to monitor the unicorn workers' do
-    assert system(
-      "Process '#{pushit_app}'\r\n  status Running\r\n  monitoring status  Monitored"
     )
   end
 end
