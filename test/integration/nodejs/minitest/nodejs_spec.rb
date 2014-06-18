@@ -31,8 +31,8 @@ describe 'pushit_test::nodejs' do
     assert File.directory?(pushit_app_path)
   end
 
-  it 'has created a log file' do
-    assert File.file?(pushit_app_log_path)
+  it 'has created a log directory' do
+    assert File.directory?(pushit_app_log_path)
   end
 
   it 'has created an upstart config file' do
@@ -73,5 +73,11 @@ describe 'pushit_test::nodejs' do
     assert system(
       "service #{pushit_app} status | grep -e 'start/running'"
     )
+  end
+
+  it 'manages the application logs with logrotate' do
+    assert ::File.read(
+      "/etc/logrotate.d/#{pushit_app}"
+    ).include?(pushit_app_log_path)
   end
 end
