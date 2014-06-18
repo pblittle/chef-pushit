@@ -35,6 +35,10 @@ describe 'pushit_test::rails' do
     ::File.join(pushit_app_path, 'shared', 'log')
   end
 
+  let(:logrotate_logs_path) do
+    ::File.join(pushit_app_log_path, '*.log')
+  end
+
   let(:bundler_binstubs_path) do
     ::File.join(pushit_app_path, 'current', 'bin')
   end
@@ -122,7 +126,7 @@ describe 'pushit_test::rails' do
   it 'manages the application logs with logrotate' do
     assert ::File.read(
       "/etc/logrotate.d/#{pushit_app}"
-    ).include?(pushit_app_log_path)
+    ).include?(logrotate_logs_path)
   end
 
   it 'uses monit to monitor the unicorn workers' do
