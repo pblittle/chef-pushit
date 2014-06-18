@@ -57,7 +57,10 @@ class Chef
         r.shallow_clone true
 
         if config['deploy_key'] && !config['deploy_key'].empty?
-          r.ssh_wrapper "#{app.user.ssh_directory}/#{config['deploy_key']}_deploy_wrapper.sh"
+          wrapper = "#{config['deploy_key']}_deploy_wrapper.sh"
+          wrapper_path = ::File.join(app.user.ssh_directory, wrapper)
+
+          r.ssh_wrapper wrapper_path
         end
 
         r.environment new_resource.environment
@@ -66,13 +69,24 @@ class Chef
         r.group Etc.getgrnam(group).name
 
         r.symlink_before_migrate({})
-        r.symlinks(
-          'env' => '.env',
-          'log' => 'log',
-          'pids' => 'pids'
-        )
+
+        before_migrate_symlinks = app.before_migrate_symlinks
+
+        r.migrate false
+        r.migration_command nil
 
         r.before_migrate do
+          app_provider.send(:create_dotenv)
+
+          before_migrate_symlinks.each do |file, link|
+            link "#{release_path}/#{link}" do
+              to "#{new_resource.shared_path}/#{file}"
+              owner owner
+              group group
+            end if ::File.exist? "#{new_resource.shared_path}/#{file}"
+          end
+
+          app_provider.send(:npm_install)
           app_provider.send(:before_migrate)
         end
 
@@ -93,7 +107,7 @@ class Chef
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
-      def before_migrate
+      def npm_install
         r = Chef::Resource::Execute.new(
           "Install #{new_resource.name} dependencies",
           run_context

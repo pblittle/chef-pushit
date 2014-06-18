@@ -15,6 +15,10 @@ describe 'pushit_test::rails' do
     ::File.join(pushit_app_path, 'shared', 'pids', 'upstart.pid')
   end
 
+  let(:upstart_config_path) do
+    ::File.join('', 'etc', 'init', "#{pushit_app}.conf")
+  end
+
   let(:database_yaml_path) do
     ::File.join(pushit_app_path, 'current', 'config', 'database.yml')
   end
@@ -45,6 +49,10 @@ describe 'pushit_test::rails' do
 
   it 'has created a log directory' do
     assert File.directory?(pushit_app_log_path)
+  end
+
+  it 'has created an upstart config file' do
+    assert File.file?(upstart_config_path)
   end
 
   it 'has symlinked the current release' do
@@ -107,7 +115,7 @@ describe 'pushit_test::rails' do
 
   it 'starts the rails app service after converge' do
     assert system(
-      "service #{pushit_app} status | grep -e $(cat #{pushit_pid_path})"
+      "service #{pushit_app} status | grep -e 'start/running'"
     )
   end
 
@@ -115,5 +123,25 @@ describe 'pushit_test::rails' do
     assert ::File.read(
       "/etc/logrotate.d/#{pushit_app}"
     ).include?(pushit_app_log_path)
+  end
+
+  it 'uses monit to monitor the unicorn workers' do
+    #skip if we're not done initializing
+    if `sudo monit status`.match(/Process '#{pushit_app}'\r?\n\s+status\s+(\w+).*\n/).captures[0] == 'Initializing'
+      skip("#{pushit_app} still initializing")
+    end
+
+    output = `sudo monit status`.match(/^Process '#{pushit_app}'\s+status\s+.*\n\s+monitoring status\s+(.*)\r?\n/)
+    assert((! output.nil? && output.captures.first == 'Monitored'), output)
+  end
+
+  it 'monit knows if the unicorn workers are up' do
+    #skip if we're not done initializing
+    if `sudo monit status`.match(/Process '#{pushit_app}'\r?\n\s+status\s+(\w+).*\n/).captures[0] == 'Initializing'
+      skip("#{pushit_app} still initializing")
+    end
+
+    output = `sudo monit status`.match(/^Process '#{pushit_app}'\s+status\s+(.*)\r?\n\s+monitoring status\s+Monitored/)
+    assert((! output.nil? && output.captures.first == 'Running'), output)
   end
 end

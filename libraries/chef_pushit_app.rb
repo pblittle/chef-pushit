@@ -118,16 +118,17 @@ class Chef
         when 'nodejs'
           'web: npm start'
         else
-          raise "Unknown pushit framework '#{framework}"
+          fail "Unknown pushit framework '#{framework}"
         end
       end
 
       def foreman_export_flags
         args = []
         args << 'upstart /etc/init'
-        args << "-f #{procfile}"
         args << "-e #{envfile}"
         args << "-a #{name}"
+        args << "-d #{release_path}"
+        args << "-r #{pid_path}"
         args << "-u #{config['owner']}"
         args << "-l #{log_path}"
         args.join(' ')
@@ -184,10 +185,10 @@ class Chef
       end
 
       def version
-        if ::File.directory?(::File.join(cached_copy_dir, '.git'))
-          Dir.chdir(cached_copy_dir) do
-            `git rev-parse HEAD`.chomp
-          end
+        return unless ::File.directory?(::File.join(cached_copy_dir, '.git'))
+
+        Dir.chdir(cached_copy_dir) do
+          `git rev-parse HEAD`.chomp
         end
       end
     end
