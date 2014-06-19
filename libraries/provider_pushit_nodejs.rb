@@ -68,14 +68,15 @@ class Chef
         r.user Etc.getpwnam(owner).name
         r.group Etc.getgrnam(group).name
 
-        r.symlink_before_migrate({})
+        r.symlink_before_migrate(
+          new_resource.before_migrate_symlinks
+        )
 
         r.migrate false
         r.migration_command nil
 
         r.before_migrate do
           app_provider.send(:create_dotenv)
-          app_provider.send(:create_before_migrate_symlinks)
 
           app_provider.send(:npm_install)
           app_provider.send(:before_migrate)

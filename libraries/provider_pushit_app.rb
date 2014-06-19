@@ -219,28 +219,6 @@ class Chef
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
 
-      def create_before_migrate_symlinks
-        app.before_migrate_symlinks.each do |file, link|
-          file_path = ::File.join(app.shared_path, file)
-          link_path = ::File.join(app.release_path, link)
-
-          if ::File.exist? file_path
-            link_directory = ::File.dirname(link_path)
-
-            directory link_directory do
-              owner self.username
-              group self.group
-            end
-
-            link link_path do
-              to file_path
-              owner self.username
-              group self.group
-            end
-          end
-        end
-      end
-
       def create_config_files
         new_resource.config_files.each do |file|
           r = Chef::Resource::CookbookFile.new(

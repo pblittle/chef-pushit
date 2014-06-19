@@ -70,7 +70,9 @@ class Chef
         r.user Etc.getpwnam(owner).name
         r.group Etc.getgrnam(group).name
 
-        r.symlink_before_migrate({})
+        r.symlink_before_migrate(
+          new_resource.before_migrate_symlinks
+        )
 
         bundle_binary = app.bundle_binary
         bundle_flags = app.bundle_flags
@@ -80,7 +82,6 @@ class Chef
 
         r.before_migrate do
           app_provider.send(:create_dotenv)
-          app_provider.send(:create_before_migrate_symlinks)
 
           bundle_install_command = "sudo su - #{owner} -c 'cd #{release_path} && #{bundle_binary} install #{bundle_flags}'"
 
