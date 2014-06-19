@@ -75,21 +75,12 @@ class Chef
         bundle_binary = app.bundle_binary
         bundle_flags = app.bundle_flags
 
-        before_migrate_symlinks = app.before_migrate_symlinks
-
         r.migrate new_resource.migrate
         r.migration_command '#{bundle_binary} exec rake db:migrate'
 
         r.before_migrate do
           app_provider.send(:create_dotenv)
-
-          before_migrate_symlinks.each do |file, link|
-            link "#{release_path}/#{link}" do
-              to "#{new_resource.shared_path}/#{file}"
-              owner owner
-              group group
-            end if ::File.exist? "#{new_resource.shared_path}/#{file}"
-          end
+          app_provider.send(:create_before_migrate_symlinks)
 
           bundle_install_command = "sudo su - #{owner} -c 'cd #{release_path} && #{bundle_binary} install #{bundle_flags}'"
 
