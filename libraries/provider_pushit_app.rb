@@ -113,6 +113,14 @@ class Chef
         @user ||= app.user
       end
 
+      def username
+        user.username
+      end
+
+      def group
+        user.group
+      end
+
       def install_ruby
         r = Chef::Resource::PushitRuby.new(
           ruby.version,
@@ -220,14 +228,14 @@ class Chef
             link_directory = ::File.dirname(link_path)
 
             directory link_directory do
-              owner user.username
-              group user.group
+              owner self.username
+              group self.group
             end
 
             link link_path do
               to file_path
-              owner user.username
-              group user.group
+              owner self.username
+              group self.group
             end
           end
         end
