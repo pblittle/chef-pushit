@@ -23,7 +23,7 @@ class Chef
   class Resource
     class PushitNodejs < Chef::Resource::PushitApp
 
-      BEFORE_MIGRATE_SYMLINKS = {
+      SYMLINK_BEFORE_MIGRATE = {
         'env' => '.env'
       }.freeze
 
@@ -56,12 +56,12 @@ class Chef
         )
       end
 
-      def before_migrate_symlinks(arg = nil)
+      def symlink_before_migrate(arg = nil)
         set_or_return(
-          :before_migrate_symlinks,
+          :symlink_before_migrate,
           arg,
           :kind_of => [Hash],
-          :default => BEFORE_MIGRATE_SYMLINKS
+          :default => SYMLINK_BEFORE_MIGRATE
         )
       end
     end

@@ -71,7 +71,7 @@ class Chef
         r.group Etc.getgrnam(group).name
 
         r.symlink_before_migrate(
-          new_resource.before_migrate_symlinks
+          new_resource.symlink_before_migrate
         )
 
         bundle_binary = app.bundle_binary
