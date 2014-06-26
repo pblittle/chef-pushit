@@ -113,6 +113,14 @@ class Chef
         @user ||= app.user
       end
 
+      def username
+        user.username
+      end
+
+      def group
+        user.group
+      end
+
       def install_ruby
         r = Chef::Resource::PushitRuby.new(
           ruby.version,

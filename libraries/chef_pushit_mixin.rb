@@ -25,16 +25,6 @@ class Chef
     module Mixin
       module App
 
-        def before_migrate_symlinks
-          {
-            'env' => '.env',
-            'ruby-version' => '.ruby-version',
-            'config/database.yml' => 'config/database.yml',
-            'config/filestore.yml' => 'config/filestore.yml',
-            'config/unicorn.rb' => 'config/unicorn.rb'
-          }
-        end
-
         def shared_directories
           %w( cached-copy config system vendor_bundle )
         end

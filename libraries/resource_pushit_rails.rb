@@ -23,6 +23,14 @@ class Chef
   class Resource
     class PushitRails < Chef::Resource::PushitApp
 
+      SYMLINK_BEFORE_MIGRATE = {
+        'env' => '.env',
+        'ruby-version' => '.ruby-version',
+        'config/database.yml' => 'config/database.yml',
+        'config/filestore.yml' => 'config/filestore.yml',
+        'config/unicorn.rb' => 'config/unicorn.rb'
+      }.freeze
+
       def initialize(name, run_context = nil)
         super
 
@@ -110,6 +118,15 @@ class Chef
           arg,
           :kind_of => [Integer],
           :default => 60
+        )
+      end
+
+      def symlink_before_migrate(arg = nil)
+        set_or_return(
+          :symlink_before_migrate,
+          arg,
+          :kind_of => [Hash],
+          :default => SYMLINK_BEFORE_MIGRATE
         )
       end
     end
