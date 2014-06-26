@@ -16,8 +16,8 @@
         "host": "localhost",
         "adapter": "postgresql",
         "name": "rails-example",
-        "username": "root",
-        "password": "password",
+        "username": "postgres",
+        "password": "postgres",
         "port": 5432,
         "options": {
             "foo": "bar"

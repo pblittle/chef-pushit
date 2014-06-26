@@ -68,23 +68,15 @@ class Chef
         r.user Etc.getpwnam(owner).name
         r.group Etc.getgrnam(group).name
 
-        r.symlink_before_migrate({})
-
-        before_migrate_symlinks = app.before_migrate_symlinks
+        r.symlink_before_migrate(
+          new_resource.symlink_before_migrate
+        )
 
         r.migrate false
         r.migration_command nil
 
         r.before_migrate do
           app_provider.send(:create_dotenv)
-
-          before_migrate_symlinks.each do |file, link|
-            link "#{release_path}/#{link}" do
-              to "#{new_resource.shared_path}/#{file}"
-              owner owner
-              group group
-            end if ::File.exist? "#{new_resource.shared_path}/#{file}"
-          end
 
           app_provider.send(:npm_install)
           app_provider.send(:before_migrate)
