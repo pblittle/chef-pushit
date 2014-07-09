@@ -120,6 +120,8 @@ class Chef
           app_provider.send(:before_restart)
         end
 
+        r.restart_command("$(which monit) restart #{new_resource.name}")
+
         r.after_restart do
           app_provider.send(:after_restart)
         end
