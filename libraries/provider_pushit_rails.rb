@@ -123,7 +123,7 @@ class Chef
         command = app.restart_command
         r.restart_command do
           output = `#{command}`
-          log("restart #{new_resource.name} returned\n #{output}"){level :debug}
+          ::Chef::Log.debug "restart #{new_resource.name} returned\n #{output}"
         end
 
         r.after_restart do
