@@ -193,7 +193,7 @@ class Chef
       end
 
       def restart_command
-        "$(which monit) restart #{new_resource.name}"
+        "$(which monit) restart #{name}"
       end
     end
   end

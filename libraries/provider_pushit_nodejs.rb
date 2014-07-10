@@ -91,10 +91,9 @@ class Chef
         end
 
         command = app.restart_command
-        app_name = new_resource.name
         r.restart_command do
           output = `#{command}`
-          log.debug{"restart #{app_name} returned\n #{output}"}
+          log.debug{"restart #{new_resource.name} returned\n #{output}"}
         end
 
         r.after_restart do
