@@ -191,6 +191,10 @@ class Chef
           `git rev-parse HEAD`.chomp
         end
       end
+
+      def restart_command
+        "$(which monit) restart #{name}"
+      end
     end
   end
 end
