@@ -23,9 +23,6 @@ platforms:
       server_root_password: 'password'
       tunable:
         lower_case_table_names: 1
-    postgresql:
-      password:
-        postgres: 'postgres'
     nginx:
       default_site_enabled: false
       dir: '/opt/pushit/nginx'

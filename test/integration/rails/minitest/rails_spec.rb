@@ -130,22 +130,22 @@ describe 'pushit_test::rails' do
   end
 
   it 'uses monit to monitor the unicorn workers' do
-    #skip if we're not done initializing
+    # skip if we're not done initializing
     if `sudo monit status`.match(/Process '#{pushit_app}'\r?\n\s+status\s+(\w+).*\n/).captures[0] == 'Initializing'
       skip("#{pushit_app} still initializing")
     end
 
     output = `sudo monit status`.match(/^Process '#{pushit_app}'\s+status\s+.*\n\s+monitoring status\s+(.*)\r?\n/)
-    assert((! output.nil? && output.captures.first == 'Monitored'), output)
+    assert((!output.nil? && output.captures.first == 'Monitored'), output)
   end
 
   it 'monit knows if the unicorn workers are up' do
-    #skip if we're not done initializing
+    # skip if we're not done initializing
     if `sudo monit status`.match(/Process '#{pushit_app}'\r?\n\s+status\s+(\w+).*\n/).captures[0] == 'Initializing'
       skip("#{pushit_app} still initializing")
     end
 
     output = `sudo monit status`.match(/^Process '#{pushit_app}'\s+status\s+(.*)\r?\n\s+monitoring status\s+Monitored/)
-    assert((! output.nil? && output.captures.first == 'Running'), output)
+    assert((!output.nil? && output.captures.first == 'Running'), output)
   end
 end
