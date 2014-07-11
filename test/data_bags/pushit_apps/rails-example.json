@@ -2,7 +2,7 @@
     "id": "rails-example",
     "owner": "deploy",
     "group": "deploy",
-    "repo": "https://github.com/heroku/ruby-rails-sample.git",
+    "repo": "https://github.com/cloud66/sample-rails.4.0.0-mysql.git",
     "framework": "rails",
     "ruby": {
         "version": "2.1.1"
@@ -14,10 +14,10 @@
     },
     "database": {
         "host": "localhost",
-        "adapter": "postgresql",
+        "adapter": "mysql2",
         "name": "rails-example",
-        "username": "postgres",
-        "password": "postgres",
+        "username": "root",
+        "password": "password",
         "port": 5432,
         "options": {
             "foo": "bar"
