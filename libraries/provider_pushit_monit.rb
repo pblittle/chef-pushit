@@ -35,7 +35,7 @@ class Chef
       def load_current_resource; end
 
       def whyrun_supported?
-        Pushit.whyrun_enabled?
+        Pushit.whyrun_supported?
       end
 
       def action_install

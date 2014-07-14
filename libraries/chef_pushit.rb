@@ -56,9 +56,10 @@ class Chef
         @pushit_apps_path ||= ::File.join(@pushit_path, 'apps')
       end
 
-      def whyrun_enabled?
-        @whyrun_enabled ||= false
+      def whyrun_supported
+        @whyrun_supported ||= true
       end
+      alias_method :whyrun_supported?, :whyrun_supported
 
       # This should be an encrypted data bag
       def app_data_bag(name)
