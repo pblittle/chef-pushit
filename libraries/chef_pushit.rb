@@ -57,7 +57,7 @@ class Chef
       end
 
       def whyrun_supported
-        @whyrun_supported ||= true
+        @whyrun_supported ||= false
       end
       alias_method :whyrun_supported?, :whyrun_supported
 
