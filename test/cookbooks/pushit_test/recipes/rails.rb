@@ -34,5 +34,14 @@ pushit_rails app do
   precompile_assets true
   migrate true
   unicorn_worker_processes 1
+  revision '9931780622322814eef5c2fbb3df3085de75ce12'
+end
+
+pushit_rails app do
+  deploy_action 'deploy'
+  environment 'test'
+  precompile_assets true
+  migrate true
+  unicorn_worker_processes 1
   revision 'master'
 end
