@@ -192,8 +192,12 @@ class Chef
         end
       end
 
+      def monit_group
+        "pushit_#{name}"
+      end
+
       def restart_command
-        "$(which monit) restart #{name}"
+        "$(which monit) -g #{monit_group} restart"
       end
     end
   end

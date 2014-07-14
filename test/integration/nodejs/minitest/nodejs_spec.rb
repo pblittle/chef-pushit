@@ -27,6 +27,10 @@ describe 'pushit_test::nodejs' do
     ::File.join('', 'etc', 'init', "#{pushit_app}.conf")
   end
 
+  let(:monit_group) do
+    "pushit_#{pushit_app}"
+  end
+
   it 'has created the base pushit directory' do
     assert File.directory?(pushit_path)
   end
@@ -83,5 +87,11 @@ describe 'pushit_test::nodejs' do
     assert ::File.read(
       "/etc/logrotate.d/#{pushit_app}"
     ).include?(logrotate_logs_path)
+  end
+
+  it 'the monit config includes the app group' do
+    assert ::File.read(
+      ::File.join('', 'etc', 'monit', 'conf.d', "#{pushit_app}.monitrc")
+    ).include?(monit_group)
   end
 end

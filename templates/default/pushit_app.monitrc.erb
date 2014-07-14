@@ -3,4 +3,4 @@ check process <%= @name %> with pidfile <%= @pid_file %>
   stop program = "<%= @stop_program %>"
   <% if @uid -%>as uid <%= @uid %><% end -%>
   <% if @gid -%>as gid <%= @gid %><% end -%>
-  group Pushit
+  group <%= @group %>

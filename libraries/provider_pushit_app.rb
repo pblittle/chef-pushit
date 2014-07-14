@@ -272,7 +272,8 @@ class Chef
           :start_program => "/sbin/start #{new_resource.name}",
           :stop_program => "/sbin/stop #{new_resource.name}",
           :uid => 'root',
-          :gid => 'root'
+          :gid => 'root',
+          :group => app.monit_group
         )
         r.run_action(:install)
 
