@@ -33,8 +33,8 @@ class Chef
     PUSHIT_DATA_BAG ||= 'pushit_apps'.freeze
 
     PUSHIT_GEM_DEPENDENCIES ||= [
-      { :name => 'bundler', :version => '1.6.2' },
-      { :name => 'foreman', :version => '0.71.0' },
+      { :name => 'bundler', :version => '1.6.3' },
+      { :name => 'foreman', :version => '0.74.0' },
       { :name => 'unicorn', :version => '4.8.3' }
     ].freeze
 
@@ -56,9 +56,10 @@ class Chef
         @pushit_apps_path ||= ::File.join(@pushit_path, 'apps')
       end
 
-      def whyrun_enabled?
-        @whyrun_enabled ||= false
+      def whyrun_supported
+        @whyrun_supported ||= true
       end
+      alias_method :whyrun_supported?, :whyrun_supported
 
       # This should be an encrypted data bag
       def app_data_bag(name)
