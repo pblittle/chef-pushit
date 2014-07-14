@@ -43,6 +43,10 @@ describe 'pushit_test::rails' do
     ::File.join(pushit_app_path, 'current', 'bin')
   end
 
+  let(:monit_group) do
+    "pushit_#{pushit_app}"
+  end
+
   it 'has created the base pushit directory' do
     assert File.directory?(pushit_path)
   end
@@ -127,6 +131,12 @@ describe 'pushit_test::rails' do
     assert ::File.read(
       "/etc/logrotate.d/#{pushit_app}"
     ).include?(logrotate_logs_path)
+  end
+
+  it 'the monit config includes the app group' do
+    assert ::File.read(
+      ::File.join('', 'etc', 'monit', 'conf.d', "#{pushit_app}.monitrc")
+    ).include?(monit_group)
   end
 
   it 'uses monit to monitor the unicorn workers' do
