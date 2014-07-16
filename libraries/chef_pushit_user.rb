@@ -29,7 +29,8 @@ class Chef
       PUSHIT_USER_DATA_BAG ||= 'users'.freeze
 
       attr_accessor :args
-      attr_accessor :ssh_private_key, :ssh_public_key
+      attr_accessor :ssh_private_key
+      attr_accessor :ssh_public_key
       attr_accessor :ssh_deploy_keys
 
       def initialize(args = {})
