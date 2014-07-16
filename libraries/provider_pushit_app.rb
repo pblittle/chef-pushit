@@ -33,8 +33,6 @@ class Chef
           @run_context.include_recipe('logrotate::global')
         end
 
-        @run_context.include_recipe('campfire-deployment::default')
-        @run_context.include_recipe('newrelic-deployment::default')
 
         super(new_resource, run_context)
       end
@@ -349,45 +347,6 @@ class Chef
         r.group user.group
         r.not_if { app.procfile? }
         r.run_action(:create)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-      end
-
-      def create_newrelic_notification
-        r = newrelic_deployment config['env']['NEW_RELIC_APP_NAME'] do
-          api_key config['env']['NEW_RELIC_API_KEY']
-          revision app.version
-          user config['owner']
-          action :nothing
-          only_if do
-            (config.key?('env') &&
-             config['env'].key?('NEW_RELIC_API_KEY') &&
-             config['env'].key?('NEW_RELIC_APP_NAME')) &&
-              config['environment'] != 'test'
-          end
-        end.run_action(:create)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-      end
-
-      def create_campfire_notification(action = :announce_start)
-        r = Chef::Resource::CampfireDeployment.new(
-          new_resource.name,
-          run_context
-        )
-        r.account config['env']['CAMPFIRE_DEPLOYMENT_ACCOUNT']
-        r.token config['env']['CAMPFIRE_DEPLOYMENT_TOKEN']
-        r.room config['env']['CAMPFIRE_DEPLOYMENT_ROOM']
-        r.release(
-          deployer: user.username,
-          environment: new_resource.environment,
-          revision: new_resource.revision,
-          application: new_resource.name
-        )
-        r.run_action(action)
-        r.not_if do
-          app.environment == 'test'
-        end
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
