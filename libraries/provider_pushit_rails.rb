@@ -78,7 +78,7 @@ class Chef
         bundle_flags = app.bundle_flags
 
         r.migrate new_resource.migrate
-        r.migration_command '#{bundle_binary} exec rake db:migrate'
+        r.migration_command "#{bundle_binary} exec rake db:migrate"
 
         r.before_migrate do
           app_provider.send(:create_dotenv)
