@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'berkshelf'
-gem 'foodcritic', '3.0.3'
+gem 'foodcritic'
 gem 'knife-spork'
 
 group 'integration' do
