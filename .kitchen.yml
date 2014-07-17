@@ -1,4 +1,6 @@
 ---
+#<% require 'kitchen-sync' %>
+
 driver_plugin: vagrant
 
 driver_config:
