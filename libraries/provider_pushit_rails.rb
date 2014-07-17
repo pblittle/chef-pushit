@@ -65,7 +65,7 @@ class Chef
           r.ssh_wrapper wrapper_path
         end
 
-        r.environment new_resource.environment
+        r.environment app.env_vars
 
         r.user Etc.getpwnam(owner).name
         r.group Etc.getgrnam(group).name
