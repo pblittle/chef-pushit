@@ -34,7 +34,7 @@ pushit_rails app do
   precompile_assets true
   migrate true
   unicorn_worker_processes 1
-  revision '9931780622322814eef5c2fbb3df3085de75ce12'
+  revision 'b41e9a3676edb38a28463c23112a25a23d850cf1'
 end
 
 pushit_rails app do
@@ -43,5 +43,5 @@ pushit_rails app do
   precompile_assets true
   migrate true
   unicorn_worker_processes 1
-  revision 'master'
+  revision 'ca0ad715cb68e58e9b28c442f2e17189dc9c29ad'
 end
