@@ -5,6 +5,7 @@ gem 'foodcritic'
 gem 'knife-spork'
 
 group 'integration' do
+  gem 'kitchen-docker'
   gem 'kitchen-vagrant'
   gem 'minitest-chef-handler'
   gem 'pry'
