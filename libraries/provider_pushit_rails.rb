@@ -44,8 +44,9 @@ class Chef
 
         app_provider = self
 
-        owner = config['owner']
-        group = config['group']
+        username = user_username
+        group = user_group
+        ssh_directory = user_ssh_directory
 
         r = Chef::Resource::DeployRevision.new(
           new_resource.name,
@@ -60,14 +61,14 @@ class Chef
 
         if config['deploy_key'] && !config['deploy_key'].empty?
           wrapper = "#{config['deploy_key']}_deploy_wrapper.sh"
-          wrapper_path = ::File.join(app.user.ssh_directory, wrapper)
+          wrapper_path = ::File.join(ssh_directory, wrapper)
 
           r.ssh_wrapper wrapper_path
         end
 
         r.environment app.env_vars
 
-        r.user Etc.getpwnam(owner).name
+        r.user Etc.getpwnam(username).name
         r.group Etc.getgrnam(group).name
 
         r.symlink_before_migrate(
@@ -83,14 +84,12 @@ class Chef
         r.before_migrate do
           app_provider.send(:create_dotenv)
 
-          bundle_install_command = "sudo su - #{owner} -c 'cd #{release_path} && #{bundle_binary} install #{bundle_flags}'"
+          bundle_install_command = "sudo su - #{username} -c 'cd #{release_path} && #{bundle_binary} install #{bundle_flags}'"
 
           begin
-            Chef::Log.warn bundle_install_command + DateTime.now.to_s
             Bundler.clean_system(bundle_install_command)
           rescue => e
-            Chef::Log.warn 'fail ' + bundle_install_command + DateTime.now.to_s
-            Chef::Log.warn(e.backtrace)
+            Chef::Log.warn e.backtrace
           end
 
           app_provider.send(:before_migrate)
@@ -106,9 +105,7 @@ class Chef
         r.before_restart do
           if precompile_assets
 
-            bundle_precompile_command = "sudo su - #{owner} -c 'cd #{release_path} && source ./.env && #{bundle_binary} exec rake #{precompile_command}'"
-
-            Chef::Log.warn bundle_precompile_command
+            bundle_precompile_command = "sudo su - #{username} -c 'cd #{release_path} && source ./.env && #{bundle_binary} exec rake #{precompile_command}'"
 
             begin
               Bundler.clean_system(bundle_precompile_command)
@@ -142,8 +139,8 @@ class Chef
         )
         r.source 'database.yml.erb'
         r.cookbook 'pushit'
-        r.owner config['owner']
-        r.group config['group']
+        r.owner user_username
+        r.group user_group
         r.mode '0644'
         r.variables(
           :database => app.database.to_hash,
@@ -161,8 +158,8 @@ class Chef
         )
         r.source 'filestore.yml.erb'
         r.cookbook 'pushit'
-        r.owner config['owner']
-        r.group config['group']
+        r.owner user_username
+        r.group user_group
         r.mode '0644'
         r.variables(
           :database => app.database.to_hash,
@@ -194,8 +191,8 @@ class Chef
         )
         r.source 'unicorn.rb.erb'
         r.cookbook 'pushit'
-        r.user config['owner']
-        r.group config['group']
+        r.user user_username
+        r.group user_group
         r.mode '0644'
         r.variables(
           :enable_stats => new_resource.unicorn_enable_stats,

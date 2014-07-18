@@ -42,8 +42,9 @@ class Chef
       def create_deploy_revision
         app_provider = self
 
-        owner = config['owner']
-        group = config['group']
+        username = user_username
+        group = user_group
+        ssh_directory = user_ssh_directory
 
         r = Chef::Resource::DeployRevision.new(
           new_resource.name,
@@ -58,14 +59,14 @@ class Chef
 
         if config['deploy_key'] && !config['deploy_key'].empty?
           wrapper = "#{config['deploy_key']}_deploy_wrapper.sh"
-          wrapper_path = ::File.join(app.user.ssh_directory, wrapper)
+          wrapper_path = ::File.join(ssh_directory, wrapper)
 
           r.ssh_wrapper wrapper_path
         end
 
         r.environment app.env_vars
 
-        r.user Etc.getpwnam(owner).name
+        r.user Etc.getpwnam(username).name
         r.group Etc.getgrnam(group).name
 
         r.symlink_before_migrate(

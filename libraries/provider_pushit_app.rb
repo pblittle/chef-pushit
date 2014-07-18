@@ -110,12 +110,16 @@ class Chef
         @user ||= app.user
       end
 
-      def username
-        user.username
+      def user_username
+        @user_username ||= user.username
       end
 
-      def group
-        user.group
+      def user_group
+        @user_group ||= user.group
+      end
+
+      def user_ssh_directory
+        @user_ssh_directory ||= user.ssh_directory
       end
 
       def install_ruby
@@ -124,8 +128,8 @@ class Chef
           run_context
         )
         r.environment ruby.environment
-        r.user user.username
-        r.group user.group
+        r.user user_username
+        r.group user_group
         r.run_action(:create)
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
@@ -138,8 +142,8 @@ class Chef
         )
         r.source 'ruby-version.erb'
         r.cookbook 'pushit'
-        r.owner user.username
-        r.group user.group
+        r.owner user_username
+        r.group user_group
         r.mode '0644'
         r.variables(
           :ruby_version => ruby.version
@@ -155,8 +159,8 @@ class Chef
             dir,
             run_context
           )
-          r.owner Etc.getpwnam(user.username).uid
-          r.group Etc.getgrnam(user.group).gid
+          r.owner Etc.getpwnam(user_username).uid
+          r.group Etc.getgrnam(user_group).gid
           r.recursive true
           r.mode 00755
           r.run_action(:create)
@@ -171,8 +175,8 @@ class Chef
             ::File.join(app.shared_path, dir),
             run_context
           )
-          r.owner Etc.getpwnam(user.username).uid
-          r.group Etc.getgrnam(user.group).gid
+          r.owner Etc.getpwnam(user_username).uid
+          r.group Etc.getgrnam(user_group).gid
           r.recursive true
           r.mode 00755
           r.run_action(:create)
@@ -187,8 +191,8 @@ class Chef
             ::File.join(app.shared_path, dir),
             run_context
           )
-          r.owner Etc.getpwnam(user.username).uid
-          r.group Etc.getgrnam(user.group).gid
+          r.owner Etc.getpwnam(user_username).uid
+          r.group Etc.getgrnam(user_group).gid
           r.recursive true
           r.mode 00755
           r.run_action(:create)
@@ -205,8 +209,8 @@ class Chef
         )
         r.source 'env.erb'
         r.cookbook 'pushit'
-        r.owner config['owner']
-        r.group config['group']
+        r.owner user_username
+        r.group user_group
         r.mode '0644'
         r.variables(
           :env => escape_env(app.env_vars)
@@ -224,8 +228,8 @@ class Chef
           )
           r.source file
           r.cookbook new_resource.cookbook_name.to_s
-          r.owner Etc.getpwnam(user.username).uid
-          r.group Etc.getgrnam(user.group).gid
+          r.owner Etc.getpwnam(user_username).uid
+          r.group Etc.getgrnam(user_group).gid
           r.mode 00755
           r.run_action(:create)
 
@@ -280,8 +284,8 @@ class Chef
       def create_logrotate_config
         log_path = app.logrotate_logs_path
         name = app.name
-        username = user.username
-        group = user.group
+        username = user_username
+        group = user_group
 
         logrotate_app name do
           cookbook 'logrotate'
@@ -324,8 +328,8 @@ class Chef
           certificate,
           run_context
         )
-        r.owner user.username
-        r.group user.group
+        r.owner user_username
+        r.group user_group
         r.cert_path Pushit::Certs.ssl_path
         r.cert_file "#{certificate}.pem"
         r.key_file "#{certificate}.key"
@@ -342,8 +346,8 @@ class Chef
           run_context
         )
         r.content app.procfile_default_entry(new_resource.framework)
-        r.owner user.username
-        r.group user.group
+        r.owner user_username
+        r.group user_group
         r.not_if { app.procfile? }
         r.run_action(:create)
 
