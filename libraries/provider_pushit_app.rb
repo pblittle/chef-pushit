@@ -24,7 +24,7 @@ class Chef
   class Provider
     class PushitApp < Chef::Provider::PushitBase
 
-      def initialize(new_resource, run_context = nil)
+      def initialize(new_resource, _run_context)
         @new_resource = new_resource
         @run_context = run_context
 
@@ -32,7 +32,6 @@ class Chef
           @run_context.include_recipe('nodejs::install_from_source')
           @run_context.include_recipe('logrotate::global')
         end
-
 
         super(new_resource, run_context)
       end

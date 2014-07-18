@@ -33,7 +33,7 @@ class Chef
       end
 
       def config
-        @config ||= Chef::Pushit.app_data_bag(@name)
+        @config ||= Pushit.pushit_app_config(@name)
       end
 
       def user

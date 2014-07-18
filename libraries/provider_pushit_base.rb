@@ -30,7 +30,9 @@ class Chef
 
       attr_reader :user
 
-      def initialize(new_resource, run_context = nil)
+      def initialize(new_resource, _run_context)
+        @new_resource = new_resource
+
         create_pushit_user
         install_gem_dependencies
       end
@@ -42,7 +44,7 @@ class Chef
       end
 
       def user
-        @user ||= Chef::Pushit::User.new
+        @user ||= Pushit::User.new
       end
 
       private

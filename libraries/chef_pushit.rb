@@ -30,7 +30,7 @@ class Chef
     PUSHIT_USER ||= 'deploy'.freeze
     PUSHIT_GROUP ||= 'deploy'.freeze
     PUSHIT_PATH ||= ::File.join('', 'opt', 'pushit').freeze
-    PUSHIT_DATA_BAG ||= 'pushit_apps'.freeze
+    PUSHIT_APP_DATA_BAG ||= 'pushit_apps'.freeze
 
     PUSHIT_GEM_DEPENDENCIES ||= [
       { :name => 'bundler', :version => '1.6.3' },
@@ -61,10 +61,10 @@ class Chef
       end
       alias_method :whyrun_supported?, :whyrun_supported
 
-      # This should be an encrypted data bag
-      def app_data_bag(name)
-        data_bag_item = Chef::DataBagItem.load(PUSHIT_DATA_BAG, name)
-        data_bag_item || {}
+      def pushit_app_config(name)
+        Chef::DataBagItem.load(PUSHIT_APP_DATA_BAG, name)
+      rescue
+        {}
       end
     end
   end
