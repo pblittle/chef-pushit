@@ -188,7 +188,9 @@ class Chef
         return unless ::File.directory?(::File.join(cached_copy_dir, '.git'))
 
         Dir.chdir(cached_copy_dir) do
-          `git rev-parse HEAD`.chomp
+          shellout = Mixlib::ShellOut.new('git rev-parse HEAD')
+          shellout.run_command
+          shellout.stdout.chomp
         end
       end
 
