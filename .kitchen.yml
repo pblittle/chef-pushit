@@ -10,6 +10,9 @@ driver_config:
     memory: 1536
     cpuexecutioncap: 75
 
+provisioner:
+  name: chef_zero
+
 platforms:
 - name: ubuntu-12.04
   driver_config:
