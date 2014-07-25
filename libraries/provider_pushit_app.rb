@@ -159,8 +159,8 @@ class Chef
             dir,
             run_context
           )
-          r.owner Etc.getpwnam(user_username).uid
-          r.group Etc.getgrnam(user_group).gid
+          r.owner user_username
+          r.group user_group
           r.recursive true
           r.mode 00755
           r.run_action(:create)
@@ -175,8 +175,8 @@ class Chef
             ::File.join(app.shared_path, dir),
             run_context
           )
-          r.owner Etc.getpwnam(user_username).uid
-          r.group Etc.getgrnam(user_group).gid
+          r.owner user_username
+          r.group user_group
           r.recursive true
           r.mode 00755
           r.run_action(:create)
@@ -191,8 +191,8 @@ class Chef
             ::File.join(app.shared_path, dir),
             run_context
           )
-          r.owner Etc.getpwnam(user_username).uid
-          r.group Etc.getgrnam(user_group).gid
+          r.owner user_username
+          r.group user_group
           r.recursive true
           r.mode 00755
           r.run_action(:create)
@@ -228,8 +228,8 @@ class Chef
           )
           r.source file
           r.cookbook new_resource.cookbook_name.to_s
-          r.owner Etc.getpwnam(user_username).uid
-          r.group Etc.getgrnam(user_group).gid
+          r.owner user_username
+          r.group user_group
           r.mode 00755
           r.run_action(:create)
 
