@@ -33,7 +33,7 @@ class Chef
     PUSHIT_APP_DATA_BAG ||= 'pushit_apps'.freeze
 
     PUSHIT_GEM_DEPENDENCIES ||= [
-      { :name => 'bundler', :version => '1.6.3' },
+      { :name => 'bundler', :version => '1.6.5' },
       { :name => 'foreman', :version => '0.74.0' },
       { :name => 'unicorn', :version => '4.8.3' }
     ].freeze
