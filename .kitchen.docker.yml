@@ -42,7 +42,6 @@ platforms:
 suites:
 - name: user
   run_list:
-    - recipe[minitest-handler]
     - recipe[pushit_test::user]
   data_bags_path:
     'test/data_bags'
@@ -51,14 +50,12 @@ suites:
 
 - name: webserver
   run_list:
-    - recipe[minitest-handler]
     - recipe[pushit_test::webserver]
   data_bags_path:
     'test/data_bags'
 
 - name: custom-vhost
   run_list:
-    - recipe[minitest-handler]
     - recipe[pushit_test::custom-vhost]
   data_bags_path:
     'test/data_bags'
@@ -67,14 +64,12 @@ suites:
 
 - name: database
   run_list:
-    - recipe[minitest-handler]
     - recipe[pushit_test::database]
   data_bags_path:
     'test/data_bags'
 
 - name: nodejs
   run_list:
-    - recipe[minitest-handler]
     - recipe[pushit_test::nodejs]
   data_bags_path:
     'test/data_bags'
@@ -83,14 +78,12 @@ suites:
 
 - name: ruby
   run_list:
-    - recipe[minitest-handler]
     - recipe[pushit_test::ruby]
   data_bags_path:
     'test/data_bags'
 
 - name: rails
   run_list:
-    - recipe[minitest-handler]
     - recipe[pushit_test::rails]
   data_bags_path:
     'test/data_bags'
