@@ -20,7 +20,6 @@
 require 'chef/provider'
 
 require_relative 'chef_pushit'
-require_relative 'chef_pushit_user'
 
 class Chef
   class Provider

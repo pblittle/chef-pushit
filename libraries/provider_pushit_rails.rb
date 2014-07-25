@@ -21,7 +21,6 @@ require_relative 'provider_pushit_app'
 
 class Chef
   class Provider
-
     # Convenience class for using the app resource with
     # the rails framework (provider)
     class PushitRails < Chef::Provider::PushitApp
@@ -40,8 +39,6 @@ class Chef
       private
 
       def create_deploy_revision
-        require 'bundler'
-
         app_provider = self
 
         username = user_username
@@ -68,8 +65,8 @@ class Chef
 
         r.environment app.env_vars
 
-        r.user Etc.getpwnam(username).name
-        r.group Etc.getgrnam(group).name
+        r.user username
+        r.group group
 
         r.symlink_before_migrate(
           new_resource.symlink_before_migrate
@@ -87,6 +84,7 @@ class Chef
           bundle_install_command = "sudo su - #{username} -c 'cd #{release_path} && #{bundle_binary} install #{bundle_flags}'"
 
           begin
+            require 'bundler'
             Bundler.clean_system(bundle_install_command)
           rescue => e
             Chef::Log.warn e.backtrace
@@ -108,6 +106,7 @@ class Chef
             bundle_precompile_command = "sudo su - #{username} -c 'cd #{release_path} && source ./.env && #{bundle_binary} exec rake #{precompile_command}'"
 
             begin
+              require 'bundler'
               Bundler.clean_system(bundle_precompile_command)
             rescue => e
               Chef::Log.warn e.backtrace

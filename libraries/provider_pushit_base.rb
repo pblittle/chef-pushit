@@ -18,7 +18,6 @@
 #
 
 require 'chef/provider'
-require 'chef/mixin/command'
 
 require_relative 'chef_pushit'
 
@@ -66,17 +65,6 @@ class Chef
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
-
-      def install_gem_dependencies
-        PUSHIT_GEM_DEPENDENCIES.each do |gem|
-          r = chef_gem gem[:name] do
-            version gem[:version] if gem[:version]
-            action :nothing
-          end
-          r.run_action(:install)
-
-          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-        end
       end
     end
   end

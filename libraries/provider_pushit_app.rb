@@ -17,11 +17,12 @@
 # limitations under the License.
 #
 
-require_relative 'chef_pushit'
 require_relative 'provider_pushit_base'
 
 class Chef
   class Provider
+    # Base class for building an app. This class should
+    # not be implemented outside of subclass inheritance.
     class PushitApp < Chef::Provider::PushitBase
 
       def initialize(new_resource, _run_context)
@@ -51,12 +52,13 @@ class Chef
           install_ruby
           create_ruby_version
 
-          if @app.database
+          if app.database
             create_database_config
             create_filestore_config
           end
 
-          create_unicorn_config if @app.webserver?
+          create_unicorn_config if app.webserver?
+        end
         end
 
         create_ssl_cert(app.database_certificate) if app.database_certificate?
@@ -120,6 +122,18 @@ class Chef
 
       def user_ssh_directory
         @user_ssh_directory ||= user.ssh_directory
+      end
+
+      def install_gem_dependencies
+        PUSHIT_APP_GEM_DEPENDENCIES.each do |gem|
+          r = chef_gem gem[:name] do
+            version gem[:version] if gem[:version]
+            action :nothing
+          end
+          r.run_action(:install)
+
+          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        end
       end
 
       def install_ruby

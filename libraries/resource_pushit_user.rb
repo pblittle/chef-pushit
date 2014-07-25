@@ -32,19 +32,6 @@ class Chef
         @allowed_actions.push :create, :create_deploy_keys, :create_ssh_keys
       end
 
-      def to_hash
-        {
-          :username => username,
-          :group => group,
-          :home => home,
-          :password => password,
-          :ssh_private_key => ssh_private_key,
-          :ssh_public_key => ssh_public_key,
-          :ssh_keys => ssh_keys,
-          :ssh_deploy_keys => ssh_deploy_keys
-        }
-      end
-
       def username(arg = nil)
         set_or_return(
           :username,
@@ -119,6 +106,19 @@ class Chef
           arg,
           :kind_of => [Array]
         )
+      end
+
+      def to_hash
+        {
+          :username => username,
+          :group => group,
+          :home => home,
+          :password => password,
+          :ssh_private_key => ssh_private_key,
+          :ssh_public_key => ssh_public_key,
+          :ssh_keys => ssh_keys,
+          :ssh_deploy_keys => ssh_deploy_keys
+        }
       end
     end
   end

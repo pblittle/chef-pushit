@@ -21,7 +21,6 @@ require_relative 'provider_pushit_app'
 
 class Chef
   class Provider
-
     # Convenience class for using the app resource with
     # the nodejs framework (provider)
     class PushitNodejs < Chef::Provider::PushitApp
@@ -66,8 +65,8 @@ class Chef
 
         r.environment app.env_vars
 
-        r.user Etc.getpwnam(username).name
-        r.group Etc.getgrnam(group).name
+        r.user username
+        r.group group
 
         r.symlink_before_migrate(
           new_resource.symlink_before_migrate

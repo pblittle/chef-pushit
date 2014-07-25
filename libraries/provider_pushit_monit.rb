@@ -17,7 +17,6 @@
 # limitations under the License.
 #
 
-require_relative 'chef_pushit'
 require_relative 'provider_pushit_base'
 
 class Chef
