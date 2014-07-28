@@ -32,7 +32,6 @@ class Chef
 
         recipe_eval do
           run_context.include_recipe 'nodejs::install_from_source'
-          run_context.include_recipe 'runit::default'
         end
 
         install_gem_dependencies
@@ -83,7 +82,7 @@ class Chef
       def before_restart
         procfile.run_action(:create)
         foreman_export.run_action(:run)
-        runit_service.run_action(:start)
+        supervisor.run_action(:nothing)
       end
 
       def after_restart; end
@@ -229,18 +228,13 @@ class Chef
         r
       end
 
-      def runit_service
-        r = Chef::Resource::RunitService.new(
+      def supervisor
+        r = Chef::Resource::Service.new(
           new_resource.name,
           run_context
         )
-        r.sv_dir app.runit_sv_path
-        r.service_dir app.runit_service_path
-        r.check false
-        r.log false
-        r.sv_templates false
-        r.owner user_username
-        r.group user_group
+        r.provider Chef::Provider::Service::Upstart
+        r.supports :status => true, :restart => true, :reload => true
         r
       end
 
