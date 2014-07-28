@@ -21,7 +21,6 @@ require_relative 'provider_pushit_base'
 
 class Chef
   class Provider
-
     class PushitRuby < Chef::Provider::PushitBase
 
       def initialize(new_resource, run_context = nil)

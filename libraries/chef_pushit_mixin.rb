@@ -25,10 +25,6 @@ class Chef
     module Mixin
       module App
 
-        def shared_directories
-          %w( cached-copy config system vendor_bundle )
-        end
-
         # if ree, "vendor/bundle/1.8"
         def bundle_path
           ::File.join('vendor', 'bundle')

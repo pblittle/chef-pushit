@@ -33,7 +33,7 @@ class Chef
       end
 
       def config
-        @config ||= Chef::Pushit.app_data_bag(@name)
+        @config ||= Pushit.pushit_app_config(@name)
       end
 
       def user
@@ -72,6 +72,10 @@ class Chef
 
       def log_path
         ::File.join(shared_path, 'log')
+      end
+
+      def shared_directories
+        %w( cached-copy config system vendor_bundle )
       end
 
       def logrotate_logs_path
@@ -188,7 +192,9 @@ class Chef
         return unless ::File.directory?(::File.join(cached_copy_dir, '.git'))
 
         Dir.chdir(cached_copy_dir) do
-          `git rev-parse HEAD`.chomp
+          shellout = Mixlib::ShellOut.new('git rev-parse HEAD')
+          shellout.run_command
+          shellout.stdout.chomp
         end
       end
 

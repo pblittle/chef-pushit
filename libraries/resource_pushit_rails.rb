@@ -23,7 +23,7 @@ class Chef
   class Resource
     class PushitRails < Chef::Resource::PushitApp
 
-      SYMLINK_BEFORE_MIGRATE = {
+      SYMLINK_BEFORE_MIGRATE ||= {
         'env' => '.env',
         'ruby-version' => '.ruby-version',
         'config/database.yml' => 'config/database.yml',

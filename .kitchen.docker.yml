@@ -1,14 +1,11 @@
 ---
 #<% require 'kitchen-sync' %>
 
-driver_plugin: vagrant
-
-driver_config:
-  require_chef_omnibus: true
-  customize:
-    cpus: 2
-    memory: 1536
-    cpuexecutioncap: 75
+driver:
+  name: docker
+  provision_command: curl -L http://www.opscode.com/chef/install.sh | bash
+  socket: <%= ENV['DOCKER_HOST'] %>
+  use_sudo: false
 
 provisioner:
   name: chef_zero

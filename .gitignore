@@ -6,7 +6,6 @@
 .*.sw[a-z]
 *.un~
 .kitchen
-.tailor
 *.box
 
 files/*

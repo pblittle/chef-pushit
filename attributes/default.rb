@@ -30,11 +30,11 @@ node.default[:mysql][:tunable][:lower_case_table_names] = 1
 
 node.default[:nodejs][:install_method] = 'source'
 node.default[:nodejs][:version] = '0.10.29'
-node.default[:nodejs][:npm] = '1.4.15'
+node.default[:nodejs][:npm] = '1.4.21'
 
 node.override['nginx']['version'] = '1.4.4'
 node.override['nginx']['source']['version'] = '1.4.4'
-node.override['nginx']['openssl_source']['version']  = '1.0.1g'
+node.override['nginx']['openssl_source']['version']  = '1.0.1h'
 
 node.default['nginx']['init_style'] = 'upstart'
 node.default['nginx']['install_method'] = 'source'

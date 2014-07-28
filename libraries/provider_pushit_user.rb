@@ -20,7 +20,6 @@
 require 'chef/provider'
 
 require_relative 'chef_pushit'
-require_relative 'chef_pushit_user'
 
 class Chef
   class Provider
@@ -94,8 +93,8 @@ class Chef
           pushit_user.ssh_directory,
           run_context
         )
-        r.owner Etc.getpwnam(pushit_user.username).uid
-        r.group Etc.getgrnam(pushit_user.group).gid
+        r.owner pushit_user.username
+        r.group pushit_user.group
         r.mode '0700'
         r.recursive true
         r.run_action(:create)
@@ -117,8 +116,8 @@ class Chef
         )
         r.source 'private_key.erb'
         r.cookbook 'pushit'
-        r.owner Etc.getpwnam(pushit_user.username).uid
-        r.group Etc.getgrnam(pushit_user.group).gid
+        r.owner pushit_user.username
+        r.group pushit_user.group
         r.mode '0600'
         r.variables(
           :private_key => pushit_user.ssh_private_key
@@ -135,8 +134,8 @@ class Chef
         )
         r.source 'public_key.erb'
         r.cookbook 'pushit'
-        r.owner Etc.getpwnam(pushit_user.username).uid
-        r.group Etc.getgrnam(pushit_user.group).gid
+        r.owner pushit_user.username
+        r.group pushit_user.group
         r.mode '0600'
         r.variables(
           :public_key => pushit_user.ssh_public_key
@@ -153,8 +152,8 @@ class Chef
         )
         r.source 'authorized_keys.erb'
         r.cookbook 'pushit'
-        r.owner Etc.getpwnam(pushit_user.username).uid
-        r.group Etc.getgrnam(pushit_user.group).gid
+        r.owner pushit_user.username
+        r.group pushit_user.group
         r.mode '0600'
         r.variables(
           :ssh_keys => pushit_user.ssh_keys
@@ -200,7 +199,7 @@ class Chef
         r.source 'ssh_deploy_key.erb'
         r.cookbook 'pushit'
         r.owner pushit_user.username
-        r.group Etc.getgrnam(pushit_user.group).gid
+        r.group pushit_user.group
         r.mode '0600'
         r.variables(
           :ssh_key_data => key['data']
@@ -223,7 +222,7 @@ class Chef
         r.source 'ssh_wrapper.sh.erb'
         r.cookbook 'pushit'
         r.owner pushit_user.username
-        r.group Etc.getgrnam(pushit_user.group).gid
+        r.group pushit_user.group
         r.mode '0755'
         r.variables(
           :ssh_key_dir => pushit_user.ssh_directory,

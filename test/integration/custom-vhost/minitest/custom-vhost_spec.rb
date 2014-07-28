@@ -16,8 +16,4 @@ describe 'pushit_test::custom-vhost' do
   it 'has used our custom template' do
     assert ::File.readlines(vhost_config_path).grep(/TEST PASSES/).length > 0
   end
-
-#   it 'shouldnt pass this' do
-#     file(vhost_config_path).must_include 'TEST NO PASS'
-#   end
 end

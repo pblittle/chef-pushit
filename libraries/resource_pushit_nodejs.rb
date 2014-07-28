@@ -23,7 +23,7 @@ class Chef
   class Resource
     class PushitNodejs < Chef::Resource::PushitApp
 
-      SYMLINK_BEFORE_MIGRATE = {
+      SYMLINK_BEFORE_MIGRATE ||= {
         'env' => '.env'
       }.freeze
 

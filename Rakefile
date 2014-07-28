@@ -18,15 +18,7 @@ rescue LoadError
   puts "Kitchen gem not loaded, omitting tasks" unless ENV['CI']
 end
 
-begin
-  require 'tailor/rake_task'
-  Tailor::RakeTask.new
-rescue LoadError
-  warn "Tailor gem not loaded, omitting tasks"
-end
-
 task :default => [
-  'tailor',
   'kitchen:all',
   'foodcritic'
 ]
