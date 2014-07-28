@@ -31,15 +31,13 @@ class Chef
         'config/unicorn.rb' => 'config/unicorn.rb'
       }.freeze
 
-      def initialize(name, run_context = nil)
-        super
+      self.resource_name = 'pushit_rails'
 
-        @resource_name = :pushit_rails
-        @provider = Chef::Provider::PushitRails
-        @action = :create
-        @allowed_actions = [:create]
+      default_action :create
+      actions :create
 
-        @framework = 'rails'
+      def framework
+        @framework ||= 'rails'
       end
 
       def migrate(arg = nil)

@@ -17,20 +17,16 @@
 # limitations under the License.
 #
 
-require 'chef/resource'
+require 'chef/resource/lwrp_base'
 
 class Chef
   class Resource
-    class PushitMonit < Chef::Resource
+    class PushitMonit < Chef::Resource::LWRPBase
 
-      def initialize(name, run_context = nil)
-        super
+      self.resource_name = 'pushit_monit'
 
-        @resource_name = :pushit_monit
-        @provider = Chef::Provider::PushitMonit
-        @action = :install
-        @allowed_actions.push :install, :restart
-      end
+      default_action :create
+      actions :create, :restart
 
       def name(arg = nil)
         set_or_return(

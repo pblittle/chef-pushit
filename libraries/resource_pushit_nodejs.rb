@@ -27,15 +27,13 @@ class Chef
         'env' => '.env'
       }.freeze
 
-      def initialize(name, run_context = nil)
-        super
+      self.resource_name = 'pushit_nodejs'
 
-        @resource_name = :pushit_nodejs
-        @provider = Chef::Provider::PushitNodejs
-        @action = :create
-        @allowed_actions = [:create]
+      default_action :create
+      actions :create
 
-        @framework = 'nodejs'
+      def framework
+        @framework ||= 'nodejs'
       end
 
       def node_binary(arg = nil)

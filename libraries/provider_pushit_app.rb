@@ -25,67 +25,65 @@ class Chef
     # not be implemented outside of subclass inheritance.
     class PushitApp < Chef::Provider::PushitBase
 
-      def initialize(new_resource, _run_context)
-        @new_resource = new_resource
-        @run_context = run_context
-
-        recipe_eval do
-          @run_context.include_recipe('nodejs::install_from_source')
-          @run_context.include_recipe('logrotate::global')
-        end
-
-        super(new_resource, run_context)
-      end
-
-      def load_current_resource; end
-
-      def whyrun_supported?
-        Pushit.whyrun_supported?
-      end
+      use_inline_resources if defined?(use_inline_resources)
 
       def action_create
+        super
+
+        recipe_eval do
+          run_context.include_recipe 'nodejs::install_from_source'
+          run_context.include_recipe 'runit::default'
+        end
+
+        install_gem_dependencies
+
         create_directories
 
         if new_resource.framework == 'rails'
           create_shared_directories
 
-          install_ruby
-          create_ruby_version
+          pushit_ruby.run_action(:create)
+          ruby_version.run_action(:create)
 
           if app.database
-            create_database_config
-            create_filestore_config
+            database_config.run_action(:create)
+            filestore_config.run_action(:create)
           end
 
-          create_unicorn_config if app.webserver?
+          if app.webserver?
+            unicorn_config.run_action(:create)
+          end
         end
+
+        if app.database_certificate?
+          ssl_cert(app.database_certificate).run_action(:create)
         end
 
-        create_ssl_cert(app.database_certificate) if app.database_certificate?
-        create_ssl_cert(app.webserver_certificate) if app.webserver_certificate?
+        if app.webserver?
+          vhost_config.run_action(:create)
 
-        create_vhost_config if app.webserver?
+          if app.webserver_certificate?
+            ssl_cert(app.webserver_certificate).run_action(:create)
+          end
+        end
 
-        create_logrotate_config
-        create_monit_check
-
-        create_deploy_revision
+        deploy_revision.run_action(new_resource.deploy_action)
       end
 
-      def create_deploy_revision; end
+      def deploy_revision; end
 
-      def before_migrate; end
+      def before_migrate
+        dotenv.run_action(:create)
+      end
 
       def before_symlink
-        create_writable_directories
         create_config_files
       end
 
       def before_restart
-        create_procfile_if_missing
-        create_service_config
-
-        service_perform_action
+        procfile.run_action(:create)
+        foreman_export.run_action(:run)
+        runit_service.run_action(:start)
       end
 
       def after_restart; end
@@ -131,12 +129,10 @@ class Chef
             action :nothing
           end
           r.run_action(:install)
-
-          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
         end
       end
 
-      def install_ruby
+      def pushit_ruby
         r = Chef::Resource::PushitRuby.new(
           ruby.version,
           run_context
@@ -144,12 +140,10 @@ class Chef
         r.environment ruby.environment
         r.user user_username
         r.group user_group
-        r.run_action(:create)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r
       end
 
-      def create_ruby_version
+      def ruby_version
         r = Chef::Resource::Template.new(
           ::File.join(app.shared_path, 'ruby-version'),
           run_context
@@ -162,9 +156,7 @@ class Chef
         r.variables(
           :ruby_version => ruby.version
         )
-        r.run_action(:create)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r
       end
 
       def create_directories
@@ -178,8 +170,6 @@ class Chef
           r.recursive true
           r.mode 00755
           r.run_action(:create)
-
-          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
         end
       end
 
@@ -194,29 +184,10 @@ class Chef
           r.recursive true
           r.mode 00755
           r.run_action(:create)
-
-          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
         end
       end
 
-      def create_writable_directories
-        %w( log pids sockets ).each do |dir|
-          r = Chef::Resource::Directory.new(
-            ::File.join(app.shared_path, dir),
-            run_context
-          )
-          r.owner user_username
-          r.group user_group
-          r.recursive true
-          r.mode 00755
-          r.run_action(:create)
-
-          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-          execute "chmod -R 00755 #{::File.join(app.shared_path, dir)}"
-        end
-      end
-
-      def create_dotenv
+      def dotenv
         r = Chef::Resource::Template.new(
           ::File.join(app.shared_path, 'env'),
           run_context
@@ -229,9 +200,7 @@ class Chef
         r.variables(
           :env => Pushit.escape_env(app.env_vars)
         )
-        r.run_action(:create)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r
       end
 
       def create_config_files
@@ -246,72 +215,36 @@ class Chef
           r.group user_group
           r.mode 00755
           r.run_action(:create)
-
-          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
         end
       end
 
-      def create_service_config
+      def foreman_export
         r = Chef::Resource::Execute.new(
           "#{app.foreman_binary} export #{app.foreman_export_flags}",
           run_context
         )
         r.cwd app.release_path
-        r.user 'root'
-        r.group 'root'
-        r.run_action :run
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r.user user_username
+        r.group user_group
+        r
       end
 
-      def service_perform_action
-        r = Chef::Resource::Service.new(
+      def runit_service
+        r = Chef::Resource::RunitService.new(
           new_resource.name,
           run_context
         )
-        r.provider Chef::Provider::Service::Upstart
-        r.supports :status => true, :restart => true, :reload => true
-        r.run_action :nothing
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r.sv_dir app.runit_sv_path
+        r.service_dir app.runit_service_path
+        r.check false
+        r.log false
+        r.sv_templates false
+        r.owner user_username
+        r.group user_group
+        r
       end
 
-      def create_monit_check
-        r = Chef::Resource::PushitMonit.new(
-          new_resource.name,
-          run_context
-        )
-        r.check(
-          :name => new_resource.name,
-          :pid_file => app.upstart_pid,
-          :start_program => "/sbin/start #{new_resource.name}",
-          :stop_program => "/sbin/stop #{new_resource.name}",
-          :uid => 'root',
-          :gid => 'root',
-          :group => app.monit_group
-        )
-        r.run_action(:install)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-      end
-
-      def create_logrotate_config
-        log_path = app.logrotate_logs_path
-        name = app.name
-        username = user_username
-        group = user_group
-
-        logrotate_app name do
-          cookbook 'logrotate'
-          path log_path
-          frequency 'daily'
-          rotate 180
-          options %w( missingok dateext delaycompress notifempty compress )
-          create "644 #{username} #{group}"
-        end
-      end
-
-      def create_vhost_config
+      def vhost_config
         r = Chef::Resource::PushitVhost.new(
           new_resource.name,
           run_context
@@ -330,14 +263,12 @@ class Chef
           Pushit::Certs.keys_directory,
           "#{app.webserver_certificate}.key"
         )
-        r.config_cookbook new_resource.vhost_config_cookbook if new_resource.vhost_config_cookbook
-        r.config_source new_resource.vhost_config_source if new_resource.vhost_config_source
-        r.run_action(:create)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r.config_cookbook new_resource.vhost_config_cookbook
+        r.config_source new_resource.vhost_config_source || "nginx_#{new_resource.framework}.conf.erb"
+        r
       end
 
-      def create_ssl_cert(certificate)
+      def ssl_cert(certificate)
         r = Chef::Resource::CertificateManage.new(
           certificate,
           run_context
@@ -349,12 +280,10 @@ class Chef
         r.key_file "#{certificate}.key"
         r.chain_file "#{certificate}-bundle.crt"
         r.nginx_cert false
-        r.run_action(:create)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r
       end
 
-      def create_procfile_if_missing
+      def procfile
         r = Chef::Resource::File.new(
           app.procfile,
           run_context
@@ -363,10 +292,7 @@ class Chef
         r.owner user_username
         r.group user_group
         r.not_if { app.procfile? }
-        r.run_action(:create)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-      end
+        r
       end
     end
   end

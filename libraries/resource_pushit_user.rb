@@ -17,20 +17,16 @@
 # limitations under the License.
 #
 
-require 'chef/resource'
+require 'chef/resource/lwrp_base'
 
 class Chef
   class Resource
-    class PushitUser < Chef::Resource
+    class PushitUser < Chef::Resource::LWRPBase
 
-      def initialize(name, run_context = nil)
-        super
+      self.resource_name = 'pushit_user'
 
-        @resource_name = :pushit_user
-        @provider = Chef::Provider::PushitUser
-        @action = :create
-        @allowed_actions.push :create, :create_deploy_keys, :create_ssh_keys
-      end
+      default_action :create
+      actions :create, :create_deploy_keys, :create_ssh_keys
 
       def username(arg = nil)
         set_or_return(

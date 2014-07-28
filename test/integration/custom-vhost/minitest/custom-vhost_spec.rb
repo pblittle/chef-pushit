@@ -6,7 +6,9 @@ require 'minitest/spec'
 describe 'pushit_test::custom-vhost' do
 
   let(:vhost_config_path) do
-    ::File.join('', 'opt', 'pushit', 'nginx', 'sites-available', 'vhost.conf')
+    ::File.join(
+      '', 'opt', 'pushit', 'nginx', 'sites-available', 'rails-example.conf'
+    )
   end
 
   it 'config file exists' do

@@ -25,20 +25,9 @@ class Chef
     # the nodejs framework (provider)
     class PushitNodejs < Chef::Provider::PushitApp
 
-      def initialize(new_resource, run_context = nil)
-        @new_resource = new_resource
-        @run_context = run_context
-
-        @framework = 'nodejs'
-
-        super(new_resource, run_context)
-      end
-
-      def load_current_resource; end
-
       private
 
-      def create_deploy_revision
+      def deploy_revision
         app_provider = self
 
         username = user_username
@@ -76,10 +65,8 @@ class Chef
         r.migration_command nil
 
         r.before_migrate do
-          app_provider.send(:create_dotenv)
-
-          app_provider.send(:npm_install)
           app_provider.send(:before_migrate)
+          app_provider.send(:npm_install).run_action(:run)
         end
 
         r.before_symlink do
@@ -100,9 +87,7 @@ class Chef
           app_provider.send(:after_restart)
         end
 
-        r.run_action(new_resource.deploy_action)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r
       end
 
       def npm_install
@@ -114,9 +99,7 @@ class Chef
         r.cwd app.release_path
         r.user 'root'
         r.group 'root'
-        r.run_action :run
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r
       end
     end
   end

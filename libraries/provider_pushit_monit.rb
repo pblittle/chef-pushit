@@ -23,21 +23,15 @@ class Chef
   class Provider
     class PushitMonit < Chef::Provider::PushitBase
 
-      def initialize(new_resource, run_context = nil)
-        @new_resource = new_resource
-        @run_context = run_context
-        @run_context.include_recipe('monit::default')
+      use_inline_resources if defined?(use_inline_resources)
 
-        super(new_resource, run_context)
-      end
+      def action_create
+        super
 
-      def load_current_resource; end
+        recipe_eval do
+          @run_context.include_recipe('monit::default')
+        end
 
-      def whyrun_supported?
-        Pushit.whyrun_supported?
-      end
-
-      def action_install
         monit_monitrc new_resource.name do
           variables(new_resource.check)
           template_source 'pushit_app.monitrc.erb'

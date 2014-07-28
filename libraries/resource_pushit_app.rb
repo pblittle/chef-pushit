@@ -17,22 +17,18 @@
 # limitations under the License.
 #
 
-require 'chef/resource'
+require 'chef/resource/lwrp_base'
 
 class Chef
   class Resource
-    class PushitApp < Chef::Resource
+    class PushitApp < Chef::Resource::LWRPBase
 
-      def initialize(name, run_context = nil)
-        super
+      self.resource_name = 'pushit_app'
 
-        @resource_name = :pushit_app
-        @provider = Chef::Provider::PushitApp
-        @action = :create
-        @allowed_actions = [:create]
+      default_action :create
+      actions :create
 
-        @framework = nil
-      end
+      def framework; end
 
       def name(arg = nil)
         set_or_return(
@@ -42,16 +38,6 @@ class Chef
           :required => true,
           :name_attribute => true,
           :regex => /^[a-z0-9\-_]+$/
-        )
-      end
-
-      def framework(arg = nil)
-        set_or_return(
-          :framework,
-          arg,
-          :kind_of => [String],
-          :required => true,
-          :equal_to => %w( nodejs rails )
         )
       end
 

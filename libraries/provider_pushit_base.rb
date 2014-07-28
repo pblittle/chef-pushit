@@ -17,38 +17,33 @@
 # limitations under the License.
 #
 
-require 'chef/provider'
+require 'chef/provider/lwrp_base'
 
 require_relative 'chef_pushit'
 
 class Chef
   class Provider
-    class PushitBase < Chef::Provider
+    class PushitBase < Chef::Provider::LWRPBase
 
       include Chef::Pushit
 
-      attr_reader :user
-
-      def initialize(new_resource, _run_context)
-        @new_resource = new_resource
-
-        create_pushit_user
-        install_gem_dependencies
-      end
-
-      def load_current_resource; end
+      use_inline_resources if defined?(use_inline_resources)
 
       def whyrun_supported?
         Pushit.whyrun_supported?
       end
 
-      def user
-        @user ||= Pushit::User.new
+      def action_create
+        pushit_user.run_action(:create)
       end
 
       private
 
-      def create_pushit_user
+      def user
+        @user ||= Pushit::User.new
+      end
+
+      def pushit_user
         r = Chef::Resource::PushitUser.new(
           user.username,
           run_context
@@ -61,10 +56,7 @@ class Chef
         r.ssh_public_key user.ssh_public_key
         r.ssh_keys user.ssh_keys
         r.ssh_deploy_keys user.ssh_deploy_keys
-        r.run_action(:create)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-      end
+        r
       end
     end
   end

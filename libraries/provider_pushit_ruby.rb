@@ -23,24 +23,15 @@ class Chef
   class Provider
     class PushitRuby < Chef::Provider::PushitBase
 
-      def initialize(new_resource, run_context = nil)
-        @new_resource = new_resource
-        @run_context = run_context
+      use_inline_resources if defined?(use_inline_resources)
+
+      def action_create
+        super
 
         recipe_eval do
           @run_context.include_recipe('ruby_build::default')
         end
 
-        super(new_resource, run_context)
-      end
-
-      def load_current_resource; end
-
-      def whyrun_supported?
-        Pushit.whyrun_supported?
-      end
-
-      def action_create
         install_ruby
 
         download_chruby

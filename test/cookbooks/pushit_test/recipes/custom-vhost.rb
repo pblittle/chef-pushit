@@ -22,13 +22,18 @@
 
 include_recipe 'pushit_test::base'
 
-app = 'vhost'
+app = 'rails-example'
+
+pushit_database app
 
 pushit_webserver 'nginx'
 
-pushit_app app do
+pushit_rails app do
   deploy_action 'deploy'
-  environment 'development'
+  environment 'test'
+  precompile_assets true
+  migrate true
+  unicorn_worker_processes 1
   revision 'master'
   vhost_config_cookbook 'pushit_test'
   vhost_config_source 'custom_vhost.conf.erb'
