@@ -30,5 +30,3 @@ depends 'sudo', '~> 2.6'
 
 recommends 'apt', '~> 2.4'
 recommends 'build-essential', '~> 2.0'
-recommends 'logrotate', '~> 1.6'
-recommends 'monit', '~> 1.5'

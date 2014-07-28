@@ -19,16 +19,8 @@ describe 'pushit_test::nodejs' do
     ::File.join(pushit_app_path, 'shared', 'log')
   end
 
-  let(:logrotate_logs_path) do
-    ::File.join(pushit_app_log_path, '*.log')
-  end
-
   let(:upstart_config_path) do
     ::File.join('', 'etc', 'init', "#{pushit_app}.conf")
-  end
-
-  let(:monit_group) do
-    "pushit_#{pushit_app}"
   end
 
   it 'has created the base pushit directory' do
@@ -81,17 +73,5 @@ describe 'pushit_test::nodejs' do
     assert system(
       "service #{pushit_app} status | grep -e 'start/running'"
     )
-  end
-
-  it 'manages the application logs with logrotate' do
-    assert ::File.read(
-      "/etc/logrotate.d/#{pushit_app}"
-    ).include?(logrotate_logs_path)
-  end
-
-  it 'the monit config includes the app group' do
-    assert ::File.read(
-      ::File.join('', 'etc', 'monit', 'conf.d', "#{pushit_app}.monitrc")
-    ).include?(monit_group)
   end
 end

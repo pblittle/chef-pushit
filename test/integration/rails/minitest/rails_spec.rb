@@ -35,16 +35,8 @@ describe 'pushit_test::rails' do
     ::File.join(pushit_app_path, 'shared', 'log')
   end
 
-  let(:logrotate_logs_path) do
-    ::File.join(pushit_app_log_path, '*.log')
-  end
-
   let(:bundler_binstubs_path) do
     ::File.join(pushit_app_path, 'current', 'bin')
-  end
-
-  let(:monit_group) do
-    "pushit_#{pushit_app}"
   end
 
   it 'has created the base pushit directory' do
@@ -125,37 +117,5 @@ describe 'pushit_test::rails' do
     assert system(
       "service #{pushit_app} status | grep -e 'start/running'"
     )
-  end
-
-  it 'manages the application logs with logrotate' do
-    assert ::File.read(
-      "/etc/logrotate.d/#{pushit_app}"
-    ).include?(logrotate_logs_path)
-  end
-
-  it 'the monit config includes the app group' do
-    assert ::File.read(
-      ::File.join('', 'etc', 'monit', 'conf.d', "#{pushit_app}.monitrc")
-    ).include?(monit_group)
-  end
-
-  it 'uses monit to monitor the unicorn workers' do
-    # skip if we're not done initializing
-    if `sudo monit status`.match(/Process '#{pushit_app}'\r?\n\s+status\s+(\w+).*\n/).captures[0] == 'Initializing'
-      skip("#{pushit_app} still initializing")
-    end
-
-    output = `sudo monit status`.match(/^Process '#{pushit_app}'\s+status\s+.*\n\s+monitoring status\s+(.*)\r?\n/)
-    assert((!output.nil? && output.captures.first == 'Monitored'), output)
-  end
-
-  it 'monit knows if the unicorn workers are up' do
-    # skip if we're not done initializing
-    if `sudo monit status`.match(/Process '#{pushit_app}'\r?\n\s+status\s+(\w+).*\n/).captures[0] == 'Initializing'
-      skip("#{pushit_app} still initializing")
-    end
-
-    output = `sudo monit status`.match(/^Process '#{pushit_app}'\s+status\s+(.*)\r?\n\s+monitoring status\s+Monitored/)
-    assert((!output.nil? && output.captures.first == 'Running'), output)
   end
 end

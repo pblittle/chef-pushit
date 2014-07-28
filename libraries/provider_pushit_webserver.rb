@@ -30,11 +30,9 @@ class Chef
 
         recipe_eval do
           run_context.include_recipe 'nginx::default'
-          run_context.include_recipe 'logrotate::default'
         end
 
         webserver_config.run_action(:create)
-        logrotate_app_enable
       end
 
       private
@@ -53,17 +51,6 @@ class Chef
             :config_path => new_resource.config_path
           )
           action :nothing
-        end
-      end
-
-      def logrotate_app_enable
-        logrotate_app 'nginx' do
-          cookbook 'logrotate'
-          path %w{ ::File.join(new_resource.log_dir, '*.log') }
-          frequency 'daily'
-          rotate 180
-          options %w( missingok dateext delaycompress notifempty compress )
-          create '0644 root root'
         end
       end
     end

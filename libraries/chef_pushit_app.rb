@@ -78,10 +78,6 @@ class Chef
         %w( cached-copy config system vendor_bundle )
       end
 
-      def logrotate_logs_path
-        ::File.join(log_path, '*.log')
-      end
-
       def pid_path
         ::File.join(shared_path, 'pids')
       end
@@ -198,12 +194,8 @@ class Chef
         end
       end
 
-      def monit_group
-        "pushit_#{name}"
-      end
-
       def restart_command
-        "$(which monit) -g #{monit_group} restart"
+        "kill -USR2 `cat #{upstart_pid}`"
       end
     end
   end
