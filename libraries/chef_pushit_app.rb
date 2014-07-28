@@ -74,6 +74,10 @@ class Chef
         ::File.join(shared_path, 'log')
       end
 
+      def shared_directories
+        %w( cached-copy config system vendor_bundle )
+      end
+
       def logrotate_logs_path
         ::File.join(log_path, '*.log')
       end

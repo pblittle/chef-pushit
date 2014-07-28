@@ -56,15 +56,17 @@ class Chef
         @pushit_apps_path ||= ::File.join(pushit_path, 'apps')
       end
 
+      def pushit_app_config(name)
+        Chef::DataBagItem.load(PUSHIT_APP_DATA_BAG, name)
+      rescue
+        {}
+      end
+
       def whyrun_supported
         @whyrun_supported ||= false
       end
       alias_method :whyrun_supported?, :whyrun_supported
 
-      def pushit_app_config(name)
-        Chef::DataBagItem.load(PUSHIT_APP_DATA_BAG, name)
-      rescue
-        {}
       end
     end
   end

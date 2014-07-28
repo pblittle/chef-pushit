@@ -227,7 +227,7 @@ class Chef
         r.group user_group
         r.mode '0644'
         r.variables(
-          :env => escape_env(app.env_vars)
+          :env => Pushit.escape_env(app.env_vars)
         )
         r.run_action(:create)
 
@@ -367,12 +367,6 @@ class Chef
 
         new_resource.updated_by_last_action(true) if r.updated_by_last_action?
       end
-
-      def escape_env(vars = {})
-        vars.inject({}) do |hash, (key, value)|
-          hash[key.upcase] = value.gsub(/"/) { %q(\") }
-          hash
-        end
       end
     end
   end
