@@ -32,13 +32,13 @@ class Chef
           @run_context.include_recipe('ruby_build::default')
         end
 
-        install_ruby
+        ruby_build.run_action(:install)
 
-        download_chruby
-        install_chruby
-        create_chruby_sh
+        chruby_source.run_action(:sync)
+        install_chruby.run_action(:run)
+        chruby_sh.run_action(:create)
 
-        install_bundler
+        bundler.run_action(:install)
       end
 
       def ruby
@@ -51,19 +51,17 @@ class Chef
 
       private
 
-      def install_ruby
+      def ruby_build
         r = ruby_build_ruby new_resource.name do
           definition new_resource.name
           prefix_path ruby.prefix_path
           environment(new_resource.environment)
           action :nothing
         end
-        r.run_action(:install)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r
       end
 
-      def download_chruby
+      def chruby_source
         ssh_known_hosts_entry 'github.com'
 
         r = Chef::Resource::Git.new(
@@ -74,9 +72,7 @@ class Chef
         r.reference 'v0.3.8'
         r.user 'root'
         r.group 'root'
-        r.run_action(:sync)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r
       end
 
       def install_chruby
@@ -87,12 +83,10 @@ class Chef
         r.command 'make install'
         r.cwd "#{Chef::Config[:file_cache_path]}/chruby"
         r.user 'root'
-        r.run_action(:run)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r
       end
 
-      def create_chruby_sh
+      def chruby_sh
         r = template '/etc/profile.d/chruby.sh' do
           source 'chruby.sh.erb'
           cookbook 'pushit'
@@ -104,22 +98,18 @@ class Chef
           )
           action :nothing
         end
-        r.run_action(:create)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r
       end
-    end
 
-    def install_bundler
-      r = gem_package 'bundler' do
-        version ruby.bundler_version
-        gem_binary ruby.gem_binary
-        options('--no-ri --no-rdoc')
-        action :nothing
+      def bundler
+        r = gem_package 'bundler' do
+          version ruby.bundler_version
+          gem_binary ruby.gem_binary
+          options('--no-ri --no-rdoc')
+          action :nothing
+        end
+        r
       end
-      r.run_action(:install)
-
-      new_resource.updated_by_last_action(true) if r.updated_by_last_action?
     end
   end
 end
