@@ -1,10 +1,18 @@
 require 'spec_helper'
 
 describe Chef::Provider::PushitVhost do
-
   let(:chef_run) do
-    runner = ChefSpec::Runner.new
-    runner.converge('pushit_test::vhost')
+    ChefSpec::Runner.new(
+      step_into: ['pushit_vhost']#, 'pushit_rails', 'pushit_user', 'pushit_webserver']
+    ).converge('pushit_test::vhost')
+  end
+
+  before do
+    allow(Chef::DataBagItem).to(
+      receive(:load).with('pushit_apps', 'rails-example').and_return(
+        {'id' =>'rails-example'}
+      )
+    )
   end
 
   let(:resource_vhost) do
@@ -16,8 +24,7 @@ describe Chef::Provider::PushitVhost do
   end
 
   it 'notifes nginx reload if vhost config changes' do
-    pending
-
-    expect(resource_vhost).to notify('...').immediately
+    vhost = chef_run.pushit_vhost('rails-example')
+    expect(vhost).to notify('pushit_webserver[rails-example]').to(:reload).delayed
   end
 end
