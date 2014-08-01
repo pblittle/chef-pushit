@@ -16,7 +16,7 @@ describe Chef::Provider::PushitVhost do
   end
 
   let(:resource_vhost) do
-    chef_run.template('/etc/init/rails-example-web-1.conf')
+    chef_run.template('/opt/pushit/nginx/sites-available/rails-example.conf')
   end
 
   it 'creates a vhost config' do
