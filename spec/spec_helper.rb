@@ -1,6 +1,5 @@
 require 'chefspec'
 require 'chefspec/berkshelf'
-#require 'chefspec/server'  #faster without it.
 
 Dir['libraries/**/*.rb'].each { |file| require File.expand_path(file) }
 
