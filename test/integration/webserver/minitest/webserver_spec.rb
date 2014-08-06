@@ -44,4 +44,10 @@ describe 'pushit_test::webserver' do
       "service nginx status | grep -e $(cat #{webserver_path}/run/nginx.pid)"
     )
   end
+
+  it 'notifies resources that subscribe to it' do
+    assert(::File.file?("/tmp/chef/cache/pushit_webserver_notification_flag"),
+      "/tmp/chef/cache/pushit_webserver_notification_flag does not exist"
+    )
+  end
 end
