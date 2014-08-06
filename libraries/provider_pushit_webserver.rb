@@ -32,7 +32,7 @@ class Chef
           run_context.include_recipe 'nginx::default'
         end
 
-        webserver_config.run_action(:create)
+        webserver_config
       end
 
       private
@@ -50,7 +50,7 @@ class Chef
             :pid_file => new_resource.pid_file,
             :config_path => new_resource.config_path
           )
-          action :nothing
+          action :create
         end
       end
     end
