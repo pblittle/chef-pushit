@@ -11,7 +11,7 @@ describe Chef::Provider::PushitWebserver do
     expect(chef_run).to create_template('nginx.conf')
   end
 
-  it 'notifes things correctly' do
-    expect(chef_run.file('add flag')).to subscribe_to('pushit_webserver[nginx]').on(:create).delayed
+  it 'is subscribed to by the test' do
+    expect(chef_run.file('add webserver flag')).to subscribe_to('pushit_webserver[nginx]').on(:create).delayed
   end
 end

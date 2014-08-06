@@ -35,10 +35,17 @@ class Chef
         webserver_config
       end
 
+      def action_delete
+        super
+
+        ## add the nginx stop recipe here
+        webserver_config.action :remove
+      end
+
       private
 
       def webserver_config
-        template 'nginx.conf' do
+        r = template 'nginx.conf' do
           path "#{new_resource.config_path}/nginx.conf"
           cookbook new_resource.config_cookbook
           source new_resource.config_source
@@ -52,6 +59,7 @@ class Chef
           )
           action :create
         end
+        r
       end
     end
   end

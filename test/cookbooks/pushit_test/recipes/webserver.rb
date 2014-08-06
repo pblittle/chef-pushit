@@ -23,14 +23,14 @@
 include_recipe 'pushit_test::base'
 
 flag_path = "#{Chef::Config[:file_cache_path]}/pushit_webserver_notification_flag"
-file 'delete flag' do
+file 'delete webserver flag' do
   path   flag_path
   action :delete
 end
 
 pushit_webserver 'nginx'
 
-file 'add flag' do
+file 'add webserver flag' do
   path    flag_path
   action  :nothing
   content 'I am here'

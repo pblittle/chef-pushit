@@ -28,7 +28,7 @@ class Chef
       use_inline_resources if defined?(use_inline_resources)
 
       def whyrun_supported?
-        Pushit.whyrun_supported?
+        true #Pushit.whyrun_supported?
       end
 
       def action_create
