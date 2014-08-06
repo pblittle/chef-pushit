@@ -77,4 +77,12 @@ if defined?(ChefSpec)
       resource_name
     )
   end
+
+  def delete_pushit_webserver(resource_name)
+    ChefSpec::Matchers::ResourceMatcher.new(
+      :pushit_webserver,
+      :delete,
+      resource_name
+    )
+  end
 end
