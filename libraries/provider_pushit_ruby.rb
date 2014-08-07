@@ -21,8 +21,8 @@ require_relative 'provider_pushit_base'
 
 class Chef
   class Provider
+    # Provider for installing a ruby in the pushit rubies directory
     class PushitRuby < Chef::Provider::PushitBase
-
       use_inline_resources if defined?(use_inline_resources)
 
       def action_create
@@ -32,13 +32,13 @@ class Chef
           @run_context.include_recipe('ruby_build::default')
         end
 
-        ruby_build.run_action(:install)
+        resource_ruby_build.action :install
 
-        chruby_source.run_action(:sync)
-        install_chruby.run_action(:run)
-        chruby_sh.run_action(:create)
+        resource_chruby_source.action :sync
+        resource_install_chruby.action :run
+        resource_chruby_sh.action :create
 
-        bundler.run_action(:install)
+        resource_bundler.action :install
       end
 
       def ruby
@@ -51,43 +51,36 @@ class Chef
 
       private
 
-      def ruby_build
-        r = ruby_build_ruby new_resource.name do
+      def resource_ruby_build
+        ruby_build_ruby new_resource.name do
           definition new_resource.name
           prefix_path ruby.prefix_path
           environment(new_resource.environment)
           action :nothing
         end
-        r
       end
 
-      def chruby_source
+      def resource_chruby_source
         ssh_known_hosts_entry 'github.com'
 
-        r = Chef::Resource::Git.new(
-          "#{Chef::Config[:file_cache_path]}/chruby",
-          run_context
-        )
-        r.repository 'https://github.com/postmodern/chruby.git'
-        r.reference 'v0.3.8'
-        r.user 'root'
-        r.group 'root'
-        r
+        git "#{Chef::Config[:file_cache_path]}/chruby" do
+          repository 'https://github.com/postmodern/chruby.git'
+          reference 'v0.3.8'
+          user 'root'
+          group 'root'
+        end
       end
 
-      def install_chruby
-        r = Chef::Resource::Execute.new(
-          'Install chruby',
-          run_context
-        )
-        r.command 'make install'
-        r.cwd "#{Chef::Config[:file_cache_path]}/chruby"
-        r.user 'root'
-        r
+      def resource_install_chruby
+        execute 'Install chruby' do
+          command 'make install'
+          cwd "#{Chef::Config[:file_cache_path]}/chruby"
+          user 'root'
+        end
       end
 
-      def chruby_sh
-        r = template '/etc/profile.d/chruby.sh' do
+      def resource_chruby_sh
+        template '/etc/profile.d/chruby.sh' do
           source 'chruby.sh.erb'
           cookbook 'pushit'
           mode '0755'
@@ -96,19 +89,16 @@ class Chef
             :rubies_path => ruby.rubies_path,
             :default_ruby => new_resource.name
           )
-          action :nothing
         end
-        r
       end
 
-      def bundler
-        r = gem_package 'bundler' do
+      def resource_bundler
+        gem_package 'bundler' do
           version ruby.bundler_version
           gem_binary ruby.gem_binary
           options('--no-ri --no-rdoc')
           action :nothing
         end
-        r
       end
     end
   end

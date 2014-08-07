@@ -23,8 +23,8 @@ require_relative 'chef_pushit'
 
 class Chef
   class Provider
+    # Provider for creating pushit users
     class PushitUser < Chef::Provider::LWRPBase
-
       use_inline_resources if defined?(use_inline_resources)
 
       def whyrun_supported?
@@ -32,20 +32,27 @@ class Chef
       end
 
       def action_create
-        group_resource.action :create
-        user_resource.action  :create
-        ssh_directory.action :create
-        authorized_keys.action :create
-        sudoers_file.action :install
+        resource_group.action :create
+        resource_user.action :create
+        resource_ssh_directory.action :create
+        resource_authorized_keys.action :create
+        resource_sudoers_file.action :install
 
         create_deploy_keys
-        create_ssh_keys
+        action_create_ssh_keys
       end
 
       def action_create_deploy_keys
-        ssh_directory.run_action(:create)
+        resource_ssh_directory.action :create
 
         create_deploy_keys
+      end
+
+      def action_create_ssh_keys
+        return unless pushit_user.manage_ssh_keys?
+
+        resource_ssh_private_key.action :create
+        resource_ssh_public_key.action :create
       end
 
       private
@@ -54,26 +61,26 @@ class Chef
         @pushit_user ||= Pushit::User.new(new_resource.to_hash)
       end
 
-      def group_resource
+      def resource_group
         r = group pushit_user.group
         r.group_name pushit_user.group
         r.append true
         r
       end
 
-      def user_resource
+      def resource_user
         r = user pushit_user.username
         r.shell '/bin/bash'
-        r.password pushit_user.password
         r.home pushit_user.home
-        r.manage_home true
-        r.supports :manage_home => true
-        r.system false
         r.gid pushit_user.group
+        r.system false
+        r.password pushit_user.password
+        r.supports :manage_home => true
+        r.manage_home true
         r
       end
 
-      def ssh_directory
+      def resource_ssh_directory
         r = directory pushit_user.ssh_directory
         r.owner pushit_user.username
         r.group pushit_user.group
@@ -82,14 +89,7 @@ class Chef
         r
       end
 
-      def action_create_ssh_keys
-        return unless pushit_user.manage_ssh_keys?
-
-        ssh_private_key.action :create
-        ssh_public_key.action :create
-      end
-
-      def ssh_private_key
+      def resource_ssh_private_key
         r = template pushit_user.ssh_private_key_path
         r.source 'private_key.erb'
         r.cookbook 'pushit'
@@ -102,7 +102,7 @@ class Chef
         r
       end
 
-      def ssh_public_key
+      def resource_ssh_public_key
         r = template pushit_user.ssh_public_key_path
         r.source 'public_key.erb'
         r.cookbook 'pushit'
@@ -115,7 +115,7 @@ class Chef
         r
       end
 
-      def authorized_keys
+      def resource_authorized_keys
         r = template pushit_user.authorized_keys_path
         r.source 'authorized_keys.erb'
         r.cookbook 'pushit'
@@ -128,7 +128,7 @@ class Chef
         r
       end
 
-      def sudoers_file
+      def resource_sudoers_file
         r = sudo pushit_user.username
         r.user "%#{pushit_user.username}"
         r.group pushit_user.group
@@ -141,14 +141,14 @@ class Chef
 
       def create_deploy_keys
         pushit_user.ssh_deploy_keys.each do |key|
-          deploy_key(key).action :create
-          deploy_wrapper(key).action :create
+          resource_deploy_key(key).action :create
+          resource_deploy_wrapper(key).action :create
 
           create_ssh_config(key)
         end
       end
 
-      def deploy_key(key)
+      def resource_deploy_key(key)
         deploy_key = ::File.join(
           pushit_user.ssh_directory, key['name']
         )
@@ -166,7 +166,7 @@ class Chef
         r
       end
 
-      def deploy_wrapper(key)
+      def resource_deploy_wrapper(key)
         deploy_wrapper = ::File.join(
           pushit_user.ssh_directory, "#{key['name']}_deploy_wrapper.sh"
         )

@@ -23,14 +23,14 @@ require_relative 'chef_pushit'
 
 class Chef
   class Provider
+    # Base class for all pushit providers
     class PushitBase < Chef::Provider::LWRPBase
-
       include Chef::Pushit
 
       use_inline_resources if defined?(use_inline_resources)
 
       def whyrun_supported?
-        false #Need to reach a point where this is true
+        false # Need to reach a point where this is true
       end
 
       def action_create
@@ -38,7 +38,9 @@ class Chef
       end
 
       def action_delete
-        #TODO need to implement this
+        log 'pushit_base does not do anything on delete' do
+          level :debug
+        end
       end
 
       private

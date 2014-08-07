@@ -21,8 +21,8 @@ require 'chef/resource/lwrp_base'
 
 class Chef
   class Resource
+    # Resource for installing pushit rubies
     class PushitRuby < Chef::Resource::LWRPBase
-
       self.resource_name = 'pushit_ruby'
 
       default_action :create

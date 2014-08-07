@@ -21,8 +21,8 @@ require_relative 'provider_pushit_base'
 
 class Chef
   class Provider
+    # provider for creating a webserver for pushit apps
     class PushitWebserver < Chef::Provider::PushitBase
-
       use_inline_resources if defined?(use_inline_resources)
 
       def action_create
@@ -32,20 +32,20 @@ class Chef
           run_context.include_recipe 'nginx::default'
         end
 
-        webserver_config
+        resource_webserver_config.action :create
       end
 
       def action_delete
         super
 
         ## add the nginx stop recipe here
-        webserver_config.action :delete
+        resource_webserver_config.action :delete
       end
 
       private
 
-      def webserver_config
-        r = template 'nginx.conf' do
+      def resource_webserver_config
+        template 'nginx.conf' do
           path "#{new_resource.config_path}/nginx.conf"
           cookbook new_resource.config_cookbook
           source new_resource.config_source
@@ -57,9 +57,7 @@ class Chef
             :pid_file => new_resource.pid_file,
             :config_path => new_resource.config_path
           )
-          action :create
         end
-        r
       end
     end
   end

@@ -21,8 +21,8 @@ require 'chef/resource/lwrp_base'
 
 class Chef
   class Resource
+    # resource for creating users for pushit library
     class PushitUser < Chef::Resource::LWRPBase
-
       self.resource_name = 'pushit_user'
 
       default_action :create
