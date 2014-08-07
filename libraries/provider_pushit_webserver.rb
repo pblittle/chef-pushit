@@ -39,7 +39,7 @@ class Chef
         super
 
         ## add the nginx stop recipe here
-        webserver_config.action :remove
+        webserver_config.action :delete
       end
 
       private

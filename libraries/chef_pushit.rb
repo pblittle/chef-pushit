@@ -62,6 +62,7 @@ class Chef
         {}
       end
 
+      # Depricated
       def whyrun_supported
         @whyrun_supported ||= false
       end
