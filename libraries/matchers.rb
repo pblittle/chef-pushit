@@ -58,6 +58,14 @@ if defined?(ChefSpec)
     )
   end
 
+  def delete_pushit_user(user_name)
+    ChefSpec::Matchers::ResourceMatcher.new(
+      :pushit_user,
+      :delete,
+      user_name
+    )
+  end
+
   # pushit_vhost matchers
   ChefSpec::Runner.define_runner_method :pushit_vhost
   def create_pushit_vhost(app_name)

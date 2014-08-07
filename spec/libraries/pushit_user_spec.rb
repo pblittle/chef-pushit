@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Chef::Provider::PushitUser do
+describe "#{Chef::Provider::PushitUser}.create" do
 
   let(:chef_run) do
     runner = ChefSpec::Runner.new

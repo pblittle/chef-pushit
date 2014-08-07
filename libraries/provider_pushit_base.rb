@@ -30,11 +30,15 @@ class Chef
       use_inline_resources if defined?(use_inline_resources)
 
       def whyrun_supported?
-        Pushit.whyrun_supported?
+        false #Need to reach a point where this is true
       end
 
       def action_create
-        pushit_user.run_action(:create)
+        pushit_user_resource.action :create
+      end
+
+      def action_delete
+        #TODO need to implement this
       end
 
       private
@@ -43,11 +47,8 @@ class Chef
         @user ||= Pushit::User.new
       end
 
-      def pushit_user
-        r = Chef::Resource::PushitUser.new(
-          user.username,
-          run_context
-        )
+      def pushit_user_resource
+        r = pushit_user user.username
         r.name user.username
         r.group user.group
         r.home user.home
