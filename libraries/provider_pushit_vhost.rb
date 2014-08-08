@@ -27,10 +27,15 @@ class Chef
 
       use_inline_resources if defined?(use_inline_resources)
 
+      def whyrun_supported?
+        true
+      end
+
       def action_create
-        config_resource.run_action(:create)
+        resource_config.action :create
 
         recipe_eval do
+          # TODO: check that this recipe supports whyrun
           run_context.include_recipe 'nginx::default'
         end
 
@@ -59,11 +64,8 @@ class Chef
         )
       end
 
-      def config_resource
-        r = Chef::Resource::Template.new(
-          config_path,
-          run_context
-        )
+      def resource_config
+        r = template config_path
         r.source new_resource.config_source
         r.cookbook new_resource.config_cookbook
         r.owner 'root'

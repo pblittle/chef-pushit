@@ -25,6 +25,10 @@ class Chef
     class PushitRuby < Chef::Provider::PushitBase
       use_inline_resources if defined?(use_inline_resources)
 
+      def whyrun_supported?
+        true
+      end
+
       def action_create
         super
 
