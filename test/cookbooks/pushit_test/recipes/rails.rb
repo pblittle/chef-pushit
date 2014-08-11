@@ -35,6 +35,7 @@ pushit_rails app do
   migrate true
   unicorn_worker_processes 1
   revision 'b41e9a3676edb38a28463c23112a25a23d850cf1'
+  config_files ['test_file.txt']
 end
 
 pushit_rails app do
