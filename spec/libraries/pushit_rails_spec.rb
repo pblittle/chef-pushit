@@ -4,8 +4,7 @@ require_relative '../../libraries/chef_pushit'
 describe "#{Chef::Provider::PushitRails}.create" do
   let(:chef_run) do
     ChefSpec::Runner.new(
-      step_into: ['pushit_rails', 'pushit_app', 'pushit_base', 'deploy_revision'],
-      log_level: :debug
+#      step_into: ['pushit_rails', 'pushit_app', 'pushit_base', 'deploy_revision']
     ) { |runner| Chef::Config[:file_cache_path] = '/tmp/chefspec' }.converge('pushit_test::rails')
   end
 

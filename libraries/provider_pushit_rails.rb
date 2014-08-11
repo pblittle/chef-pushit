@@ -27,6 +27,10 @@ class Chef
 
       use_inline_resources
 
+      def whyrun_supported?
+        true
+      end
+
       def action_create
         super
       end

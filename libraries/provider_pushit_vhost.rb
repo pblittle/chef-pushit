@@ -32,23 +32,13 @@ class Chef
       end
 
       def action_create
-# this should all be handled by the pushit_webserver
-#         recipe_eval do
-#           # TODO: check that this recipe supports whyrun
-#           run_context.include_recipe 'nginx::default'
-#         end
-#
-#         service 'nginx' do
-#           action :start
-#         end
-
         pushit_webserver 'nginx'
 
         # need to re-declare this on the global resource collection
         # eventually pushit_webserver needs a 'vhost' attribute for vhosts.
         service 'nginx'
 
-        resource_config.action :create
+        vhost_config_resource.action :create
 
         nginx_site config_file do
           enable true
@@ -72,7 +62,7 @@ class Chef
         )
       end
 
-      def resource_config
+      def vhost_config_resource
         r = template config_path
         r.source new_resource.config_source
         r.cookbook new_resource.config_cookbook

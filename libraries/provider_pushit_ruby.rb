@@ -36,13 +36,12 @@ class Chef
           @run_context.include_recipe('ruby_build::default')
         end
 
-        resource_ruby_build.action :install
+        ruby_build_resource.action :install
 
-        resource_chruby_source.action :sync
-        resource_install_chruby.action :run
-        resource_chruby_sh.action :create
-
-        resource_bundler.action :install
+        chruby_source_resource.action :sync
+        chruby_install_resource.action :run
+        chruby_sh_resource.action :create
+        bundler_gem_resource.action :install
       end
 
       def ruby
@@ -55,7 +54,7 @@ class Chef
 
       private
 
-      def resource_ruby_build
+      def ruby_build_resource
         ruby_build_ruby new_resource.name do
           definition new_resource.name
           prefix_path ruby.prefix_path
@@ -64,7 +63,7 @@ class Chef
         end
       end
 
-      def resource_chruby_source
+      def chruby_source_resource
         ssh_known_hosts_entry 'github.com'
 
         git "#{Chef::Config[:file_cache_path]}/chruby" do
@@ -75,7 +74,7 @@ class Chef
         end
       end
 
-      def resource_install_chruby
+      def chruby_install_resource
         execute 'Install chruby' do
           command 'make install'
           cwd "#{Chef::Config[:file_cache_path]}/chruby"
@@ -83,7 +82,7 @@ class Chef
         end
       end
 
-      def resource_chruby_sh
+      def chruby_sh_resource
         template '/etc/profile.d/chruby.sh' do
           source 'chruby.sh.erb'
           cookbook 'pushit'
@@ -96,7 +95,7 @@ class Chef
         end
       end
 
-      def resource_bundler
+      def bundler_gem_resource
         gem_package 'bundler' do
           version ruby.bundler_version
           gem_binary ruby.gem_binary

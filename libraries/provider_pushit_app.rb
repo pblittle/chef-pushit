@@ -70,7 +70,9 @@ class Chef
           end
         end
 
-        deploy_revision_resource.action new_resource.deploy_action
+        converge_by 'deploy the new app' do
+          deploy_revision_resource.action new_resource.deploy_action
+        end
       end
 
       def deploy_revision_resource; end

@@ -37,7 +37,7 @@ class Chef
           provider Chef::Provider::Service::Upstart
         end
 
-        resource_webserver_config.action :create
+        webserver_config_resource.action :create
       end
 
       def action_delete
@@ -47,7 +47,7 @@ class Chef
           action [:stop, :disable]
         end
 
-        resource_webserver_config.action :delete
+        webserver_config_resource.action :delete
       end
 
       def action_restart
@@ -66,7 +66,7 @@ class Chef
 
       private
 
-      def resource_webserver_config
+      def webserver_config_resource
         template 'nginx.conf' do
           path "#{new_resource.config_path}/nginx.conf"
           cookbook new_resource.config_cookbook
