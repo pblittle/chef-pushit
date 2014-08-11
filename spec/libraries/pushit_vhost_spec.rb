@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Chef::Provider::PushitVhost do
   let(:chef_run) do
     ChefSpec::Runner.new(
-      step_into: ['pushit_vhost']#, 'pushit_rails', 'pushit_user', 'pushit_webserver']
+      step_into: ['pushit_vhost']
     ).converge('pushit_test::vhost')
   end
 
@@ -23,15 +23,13 @@ describe Chef::Provider::PushitVhost do
     expect(chef_run).to create_pushit_vhost('rails-example')
   end
 
-  it 'starts the nginx service' do
-    expect(chef_run).to start_service('nginx')
-  end
-
   it 'adds a nginx site' do
+    pending 'need to figure out the matchers for this'
     expect(chef_run).to enable_nginx_site('/opt/pushit/nginx/sites-available/rails-example.conf')
   end
 
   it 'notifes nginx reload if vhost config changes' do
+    pending 'the internals of vhost need to do this, not vhost itself'
     vhost = chef_run.pushit_vhost('rails-example')
     expect(vhost).to notify('pushit_webserver[rails-example]').to(:reload).delayed
   end

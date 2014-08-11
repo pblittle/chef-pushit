@@ -26,7 +26,7 @@ class Chef
       self.resource_name = 'pushit_webserver'
 
       default_action :create
-      actions :create, :delete
+      actions :create, :delete, :restart, :reload
 
       def name(arg = nil)
         set_or_return(

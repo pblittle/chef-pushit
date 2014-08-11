@@ -32,19 +32,27 @@ class Chef
       end
 
       def action_create
+# this should all be handled by the pushit_webserver
+#         recipe_eval do
+#           # TODO: check that this recipe supports whyrun
+#           run_context.include_recipe 'nginx::default'
+#         end
+#
+#         service 'nginx' do
+#           action :start
+#         end
+
+        pushit_webserver 'nginx'
+
+        # need to re-declare this on the global resource collection
+        # eventually pushit_webserver needs a 'vhost' attribute for vhosts.
+        service 'nginx'
+
         resource_config.action :create
-
-        recipe_eval do
-          # TODO: check that this recipe supports whyrun
-          run_context.include_recipe 'nginx::default'
-        end
-
-        service 'nginx' do
-          action :start
-        end
 
         nginx_site config_file do
           enable true
+          notifies :reload, 'pushit_webserver[nginx]'
         end
       end
 
@@ -84,6 +92,7 @@ class Chef
           :upstream_port => new_resource.upstream_port,
           :upstream_socket => new_resource.upstream_socket
         )
+        r.notifies :reload, 'pushit_webserver[nginx]'
         r
       end
     end

@@ -35,13 +35,31 @@ describe "#{Chef::Provider::PushitWebserver}.delete" do
     expect(chef_run).to_not create_template('nginx.conf')
   end
 
-# I don't think we should delete the user just because the webserver is deleted.
-  it 'removes the user' do
-    pending 'not implemented until we have the Pushit_Base.action_delete method ready'
-    expect(chef_run).to delete_pushit_user('deploy')
-  end
-
   it 'is subscribed to by the test' do
     expect(chef_run.file('add webserver flag')).to subscribe_to('pushit_webserver[nginx]').on(:create).delayed
+  end
+end
+
+describe "#{Chef::Provider::PushitWebserver}.restart" do
+  let(:chef_run) do
+    ChefSpec::Runner.new(
+      step_into: ['pushit_webserver']
+    ).converge('pushit_test::webserver_restart')
+  end
+
+  it 'restarts nginx' do
+    expect(chef_run).to restart_service('nginx')
+  end
+end
+
+describe "#{Chef::Provider::PushitWebserver}.reload" do
+  let(:chef_run) do
+    ChefSpec::Runner.new(
+      step_into: ['pushit_webserver']
+    ).converge('pushit_test::webserver_reload')
+  end
+
+  it 'restarts nginx' do
+    expect(chef_run).to reload_service('nginx')
   end
 end

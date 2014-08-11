@@ -105,7 +105,7 @@ class Chef
 
       def config_data
         @config_data || begin
-          Chef::DataBagItem.load(PUSHIT_USER_DATA_BAG, username)
+          data_bag_item(PUSHIT_USER_DATA_BAG, username)
         rescue
           {}
         end

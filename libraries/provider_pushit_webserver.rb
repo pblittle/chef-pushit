@@ -32,14 +32,35 @@ class Chef
           run_context.include_recipe 'nginx::default'
         end
 
+        service 'nginx' do
+          action [:enable, :start]
+        end
+
         resource_webserver_config.action :create
       end
 
       def action_delete
         super
 
-        ## add the nginx stop recipe here
+        service 'nginx' do
+          action [:stop, :disable]
+        end
+
         resource_webserver_config.action :delete
+      end
+
+      def action_restart
+        action_create
+        service 'nginx' do
+          action :restart
+        end
+      end
+
+      def action_reload
+        action_create
+        service 'nginx' do
+          action :reload
+        end
       end
 
       private
