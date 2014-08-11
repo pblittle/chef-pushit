@@ -6,7 +6,7 @@ describe "#{Chef::Provider::PushitRails}.create" do
     ChefSpec::Runner.new(
       step_into: ['pushit_rails', 'pushit_app', 'pushit_base', 'deploy_revision'],
       log_level: :debug
-    ).converge('pushit_test::rails')
+    ) { |runner| Chef::Config[:file_cache_path] = '/tmp/chefspec' }.converge('pushit_test::rails')
   end
 
   before do

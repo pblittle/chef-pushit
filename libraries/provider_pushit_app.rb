@@ -86,7 +86,7 @@ class Chef
       def before_restart
         procfile_resource.action :create
         foreman_export_resource.action :run
-        supervisor_resource.action :nothing
+        supervisor_resource.action [:enable, :start]
       end
 
       def after_restart; end
