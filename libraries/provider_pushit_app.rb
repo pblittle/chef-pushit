@@ -223,8 +223,8 @@ class Chef
           run_context
         )
         r.cwd app.release_path
-        r.user root
-        r.group root
+        r.user 'root'
+        r.group 'root'
         r
       end
 
