@@ -24,7 +24,6 @@ class Chef
     # Convenience class for using the app resource with
     # the rails framework (provider)
     class PushitRails < Chef::Provider::PushitApp
-
       use_inline_resources
 
       def whyrun_supported?

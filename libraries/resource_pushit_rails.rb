@@ -21,8 +21,8 @@ require_relative 'resource_pushit_app'
 
 class Chef
   class Resource
+    # resource class for rails pushit apps
     class PushitRails < Chef::Resource::PushitApp
-
       SYMLINK_BEFORE_MIGRATE ||= {
         'env' => '.env',
         'ruby-version' => '.ruby-version',

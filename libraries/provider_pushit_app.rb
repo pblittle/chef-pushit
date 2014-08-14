@@ -24,7 +24,6 @@ class Chef
     # Base class for building an app. This class should
     # not be implemented outside of subclass inheritance.
     class PushitApp < Chef::Provider::PushitBase
-
       use_inline_resources if defined?(use_inline_resources)
 
       def whyrun_supported?
@@ -53,9 +52,7 @@ class Chef
             filestore_config_resource.action :create
           end
 
-          if app.webserver?
-            unicorn_config_resource.action :create
-          end
+          unicorn_config_resource.action :create if app.webserver?
         end
 
         if app.database_certificate?

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe "#{Chef::Provider::PushitRuby}.create" do
   let(:chef_run) do
     ChefSpec::Runner.new(
-      step_into: ['pushit_ruby', 'pushit_base']
+      step_into => %w(pushit_ruby pushit_base)
     ).converge('pushit_test::ruby')
   end
 
@@ -23,4 +23,3 @@ describe "#{Chef::Provider::PushitRuby}.create" do
     expect(chef_run).to create_template('/etc/profile.d/chruby.sh')
   end
 end
-

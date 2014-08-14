@@ -24,8 +24,8 @@ require_relative 'chef_pushit'
 
 class Chef
   module Pushit
+    # model class for pushit user
     class User
-
       PUSHIT_USER_DATA_BAG ||= 'users'.freeze
 
       attr_accessor :args
@@ -105,7 +105,7 @@ class Chef
 
       def config_data
         @config_data || begin
-          data_bag_item(PUSHIT_USER_DATA_BAG, username)
+          Chef::DataBagItem.load(PUSHIT_USER_DATA_BAG, username)
         rescue
           {}
         end

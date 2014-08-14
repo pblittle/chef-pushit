@@ -23,9 +23,10 @@
 require_relative 'chef_pushit'
 
 class Chef
+  # pushit module
   module Pushit
+    # Model class for pushit apps
     class App
-
       include Mixin::App
 
       def initialize(name)

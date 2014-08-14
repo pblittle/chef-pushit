@@ -7,6 +7,7 @@ describe "#{Chef::Provider::PushitUser}.create" do
     runner.converge('pushit_test::user')
   end
 
+  # TODO: need more tests
   before do
     # load test user databag
   end

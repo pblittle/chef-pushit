@@ -23,8 +23,8 @@ require_relative 'provider_pushit_app'
 
 class Chef
   class Provider
+    # provider class for creating a vhost config for pushit apps
     class PushitVhost < Chef::Provider::LWRPBase
-
       use_inline_resources if defined?(use_inline_resources)
 
       def whyrun_supported?

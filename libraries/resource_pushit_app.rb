@@ -21,8 +21,8 @@ require 'chef/resource/lwrp_base'
 
 class Chef
   class Resource
+    # resource class for pushit apps (only used by inheritance in rails and nodejs)
     class PushitApp < Chef::Resource::LWRPBase
-
       self.resource_name = 'pushit_app'
 
       default_action :create

@@ -21,15 +21,14 @@ require 'chef/resource/lwrp_base'
 
 class Chef
   class Resource
+    # resource class for pushit vhost configs
     class PushitVhost < Chef::Resource::LWRPBase
-
       self.resource_name = 'pushit_vhost'
 
       default_action :create
       actions :create
 
-      attribute :app_name, :kind_of => String,
-        :name_attribute => true
+      attribute :app_name, :kind_of => String, :name_attribute => true
 
       attribute :config_cookbook, :kind_of => String, :default => 'pushit'
       attribute :config_source, :kind_of => String
