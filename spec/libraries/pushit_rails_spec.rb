@@ -4,71 +4,91 @@ require_relative '../../libraries/chef_pushit'
 describe "#{Chef::Provider::PushitRails}.create" do
   let(:chef_run) do
     ChefSpec::Runner.new(
-#      step_into: ['pushit_rails', 'pushit_app', 'pushit_base', 'deploy_revision']
-    ) { |runner| Chef::Config[:file_cache_path] = '/tmp/chefspec' }.converge('pushit_test::rails')
+      :step_into => %w(pushit_rails pushit_app pushit_base),# deploy_revision),
+      :log_level => :debug
+    ).converge('pushit_test::rails')
   end
 
   before do
+    allow(Chef::DataBagItem).to receive(:load).and_return(Hash.new)
+
     allow(Chef::DataBagItem).to(
       receive(:load).with('pushit_apps', 'rails-example').and_return(
-        {'id' =>  'rails-example',
-          'owner' =>  'deploy',
-          'group' =>  'deploy',
-          'repo' =>  'https://github.com/cloud66/sample-rails.4.0.0-mysql.git',
-          'framework' =>  'rails',
-          'ruby' =>  {
-            'version' =>  '2.1.1'
+        'id' =>  'rails-example',
+        'owner' =>  'deploy',
+        'group' =>  'deploy',
+        'repo' =>  'https://github.com/cloud66/sample-rails.4.0.0-mysql.git',
+        'framework' =>  'rails',
+        'ruby' =>  {
+          'version' =>  '2.1.1'
+        },
+        'environment' =>  'test',
+        'webserver' =>  {
+          'type' =>  'nginx',
+          'server_name' =>  'rails-example',
+          'certificate' => 'dummy'
+        },
+        'database' =>  {
+          'host' =>  'localhost',
+          'adapter' =>  'mysql2',
+          'name' =>  'rails-example',
+          'username' =>  'root',
+          'password' =>  'password',
+          'port' =>  5432,
+          'options' =>  {
+            'foo' =>  'bar',
+            'sslca' =>   '/opt/pushit/certs/certs/cleardb-bundle.crt',
+            # 'sslcert' => '/opt/pushit/certs/certs/cleardb.pem',
+            'sslkey' =>  '/opt/pushit/certs/private/cleardb.key'
           },
-          'environment' =>  'test',
-          'webserver' =>  {
-            'type' =>  'nginx',
-            'server_name' =>  'rails-example',
-            'certificate' => 'dummy'
-          },
-          'database' =>  {
-            'host' =>  'localhost',
-            'adapter' =>  'mysql2',
-            'name' =>  'rails-example',
-            'username' =>  'root',
-            'password' =>  'password',
-            'port' =>  5432,
-            'options' =>  {
-              'foo' =>  'bar',
-              'sslca' =>   '/opt/pushit/certs/certs/cleardb-bundle.crt',
-              #'sslcert' => '/opt/pushit/certs/certs/cleardb.pem',
-              'sslkey' =>  '/opt/pushit/certs/private/cleardb.key'
-            },
-            'root_username' =>  'root',
-            'root_password' =>  'password',
-            'certificate' => 'dummy'
-          },
-          'env' =>  {
-            'FOO' =>  'bar',
-            'RACK_ENV' =>  'test',
-            'RAILS_ENV' =>  'test'
-          }
+          'root_username' =>  'root',
+          'root_password' =>  'password',
+          'certificate' => 'dummy'
+        },
+        'env' =>  {
+          'FOO' =>  'bar',
+          'RACK_ENV' =>  'test',
+          'RAILS_ENV' =>  'test'
         }
       )
     )
 
-    stub_data_bag_item('users', 'deploy').and_return(
-      {
+    allow(Chef::DataBagItem).to(
+      receive(:load).with('users', 'deploy').and_return(
         'id' =>  'deploy',
         'comment' =>  'Application Deployer',
         'ssh_private_key' =>  '-----BEGIN RSA PRIVATE KEY-----',
         'ssh_public_key' =>  'ssh-rsa',
         'ssh_deploy_keys' =>  [
-            {
-                'name' =>  'id_rsa_rails-example',
-                'data' =>  '-----BEGIN RSA PRIVATE KEY-----\n=rails-example-deploy-key\n-----END RSA PRIVATE KEY-----'
-            }
+          {
+            'name' =>  'id_rsa_rails-example',
+            'data' =>  '-----BEGIN RSA PRIVATE KEY-----\n=rails-example-deploy-key\n-----END RSA PRIVATE KEY-----'
+           }
         ],
         'ssh_keys' =>  [
-            'ssh-rsa == foo',
-            'ssh-rsa == bar'
+          'ssh-rsa == foo',
+          'ssh-rsa == bar'
         ]
-      }
+      )
     )
+
+    my_deploy_double = double('deploy')
+    deploy_resource = nil
+    allow(Chef::Provider::Deploy::Revision).to receive(:new){ |resource, run_context|
+      deploy_resource = resource
+    }.and_return(my_deploy_double)
+    allow(my_deploy_double).to receive(:action=)
+    allow(my_deploy_double).to receive(:run_action) do
+      puts "*****************\n\n*****************#{deploy_resource.action}*\n*\n*\n********************"
+      recipe_eval(deploy_resource.before_migrate)
+    end
+    # {
+#       deploy_resource.callback(:before_migrate, deploy_resource.new_resource.before_migrate)
+#       deploy_resource.callback(:before_symlink, deploy_resource.new_resource.before_symlink)
+#       deploy_resource.callback(:before_restart, deploy_resource.new_resource.before_restart)
+#       deploy_resource.callback(:after_restart, deploy_resource.new_resource.after_restart)
+#       puts "*****************\n\n*****************#{deploy_resource.new_resource.before_migrate}*\n*\n*\n********************"
+#     }
   end
 
   include Chef::Pushit
@@ -168,7 +188,7 @@ describe "#{Chef::Provider::PushitRails}.create" do
   end
 
   it 'creates the .env file' do
- #   pending 'not stepping into deploy_revision'
+  #pending 'not stepping into deploy_revision'
     expect(chef_run).to create_template('/opt/pushit/apps/rails-example/shared/env')
   end
 
