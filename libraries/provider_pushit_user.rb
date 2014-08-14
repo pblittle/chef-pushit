@@ -65,6 +65,7 @@ class Chef
         r = group pushit_user.group
         r.group_name pushit_user.group
         r.append true
+        r.action :nothing
         r
       end
 
@@ -77,6 +78,7 @@ class Chef
         r.password pushit_user.password
         r.supports :manage_home => true
         r.manage_home true
+        r.action :nothing
         r
       end
 
@@ -86,6 +88,7 @@ class Chef
         r.group pushit_user.group
         r.mode '0700'
         r.recursive true
+        r.action :nothing
         r
       end
 
@@ -99,6 +102,7 @@ class Chef
         r.variables(
           :private_key => pushit_user.ssh_private_key
         )
+        r.action :nothing
         r
       end
 
@@ -112,6 +116,7 @@ class Chef
         r.variables(
           :public_key => pushit_user.ssh_public_key
         )
+        r.action :nothing
         r
       end
 
@@ -125,6 +130,7 @@ class Chef
         r.variables(
           :ssh_keys => pushit_user.ssh_keys
         )
+        r.action :nothing
         r
       end
 
@@ -136,6 +142,7 @@ class Chef
           '/usr/bin/chef-client'
         ]
         r.nopasswd true
+        r.action :nothing
         r
       end
 
@@ -163,6 +170,7 @@ class Chef
           :ssh_key_data => key['data']
         )
         r.not_if { ::File.exist?(deploy_key) }
+        r.action :nothing
         r
       end
 
@@ -182,6 +190,7 @@ class Chef
           :ssh_key_name => key['name']
         )
         r.not_if { ::File.exist?(deploy_wrapper) }
+        r.action :nothing
         r
       end
 
