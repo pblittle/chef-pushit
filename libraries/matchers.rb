@@ -48,7 +48,6 @@ if defined?(ChefSpec)
     )
   end
 
-  # pushit_user matchers
   ChefSpec::Runner.define_runner_method :pushit_user
   def create_pushit_user(user_name)
     ChefSpec::Matchers::ResourceMatcher.new(
@@ -66,7 +65,6 @@ if defined?(ChefSpec)
     )
   end
 
-  # pushit_vhost matchers
   ChefSpec::Runner.define_runner_method :pushit_vhost
   def create_pushit_vhost(app_name)
     ChefSpec::Matchers::ResourceMatcher.new(
@@ -76,7 +74,6 @@ if defined?(ChefSpec)
     )
   end
 
-  # pushit_webserver matchers
   ChefSpec::Runner.define_runner_method :pushit_webserver
   def create_pushit_webserver(resource_name)
     ChefSpec::Matchers::ResourceMatcher.new(

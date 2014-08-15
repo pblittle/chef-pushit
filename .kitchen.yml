@@ -18,67 +18,12 @@ provisioner:
 platforms:
 - name: ubuntu-12.04-base
   driver_config:
-    box: ck-base
-#    box: opscode-ubuntu-12.04
-#    box_url: http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-12.04_chef-provisionerless.box
-  run_list:
+    box: opscode-ubuntu-12.04
+    box_url: http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-12.04_chef-provisionerless.box
+  run_list: &default_run_list
     - recipe[apt::default]
     - recipe[build-essential::default]
-  attributes:
-    mysql:
-      bind_address: 'localhost'
-      server_debian_password: 'password'
-      server_repl_password: 'password'
-      server_root_password: 'password'
-      tunable:
-        lower_case_table_names: 1
-    nginx:
-      default_site_enabled: false
-      dir: '/opt/pushit/nginx'
-      log_dir: '/opt/pushit/nginx/log'
-      pid: '/opt/pushit/nginx/run/nginx.pid'
-      install_method: 'source'
-      source:
-        version: '1.4.4'
-        conf_path: '/opt/pushit/nginx/nginx.conf'
-        sbin_path: '/opt/pushit/nginx/sbin/nginx'
-
-- name: ubuntu-12.04-ruby
-  driver_config:
-    box: ck-ruby
-#    box: opscode-ubuntu-12.04
-#    box_url: http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-12.04_chef-provisionerless.box
-  run_list:
-    - recipe[apt::default]
-    - recipe[build-essential::default]
-  attributes:
-    mysql:
-      bind_address: 'localhost'
-      server_debian_password: 'password'
-      server_repl_password: 'password'
-      server_root_password: 'password'
-      tunable:
-        lower_case_table_names: 1
-    nginx:
-      default_site_enabled: false
-      dir: '/opt/pushit/nginx'
-      log_dir: '/opt/pushit/nginx/log'
-      pid: '/opt/pushit/nginx/run/nginx.pid'
-      install_method: 'source'
-      source:
-        version: '1.4.4'
-        conf_path: '/opt/pushit/nginx/nginx.conf'
-        sbin_path: '/opt/pushit/nginx/sbin/nginx'
-
-- name: ubuntu-12.04-node
-  driver_config:
-    box: ck-node
-#    box: opscode-ubuntu-12.04
-#    box_url: http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-12.04_chef-provisionerless.box
-  run_list:
-    - recipe[apt::default]
-    - recipe[build-essential::default]
-  attributes:
+  attributes: &default_attributes
     mysql:
       bind_address: 'localhost'
       server_debian_password: 'password'
@@ -99,9 +44,6 @@ platforms:
 
 suites:
 - name: user
-  excludes:
-    - ubuntu-12.04-base
-    - ubuntu-12.04-node
   run_list:
     - recipe[pushit_test::user]
   data_bags_path:
@@ -110,9 +52,6 @@ suites:
     'test/encrypted_data_bag_secret'
 
 - name: webserver
-  excludes:
-    - ubuntu-12.04-base
-    - ubuntu-12.04-node
   run_list:
     - recipe[pushit_test::webserver]
   data_bags_path:
@@ -130,18 +69,12 @@ suites:
     'test/encrypted_data_bag_secret'
 
 - name: database
-  excludes:
-    - ubuntu-12.04-base
-    - ubuntu-12.04-node
   run_list:
     - recipe[pushit_test::database]
   data_bags_path:
     'test/data_bags'
 
 - name: nodejs
-  excludes:
-    - ubuntu-12.04-ruby
-    - ubuntu-12.04-node
   run_list:
     - recipe[pushit_test::nodejs]
   data_bags_path:
@@ -150,18 +83,12 @@ suites:
     'test/encrypted_data_bag_secret'
 
 - name: ruby
-  excludes:
-    - ubuntu-12.04-base
-    - ubuntu-12.04-ruby
   run_list:
     - recipe[pushit_test::ruby]
   data_bags_path:
     'test/data_bags'
 
 - name: rails
-  excludes:
-    - ubuntu-12.04-base
-    - ubuntu-12.04-node
   run_list:
     - recipe[pushit_test::rails]
   data_bags_path:

@@ -62,6 +62,7 @@ class Chef
       end
 
       # Depricated
+      # TODO: remove it when we can
       def whyrun_supported
         @whyrun_supported ||= false
       end
