@@ -21,12 +21,12 @@ require 'chef/resource/lwrp_base'
 
 class Chef
   class Resource
+    # Resource for creating webservers for pushit apps
     class PushitWebserver < Chef::Resource::LWRPBase
-
       self.resource_name = 'pushit_webserver'
 
       default_action :create
-      actions :create
+      actions :create, :delete, :restart, :reload
 
       def name(arg = nil)
         set_or_return(

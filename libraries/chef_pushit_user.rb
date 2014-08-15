@@ -24,8 +24,8 @@ require_relative 'chef_pushit'
 
 class Chef
   module Pushit
+    # model class for pushit user
     class User
-
       PUSHIT_USER_DATA_BAG ||= 'users'.freeze
 
       attr_accessor :args

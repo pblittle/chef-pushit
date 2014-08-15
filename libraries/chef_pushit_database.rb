@@ -24,8 +24,8 @@ require_relative 'chef_pushit'
 
 class Chef
   module Pushit
+    # Model class for pushit databases
     class Database
-
       def initialize(args = {})
         @args = args
       end

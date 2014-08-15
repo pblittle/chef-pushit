@@ -24,20 +24,16 @@ class Chef
     # Convenience class for using the app resource with
     # the nodejs framework (provider)
     class PushitNodejs < Chef::Provider::PushitApp
-
       private
 
-      def deploy_revision
+      def deploy_revision_resource
         app_provider = self
 
         username = user_username
         group = user_group
         ssh_directory = user_ssh_directory
 
-        r = Chef::Resource::DeployRevision.new(
-          new_resource.name,
-          run_context
-        )
+        r = deploy_revision new_resource.name
         r.action new_resource.deploy_action
         r.deploy_to app.path
 
@@ -66,7 +62,7 @@ class Chef
 
         r.before_migrate do
           app_provider.send(:before_migrate)
-          app_provider.send(:npm_install).run_action(:run)
+          app_provider.send(:npm_install_resource).action :run
         end
 
         r.before_symlink do
@@ -87,18 +83,18 @@ class Chef
           app_provider.send(:after_restart)
         end
 
+        r.action :nothing
+
         r
       end
 
-      def npm_install
-        r = Chef::Resource::Execute.new(
-          "Install #{new_resource.name} dependencies",
-          run_context
-        )
+      def npm_install_resource
+        r = execute "Install #{new_resource.name} dependencies"
         r.command "#{Pushit::Nodejs.npm_binary} install"
         r.cwd app.release_path
         r.user 'root'
         r.group 'root'
+        r.action :nothing
         r
       end
     end

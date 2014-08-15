@@ -23,9 +23,10 @@
 require_relative 'chef_pushit'
 
 class Chef
+  # pushit module
   module Pushit
+    # Model class for pushit apps
     class App
-
       include Mixin::App
 
       def initialize(name)
@@ -75,7 +76,7 @@ class Chef
       end
 
       def shared_directories
-        %w( cached-copy config system vendor_bundle )
+        %w( cached-copy config system vendor_bundle log pids )
       end
 
       def pid_path

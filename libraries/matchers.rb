@@ -48,7 +48,6 @@ if defined?(ChefSpec)
     )
   end
 
-  # pushit_user matchers
   ChefSpec::Runner.define_runner_method :pushit_user
   def create_pushit_user(user_name)
     ChefSpec::Matchers::ResourceMatcher.new(
@@ -58,7 +57,14 @@ if defined?(ChefSpec)
     )
   end
 
-  # pushit_vhost matchers
+  def delete_pushit_user(user_name)
+    ChefSpec::Matchers::ResourceMatcher.new(
+      :pushit_user,
+      :delete,
+      user_name
+    )
+  end
+
   ChefSpec::Runner.define_runner_method :pushit_vhost
   def create_pushit_vhost(app_name)
     ChefSpec::Matchers::ResourceMatcher.new(
@@ -68,12 +74,19 @@ if defined?(ChefSpec)
     )
   end
 
-  # pushit_webserver matchers
   ChefSpec::Runner.define_runner_method :pushit_webserver
   def create_pushit_webserver(resource_name)
     ChefSpec::Matchers::ResourceMatcher.new(
       :pushit_webserver,
       :create,
+      resource_name
+    )
+  end
+
+  def delete_pushit_webserver(resource_name)
+    ChefSpec::Matchers::ResourceMatcher.new(
+      :pushit_webserver,
+      :delete,
       resource_name
     )
   end

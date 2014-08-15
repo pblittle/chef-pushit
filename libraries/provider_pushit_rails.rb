@@ -24,8 +24,11 @@ class Chef
     # Convenience class for using the app resource with
     # the rails framework (provider)
     class PushitRails < Chef::Provider::PushitApp
-
       use_inline_resources
+
+      def whyrun_supported?
+        true
+      end
 
       def action_create
         super
@@ -33,7 +36,7 @@ class Chef
 
       private
 
-      def deploy_revision
+      def deploy_revision_resource
         app_provider = self
 
         username = user_username
@@ -42,11 +45,7 @@ class Chef
 
         bundle_binary = app.bundle_binary
 
-        r = Chef::Resource::DeployRevision.new(
-          new_resource.name,
-          run_context
-        )
-        r.action new_resource.deploy_action
+        r = deploy_revision new_resource.name
         r.deploy_to app.path
 
         r.repository config['repo']
@@ -109,15 +108,11 @@ class Chef
         r.after_restart do
           app_provider.send(:after_restart)
         end
-
         r
       end
 
-      def database_config
-        r = Chef::Resource::Template.new(
-          ::File.join(app.shared_path, 'config', 'database.yml'),
-          run_context
-        )
+      def database_config_resource
+        r = template ::File.join(app.shared_path, 'config', 'database.yml')
         r.source 'database.yml.erb'
         r.cookbook 'pushit'
         r.owner user_username
@@ -127,14 +122,12 @@ class Chef
           :database => app.database.to_hash,
           :environment => new_resource.environment
         )
+        r.action :nothing
         r
       end
 
-      def filestore_config
-        r = Chef::Resource::Template.new(
-          ::File.join(app.shared_path, 'config', 'filestore.yml'),
-          run_context
-        )
+      def filestore_config_resource
+        r = template ::File.join(app.shared_path, 'config', 'filestore.yml')
         r.source 'filestore.yml.erb'
         r.cookbook 'pushit'
         r.owner user_username
@@ -144,6 +137,7 @@ class Chef
           :database => app.database.to_hash,
           :environment => new_resource.environment
         )
+        r.action :nothing
         r
       end
 
@@ -161,11 +155,8 @@ class Chef
         worker_count
       end
 
-      def unicorn_config
-        r = Chef::Resource::Template.new(
-          ::File.join(app.shared_path, 'config', 'unicorn.rb'),
-          run_context
-        )
+      def unicorn_config_resource
+        r = template ::File.join(app.shared_path, 'config', 'unicorn.rb')
         r.source 'unicorn.rb.erb'
         r.cookbook 'pushit'
         r.user user_username
@@ -183,6 +174,7 @@ class Chef
           :worker_timeout => new_resource.unicorn_worker_timeout,
           :working_directory => app.current_path
         )
+        r.action :nothing
         r
       end
 

@@ -21,8 +21,8 @@ require_relative 'resource_pushit_app'
 
 class Chef
   class Resource
+    # resource class for nodejs  pushit apps
     class PushitNodejs < Chef::Resource::PushitApp
-
       SYMLINK_BEFORE_MIGRATE ||= {
         'env' => '.env'
       }.freeze

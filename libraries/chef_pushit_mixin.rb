@@ -22,9 +22,10 @@
 
 class Chef
   module Pushit
+    # mixins for pushit classses
     module Mixin
+      # app mixins
       module App
-
         # if ree, "vendor/bundle/1.8"
         def bundle_path
           ::File.join('vendor', 'bundle')

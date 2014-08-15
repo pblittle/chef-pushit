@@ -23,23 +23,26 @@ require_relative 'provider_pushit_app'
 
 class Chef
   class Provider
+    # provider class for creating a vhost config for pushit apps
     class PushitVhost < Chef::Provider::LWRPBase
-
       use_inline_resources if defined?(use_inline_resources)
 
+      def whyrun_supported?
+        true
+      end
+
       def action_create
-        config_resource.run_action(:create)
+        pushit_webserver 'nginx'
 
-        recipe_eval do
-          run_context.include_recipe 'nginx::default'
-        end
+        # need to re-declare this on the global resource collection
+        # eventually pushit_webserver needs a 'vhost' attribute for vhosts.
+        service 'nginx'
 
-        service 'nginx' do
-          action :start
-        end
+        vhost_config_resource.action :create
 
         nginx_site config_file do
           enable true
+          notifies :reload, 'pushit_webserver[nginx]'
         end
       end
 
@@ -59,11 +62,8 @@ class Chef
         )
       end
 
-      def config_resource
-        r = Chef::Resource::Template.new(
-          config_path,
-          run_context
-        )
+      def vhost_config_resource
+        r = template config_path
         r.source new_resource.config_source
         r.cookbook new_resource.config_cookbook
         r.owner 'root'
@@ -82,6 +82,7 @@ class Chef
           :upstream_port => new_resource.upstream_port,
           :upstream_socket => new_resource.upstream_socket
         )
+        r.notifies :reload, 'pushit_webserver[nginx]'
         r
       end
     end

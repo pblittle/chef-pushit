@@ -25,8 +25,8 @@ require 'fileutils'
 require_relative 'chef_pushit_mixin'
 
 class Chef
+  # all things pushit
   module Pushit
-
     PUSHIT_USER ||= 'deploy'.freeze
     PUSHIT_GROUP ||= 'deploy'.freeze
     PUSHIT_PATH ||= ::File.join('', 'opt', 'pushit').freeze
@@ -39,7 +39,6 @@ class Chef
     ].freeze
 
     class << self
-
       def pushit_user
         @pushit_user ||= PUSHIT_USER
       end
@@ -62,6 +61,8 @@ class Chef
         {}
       end
 
+      # Depricated
+      # TODO: remove it when we can
       def whyrun_supported
         @whyrun_supported ||= false
       end

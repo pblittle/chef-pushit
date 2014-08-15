@@ -23,29 +23,36 @@ require_relative 'chef_pushit'
 
 class Chef
   class Provider
+    # Provider for creating pushit users
     class PushitUser < Chef::Provider::LWRPBase
-
       use_inline_resources if defined?(use_inline_resources)
 
       def whyrun_supported?
-        Pushit.whyrun_supported?
+        true
       end
 
       def action_create
-        group.run_action(:create)
-        user.run_action(:create)
-        ssh_directory.run_action(:create)
-        authorized_keys.run_action(:create)
-        sudoers_file.run_action(:install)
+        group_resource.action :create
+        user_resource.action :create
+        ssh_directory_resource.action :create
+        authorized_keys_resource.action :create
+        sudoers_file_resource.action :install
 
         create_deploy_keys
-        create_ssh_keys
+        action_create_ssh_keys
       end
 
-      def create_deploy_keys
-        ssh_directory.run_action(:create)
+      def action_create_deploy_keys
+        ssh_directory_resource.action :create
 
         create_deploy_keys
+      end
+
+      def action_create_ssh_keys
+        return unless pushit_user.manage_ssh_keys?
+
+        ssh_private_key_resource.action :create
+        ssh_public_key_resource.action :create
       end
 
       private
@@ -54,55 +61,39 @@ class Chef
         @pushit_user ||= Pushit::User.new(new_resource.to_hash)
       end
 
-      def group
-        r = Chef::Resource::Group.new(
-          pushit_user.group,
-          run_context
-        )
+      def group_resource
+        r = group pushit_user.group
         r.group_name pushit_user.group
         r.append true
+        r.action :nothing
         r
       end
 
-      def user
-        r = Chef::Resource::User.new(
-          pushit_user.username,
-          run_context
-        )
+      def user_resource
+        r = user pushit_user.username
         r.shell '/bin/bash'
-        r.password pushit_user.password
         r.home pushit_user.home
-        r.manage_home true
-        r.supports :manage_home => true
-        r.system false
         r.gid pushit_user.group
+        r.system false
+        r.password pushit_user.password
+        r.supports :manage_home => true
+        r.manage_home true
+        r.action :nothing
         r
       end
 
-      def ssh_directory
-        r = Chef::Resource::Directory.new(
-          pushit_user.ssh_directory,
-          run_context
-        )
+      def ssh_directory_resource
+        r = directory pushit_user.ssh_directory
         r.owner pushit_user.username
         r.group pushit_user.group
         r.mode '0700'
         r.recursive true
+        r.action :nothing
         r
       end
 
-      def create_ssh_keys
-        return unless pushit_user.manage_ssh_keys?
-
-        ssh_private_key.run_action(:create)
-        ssh_public_key.run_action(:create)
-      end
-
-      def ssh_private_key
-        r = Chef::Resource::Template.new(
-          pushit_user.ssh_private_key_path,
-          run_context
-        )
+      def ssh_private_key_resource
+        r = template pushit_user.ssh_private_key_path
         r.source 'private_key.erb'
         r.cookbook 'pushit'
         r.owner pushit_user.username
@@ -111,14 +102,12 @@ class Chef
         r.variables(
           :private_key => pushit_user.ssh_private_key
         )
+        r.action :nothing
         r
       end
 
-      def ssh_public_key
-        r = Chef::Resource::Template.new(
-          pushit_user.ssh_public_key_path,
-          run_context
-        )
+      def ssh_public_key_resource
+        r = template pushit_user.ssh_public_key_path
         r.source 'public_key.erb'
         r.cookbook 'pushit'
         r.owner pushit_user.username
@@ -127,14 +116,12 @@ class Chef
         r.variables(
           :public_key => pushit_user.ssh_public_key
         )
+        r.action :nothing
         r
       end
 
-      def authorized_keys
-        r = Chef::Resource::Template.new(
-          pushit_user.authorized_keys_path,
-          run_context
-        )
+      def authorized_keys_resource
+        r = template pushit_user.authorized_keys_path
         r.source 'authorized_keys.erb'
         r.cookbook 'pushit'
         r.owner pushit_user.username
@@ -143,41 +130,37 @@ class Chef
         r.variables(
           :ssh_keys => pushit_user.ssh_keys
         )
+        r.action :nothing
         r
       end
 
-      def sudoers_file
-        r = Chef::Resource::Sudo.new(
-          pushit_user.username,
-          run_context
-        )
+      def sudoers_file_resource
+        r = sudo pushit_user.username
         r.user "%#{pushit_user.username}"
         r.group pushit_user.group
         r.commands [
           '/usr/bin/chef-client'
         ]
         r.nopasswd true
+        r.action :nothing
         r
       end
 
       def create_deploy_keys
         pushit_user.ssh_deploy_keys.each do |key|
-          deploy_key(key).run_action(:create)
-          deploy_wrapper(key).run_action(:create)
+          deploy_key_resource(key).action :create
+          deploy_wrapper_resource(key).action :create
 
           create_ssh_config(key)
         end
       end
 
-      def deploy_key(key)
+      def deploy_key_resource(key)
         deploy_key = ::File.join(
           pushit_user.ssh_directory, key['name']
         )
 
-        r = Chef::Resource::Template.new(
-          deploy_key,
-          run_context
-        )
+        r = template deploy_key
         r.source 'ssh_deploy_key.erb'
         r.cookbook 'pushit'
         r.owner pushit_user.username
@@ -187,18 +170,16 @@ class Chef
           :ssh_key_data => key['data']
         )
         r.not_if { ::File.exist?(deploy_key) }
+        r.action :nothing
         r
       end
 
-      def deploy_wrapper(key)
+      def deploy_wrapper_resource(key)
         deploy_wrapper = ::File.join(
           pushit_user.ssh_directory, "#{key['name']}_deploy_wrapper.sh"
         )
 
-        r = Chef::Resource::Template.new(
-          deploy_wrapper,
-          run_context
-        )
+        r = template deploy_wrapper
         r.source 'ssh_wrapper.sh.erb'
         r.cookbook 'pushit'
         r.owner pushit_user.username
@@ -209,6 +190,7 @@ class Chef
           :ssh_key_name => key['name']
         )
         r.not_if { ::File.exist?(deploy_wrapper) }
+        r.action :nothing
         r
       end
 
@@ -220,14 +202,16 @@ class Chef
         config_file = ::File.join(pushit_user.ssh_directory, 'config')
         username = pushit_user.username
 
-        ssh_config host_key_alias do
-          options(
-            'User' => 'git',
-            'HostName' => 'github.com',
-            'IdentityFile' => identity_file
-          )
-          user username
-          path config_file
+        converge_by("Create ssh config for #{username}") do
+          ssh_config host_key_alias do
+            options(
+              'User' => 'git',
+              'HostName' => 'github.com',
+              'IdentityFile' => identity_file
+            )
+            user username
+            path config_file
+          end
         end
       end
     end
