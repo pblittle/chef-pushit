@@ -25,21 +25,20 @@ require 'fileutils'
 require_relative 'chef_pushit_mixin'
 
 class Chef
+  # all things pushit
   module Pushit
-
     PUSHIT_USER ||= 'deploy'.freeze
     PUSHIT_GROUP ||= 'deploy'.freeze
     PUSHIT_PATH ||= ::File.join('', 'opt', 'pushit').freeze
-    PUSHIT_DATA_BAG ||= 'pushit_apps'.freeze
 
-    PUSHIT_GEM_DEPENDENCIES ||= [
-      { :name => 'bundler', :version => '1.6.3' },
+    PUSHIT_APP_DATA_BAG ||= 'pushit_apps'.freeze
+    PUSHIT_APP_GEM_DEPENDENCIES ||= [
+      { :name => 'bundler', :version => '1.6.5' },
       { :name => 'foreman', :version => '0.74.0' },
       { :name => 'unicorn', :version => '4.8.3' }
     ].freeze
 
     class << self
-
       def pushit_user
         @pushit_user ||= PUSHIT_USER
       end
@@ -53,18 +52,27 @@ class Chef
       end
 
       def pushit_apps_path
-        @pushit_apps_path ||= ::File.join(@pushit_path, 'apps')
+        @pushit_apps_path ||= ::File.join(pushit_path, 'apps')
       end
 
+      def pushit_app_config(name)
+        Chef::DataBagItem.load(PUSHIT_APP_DATA_BAG, name)
+      rescue
+        {}
+      end
+
+      # Depricated
+      # TODO: remove it when we can
       def whyrun_supported
         @whyrun_supported ||= false
       end
       alias_method :whyrun_supported?, :whyrun_supported
 
-      # This should be an encrypted data bag
-      def app_data_bag(name)
-        data_bag_item = Chef::DataBagItem.load(PUSHIT_DATA_BAG, name)
-        data_bag_item || {}
+      def escape_env(vars = {})
+        vars.inject({}) do |hash, (key, value)|
+          hash[key.upcase] = value.gsub(/"/) { %q(\") }
+          hash
+        end
       end
     end
   end

@@ -21,37 +21,31 @@ require_relative 'provider_pushit_app'
 
 class Chef
   class Provider
-
     # Convenience class for using the app resource with
     # the rails framework (provider)
     class PushitRails < Chef::Provider::PushitApp
+      use_inline_resources
 
-      def initialize(new_resource, run_context = nil)
-        @new_resource = new_resource
-        @run_context = run_context
-
-        @framework = 'rails'
-
-        super(new_resource, run_context)
+      def whyrun_supported?
+        true
       end
 
-      def load_current_resource; end
+      def action_create
+        super
+      end
 
       private
 
-      def create_deploy_revision
-        require 'bundler'
-
+      def deploy_revision_resource
         app_provider = self
 
-        owner = config['owner']
-        group = config['group']
+        username = user_username
+        group = user_group
+        ssh_directory = user_ssh_directory
 
-        r = Chef::Resource::DeployRevision.new(
-          new_resource.name,
-          run_context
-        )
-        r.action new_resource.deploy_action
+        bundle_binary = app.bundle_binary
+
+        r = deploy_revision new_resource.name
         r.deploy_to app.path
 
         r.repository config['repo']
@@ -60,40 +54,26 @@ class Chef
 
         if config['deploy_key'] && !config['deploy_key'].empty?
           wrapper = "#{config['deploy_key']}_deploy_wrapper.sh"
-          wrapper_path = ::File.join(app.user.ssh_directory, wrapper)
+          wrapper_path = ::File.join(ssh_directory, wrapper)
 
           r.ssh_wrapper wrapper_path
         end
 
         r.environment app.env_vars
 
-        r.user Etc.getpwnam(owner).name
-        r.group Etc.getgrnam(group).name
+        r.user username
+        r.group group
 
         r.symlink_before_migrate(
           new_resource.symlink_before_migrate
         )
 
-        bundle_binary = app.bundle_binary
-        bundle_flags = app.bundle_flags
-
         r.migrate new_resource.migrate
         r.migration_command "#{bundle_binary} exec rake db:migrate"
 
         r.before_migrate do
-          app_provider.send(:create_dotenv)
-
-          bundle_install_command = "sudo su - #{owner} -c 'cd #{release_path} && #{bundle_binary} install #{bundle_flags}'"
-
-          begin
-            Chef::Log.warn bundle_install_command + DateTime.now.to_s
-            Bundler.clean_system(bundle_install_command)
-          rescue => e
-            Chef::Log.warn 'fail ' + bundle_install_command + DateTime.now.to_s
-            Chef::Log.warn(e.backtrace)
-          end
-
           app_provider.send(:before_migrate)
+          app_provider.send(:bundle_install)
         end
 
         r.before_symlink do
@@ -106,11 +86,10 @@ class Chef
         r.before_restart do
           if precompile_assets
 
-            bundle_precompile_command = "sudo su - #{owner} -c 'cd #{release_path} && source ./.env && #{bundle_binary} exec rake #{precompile_command}'"
-
-            Chef::Log.warn bundle_precompile_command
+            bundle_precompile_command = "sudo su - #{username} -c 'cd #{release_path} && source ./.env && #{bundle_binary} exec rake #{precompile_command}'"
 
             begin
+              require 'bundler'
               Bundler.clean_system(bundle_precompile_command)
             rescue => e
               Chef::Log.warn e.backtrace
@@ -129,48 +108,37 @@ class Chef
         r.after_restart do
           app_provider.send(:after_restart)
         end
-
-        r.run_action(new_resource.deploy_action)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r
       end
 
-      def create_database_config
-        r = Chef::Resource::Template.new(
-          ::File.join(app.shared_path, 'config', 'database.yml'),
-          run_context
-        )
+      def database_config_resource
+        r = template ::File.join(app.shared_path, 'config', 'database.yml')
         r.source 'database.yml.erb'
         r.cookbook 'pushit'
-        r.owner config['owner']
-        r.group config['group']
+        r.owner user_username
+        r.group user_group
         r.mode '0644'
         r.variables(
           :database => app.database.to_hash,
           :environment => new_resource.environment
         )
-        r.run_action(:create)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r.action :nothing
+        r
       end
 
-      def create_filestore_config
-        r = Chef::Resource::Template.new(
-          ::File.join(app.shared_path, 'config', 'filestore.yml'),
-          run_context
-        )
+      def filestore_config_resource
+        r = template ::File.join(app.shared_path, 'config', 'filestore.yml')
         r.source 'filestore.yml.erb'
         r.cookbook 'pushit'
-        r.owner config['owner']
-        r.group config['group']
+        r.owner user_username
+        r.group user_group
         r.mode '0644'
         r.variables(
           :database => app.database.to_hash,
           :environment => new_resource.environment
         )
-        r.run_action(:create)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r.action :nothing
+        r
       end
 
       def worker_processes
@@ -187,15 +155,12 @@ class Chef
         worker_count
       end
 
-      def create_unicorn_config
-        r = Chef::Resource::Template.new(
-          ::File.join(app.shared_path, 'config', 'unicorn.rb'),
-          run_context
-        )
+      def unicorn_config_resource
+        r = template ::File.join(app.shared_path, 'config', 'unicorn.rb')
         r.source 'unicorn.rb.erb'
         r.cookbook 'pushit'
-        r.user config['owner']
-        r.group config['group']
+        r.user user_username
+        r.group user_group
         r.mode '0644'
         r.variables(
           :enable_stats => new_resource.unicorn_enable_stats,
@@ -209,9 +174,19 @@ class Chef
           :worker_timeout => new_resource.unicorn_worker_timeout,
           :working_directory => app.current_path
         )
-        r.run_action(:create)
+        r.action :nothing
+        r
+      end
 
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      def bundle_install
+        install_command = "sudo su - #{user_username} -c 'cd #{app.release_path} && #{app.bundle_binary} install #{app.bundle_flags}'"
+
+        begin
+          require 'bundler'
+          Bundler.clean_system(install_command)
+        rescue => e
+          Chef::Log.warn e.backtrace
+        end
       end
     end
   end

@@ -12,23 +12,18 @@ long_description IO.read(
   )
 )
 
-version '0.9.14'
+version '0.10.0'
 
 supports 'debian'
 supports 'ubuntu'
 
-depends 'campfire-deployment', '~> 0.1.20'
 depends 'certificate', '= 0.5.2'
 depends 'database', '~> 2.2'
 depends 'git', '~> 4.0'
-depends 'logrotate', '1.6'
-depends 'monit', '~> 1.5'
-depends 'newrelic-deployment', '~> 0.2.0'
 depends 'nginx', '~> 2.6'
 depends 'nodejs', '~> 1.3'
-depends 'rsyslog', '~> 1.12'
 depends 'ruby_build', '= 0.8.0'
-depends 'runit', '~> 1.5'
+depends 'runit', '= 1.5.10'
 depends 'ssh', '= 0.6.6'
 depends 'ssh_known_hosts', '~> 1.3'
 depends 'sudo', '~> 2.6'

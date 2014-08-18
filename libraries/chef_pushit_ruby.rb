@@ -24,8 +24,8 @@ require_relative 'chef_pushit'
 
 class Chef
   module Pushit
+    # model class for pushit ruby
     class Ruby
-
       RUBY_DEFAULT_VERSION ||= '2.0.0-p481'
       BUNDLER_DEFAULT_VERSION ||= '1.6.2'
 

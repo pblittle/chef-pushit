@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
 # Cookbook Name:: pushit_test
-# Recipe:: custom_vhost
+# Recipe:: webserver
 #
 # Author:: P. Barrett Little (<barrett@barrettlittle.com>)
 #
@@ -22,19 +22,19 @@
 
 include_recipe 'pushit_test::base'
 
-app = 'rails-example'
+flag_path = "#{Chef::Config[:file_cache_path]}/pushit_webserver_notification_flag"
+file 'delete webserver flag' do
+  path   flag_path
+  action :delete
+end
 
-pushit_database app
+pushit_webserver 'nginx' do
+  action :delete
+end
 
-pushit_webserver 'nginx'
-
-pushit_rails app do
-  deploy_action 'deploy'
-  environment 'test'
-  precompile_assets true
-  migrate true
-  unicorn_worker_processes 1
-  revision 'master'
-  vhost_config_cookbook 'pushit_test'
-  vhost_config_source 'custom_vhost.conf.erb'
+file 'add webserver flag' do
+  path    flag_path
+  action  :nothing
+  content 'I am here'
+  subscribes :create, "pushit_webserver[nginx]"
 end

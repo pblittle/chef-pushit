@@ -17,33 +17,16 @@
 # limitations under the License.
 #
 
-require 'chef/resource'
+require 'chef/resource/lwrp_base'
 
 class Chef
   class Resource
-    class PushitUser < Chef::Resource
+    # resource for creating users for pushit library
+    class PushitUser < Chef::Resource::LWRPBase
+      self.resource_name = 'pushit_user'
 
-      def initialize(name, run_context = nil)
-        super
-
-        @resource_name = :pushit_user
-        @provider = Chef::Provider::PushitUser
-        @action = :create
-        @allowed_actions.push :create, :create_deploy_keys, :create_ssh_keys
-      end
-
-      def to_hash
-        {
-          :username => username,
-          :group => group,
-          :home => home,
-          :password => password,
-          :ssh_private_key => ssh_private_key,
-          :ssh_public_key => ssh_public_key,
-          :ssh_keys => ssh_keys,
-          :ssh_deploy_keys => ssh_deploy_keys
-        }
-      end
+      default_action :create
+      actions :create, :create_deploy_keys, :create_ssh_keys
 
       def username(arg = nil)
         set_or_return(
@@ -119,6 +102,19 @@ class Chef
           arg,
           :kind_of => [Array]
         )
+      end
+
+      def to_hash
+        {
+          :username => username,
+          :group => group,
+          :home => home,
+          :password => password,
+          :ssh_private_key => ssh_private_key,
+          :ssh_public_key => ssh_public_key,
+          :ssh_keys => ssh_keys,
+          :ssh_deploy_keys => ssh_deploy_keys
+        }
       end
     end
   end

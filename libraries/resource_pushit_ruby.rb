@@ -17,18 +17,16 @@
 # limitations under the License.
 #
 
+require 'chef/resource/lwrp_base'
+
 class Chef
   class Resource
-    class PushitRuby < Chef::Resource
+    # Resource for installing pushit rubies
+    class PushitRuby < Chef::Resource::LWRPBase
+      self.resource_name = 'pushit_ruby'
 
-      def initialize(name, run_context = nil)
-        super
-
-        @resource_name = :pushit_ruby
-        @provider = Chef::Provider::PushitRuby
-        @action = :create
-        @allowed_actions = [:create, :nothing]
-      end
+      default_action :create
+      actions :create
 
       def name(arg = nil)
         set_or_return(

@@ -21,76 +21,85 @@ require 'chef/resource/lwrp_base'
 
 class Chef
   class Resource
-    # resource class for pushit apps (only used by inheritance in rails and nodejs)
-    class PushitApp < Chef::Resource::LWRPBase
-      self.resource_name = 'pushit_app'
+    # Resource for creating webservers for pushit apps
+    class PushitWebserver < Chef::Resource::LWRPBase
+      self.resource_name = 'pushit_webserver'
 
       default_action :create
-      actions :create
-
-      def framework; end
+      actions :create, :delete, :restart, :reload
 
       def name(arg = nil)
         set_or_return(
           :name,
           arg,
           :kind_of => [String],
-          :required => true,
-          :name_attribute => true,
-          :regex => /^[a-z0-9\-_]+$/
+          :default => 'nginx',
+          :name_attribute => true
         )
       end
 
-      def deploy_action(arg = nil)
+      def config_cookbook(arg = nil)
         set_or_return(
-          :deploy_action,
+          :config_cookbook,
           arg,
           :kind_of => [String],
-          :default => 'deploy'
+          :default => 'pushit'
         )
       end
 
-      def environment(arg = nil)
+      def config_path(arg = nil)
         set_or_return(
-          :environment,
+          :config_path,
           arg,
           :kind_of => [String],
-          :required => true,
-          :default => 'development'
+          :default => node['nginx']['dir']
         )
       end
 
-      def revision(arg = nil)
+      def config_source(arg = nil)
         set_or_return(
-          :revision,
+          :config_source,
           arg,
           :kind_of => [String],
-          :default => 'HEAD'
+          :default => 'nginx.conf.erb'
         )
       end
 
-      def config_files(arg = nil)
+      def pid_file(arg = nil)
         set_or_return(
-          :config_files,
+          :pid_file,
           arg,
-          :kind_of => [Array],
-          :default => []
+          :kind_of => [String],
+          :default => node['nginx']['pid']
         )
       end
 
-      def vhost_config_source(arg = nil)
+      def log_dir(arg = nil)
         set_or_return(
-          :vhost_config_source,
+          :log_dir,
           arg,
-          :kind_of => String
+          :kind_of => [String],
+          :default => node['nginx']['log_dir']
         )
       end
 
-      def vhost_config_cookbook(arg = nil)
+      def user(arg = nil)
         set_or_return(
-          :vhost_config_cookbook,
+          :user,
           arg,
-          :kind_of => String
+          :kind_of => [String],
+          :regex => /^[a-z0-9\-_]+$/,
+          :default => node['nginx']['user']
+        )
+      end
+
+      def group(arg = nil)
+        set_or_return(
+          :group,
+          arg,
+          :kind_of => [String],
+          :regex => /^[a-z0-9\-_]+$/,
+          :default => node['nginx']['group']
         )
       end
     end

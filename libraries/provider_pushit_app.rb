@@ -17,76 +17,75 @@
 # limitations under the License.
 #
 
-require_relative 'chef_pushit'
 require_relative 'provider_pushit_base'
 
 class Chef
   class Provider
+    # Base class for building an app. This class should
+    # not be implemented outside of subclass inheritance.
     class PushitApp < Chef::Provider::PushitBase
-
-      def initialize(new_resource, run_context = nil)
-        @new_resource = new_resource
-        @run_context = run_context
-
-        recipe_eval do
-          @run_context.include_recipe('nodejs::install_from_source')
-          @run_context.include_recipe('logrotate::global')
-        end
-
-        @run_context.include_recipe('campfire-deployment::default')
-        @run_context.include_recipe('newrelic-deployment::default')
-
-        super(new_resource, run_context)
-      end
-
-      def load_current_resource; end
+      use_inline_resources if defined?(use_inline_resources)
 
       def whyrun_supported?
-        Pushit.whyrun_supported?
+        true # TODO: make sure that nodejs::install_from_source is kosher.
       end
 
       def action_create
-        create_directories
+        super
 
-        if new_resource.framework == 'rails'
-          create_shared_directories
-
-          install_ruby
-          create_ruby_version
-
-          if @app.database
-            create_database_config
-            create_filestore_config
-          end
-
-          create_unicorn_config if @app.webserver?
+        recipe_eval do
+          run_context.include_recipe 'nodejs::install_from_source'
         end
 
-        create_ssl_cert(app.database_certificate) if app.database_certificate?
-        create_ssl_cert(app.webserver_certificate) if app.webserver_certificate?
+        gem_dependency_resources.each { |gem| gem.action :install }
 
-        create_vhost_config if app.webserver?
+        app_directory_resources.each { |dir| dir.action :create }
 
-        create_logrotate_config
-        create_monit_check
+        if new_resource.framework == 'rails'
+          shared_directory_resources.each { |dir| dir.action :create }
 
-        create_deploy_revision
+          pushit_ruby_resource.action :create
+          ruby_version_file_resource.action :create
+
+          if app.database
+            database_config_resource.action :create
+            filestore_config_resource.action :create
+          end
+
+          unicorn_config_resource.action :create if app.webserver?
+        end
+
+        if app.database_certificate?
+          ssl_cert_resource(app.database_certificate).action :create
+        end
+
+        if app.webserver?
+          vhost_config_resource.action :create
+
+          if app.webserver_certificate?
+            ssl_cert_resource(app.webserver_certificate).action :create
+          end
+        end
+
+        converge_by 'deploy the new app' do
+          deploy_revision_resource.action new_resource.deploy_action
+        end
       end
 
-      def create_deploy_revision; end
+      def deploy_revision_resource; end
 
-      def before_migrate; end
+      def before_migrate
+        dotenv_file_resource.action :create
+      end
 
       def before_symlink
-        create_writable_directories
-        create_config_files
+        config_file_resources.each { |conf| conf.action :create }
       end
 
       def before_restart
-        create_procfile_if_missing
-        create_service_config
-
-        service_perform_action
+        procfile_resource.action :create
+        foreman_export_resource.action :run
+        supervisor_resource.action [:enable, :start]
       end
 
       def after_restart; end
@@ -113,194 +112,121 @@ class Chef
         @user ||= app.user
       end
 
-      def username
-        user.username
+      def user_username
+        @user_username ||= user.username
       end
 
-      def group
-        user.group
+      def user_group
+        @user_group ||= user.group
       end
 
-      def install_ruby
-        r = Chef::Resource::PushitRuby.new(
-          ruby.version,
-          run_context
-        )
+      def user_ssh_directory
+        @user_ssh_directory ||= user.ssh_directory
+      end
+
+      def gem_dependency_resources
+        PUSHIT_APP_GEM_DEPENDENCIES.map do |gem|
+          chef_gem gem[:name] do
+            version gem[:version] if gem[:version]
+            action :nothing
+          end
+        end
+      end
+
+      def pushit_ruby_resource
+        r = pushit_ruby ruby.version
         r.environment ruby.environment
-        r.user user.username
-        r.group user.group
-        r.run_action(:create)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r.user user_username
+        r.group user_group
+        r.action :nothing
+        r
       end
 
-      def create_ruby_version
-        r = Chef::Resource::Template.new(
-          ::File.join(app.shared_path, 'ruby-version'),
-          run_context
-        )
+      def ruby_version_file_resource
+        r = template ::File.join(app.shared_path, 'ruby-version')
         r.source 'ruby-version.erb'
         r.cookbook 'pushit'
-        r.owner user.username
-        r.group user.group
+        r.owner user_username
+        r.group user_group
         r.mode '0644'
         r.variables(
           :ruby_version => ruby.version
         )
-        r.run_action(:create)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r.action :nothing
+        r
       end
 
-      def create_directories
-        [app.path, app.shared_path].each do |dir|
-          r = Chef::Resource::Directory.new(
-            dir,
-            run_context
-          )
-          r.owner Etc.getpwnam(user.username).uid
-          r.group Etc.getgrnam(user.group).gid
-          r.recursive true
-          r.mode 00755
-          r.run_action(:create)
-
-          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+      def app_directory_resources
+        [app.path, app.shared_path].map do |dir|
+          r = directory dir
+          r.owner user_username
+          r. group user_group
+          r. recursive true
+          r. mode 00755
+          r.action :nothing
+          r
         end
       end
 
-      def create_shared_directories
-        app.shared_directories.each do |dir|
-          r = Chef::Resource::Directory.new(
-            ::File.join(app.shared_path, dir),
-            run_context
-          )
-          r.owner Etc.getpwnam(user.username).uid
-          r.group Etc.getgrnam(user.group).gid
+      def shared_directory_resources
+        app.shared_directories.map do |dir|
+          r = directory ::File.join(app.shared_path, dir)
+          r.owner user_username
+          r.group user_group
           r.recursive true
           r.mode 00755
-          r.run_action(:create)
-
-          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+          r.action :nothing
+          r
         end
       end
 
-      def create_writable_directories
-        %w( log pids sockets ).each do |dir|
-          r = Chef::Resource::Directory.new(
-            ::File.join(app.shared_path, dir),
-            run_context
-          )
-          r.owner Etc.getpwnam(user.username).uid
-          r.group Etc.getgrnam(user.group).gid
-          r.recursive true
-          r.mode 00755
-          r.run_action(:create)
-
-          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-          execute "chmod -R 00755 #{::File.join(app.shared_path, dir)}"
-        end
-      end
-
-      def create_dotenv
-        r = Chef::Resource::Template.new(
-          ::File.join(app.shared_path, 'env'),
-          run_context
-        )
+      def dotenv_file_resource
+        r = template ::File.join(app.shared_path, 'env')
         r.source 'env.erb'
         r.cookbook 'pushit'
-        r.owner config['owner']
-        r.group config['group']
+        r.owner user_username
+        r.group user_group
         r.mode '0644'
         r.variables(
-          :env => escape_env(app.env_vars)
+          :env => Pushit.escape_env(app.env_vars)
         )
-        r.run_action(:create)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r.action :nothing
+        r
       end
 
-      def create_config_files
-        new_resource.config_files.each do |file|
-          r = Chef::Resource::CookbookFile.new(
-            ::File.join(app.release_path, file),
-            run_context
-          )
+      def config_file_resources
+        new_resource.config_files.map do |file|
+          r = cookbook_file ::File.join(app.release_path, file)
           r.source file
           r.cookbook new_resource.cookbook_name.to_s
-          r.owner Etc.getpwnam(user.username).uid
-          r.group Etc.getgrnam(user.group).gid
+          r.owner user_username
+          r.group user_group
           r.mode 00755
-          r.run_action(:create)
-
-          new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+          r.action :nothing
+          r
         end
       end
 
-      def create_service_config
-        r = Chef::Resource::Execute.new(
-          "#{app.foreman_binary} export #{app.foreman_export_flags}",
-          run_context
-        )
+      def foreman_export_resource
+        r = execute 'run foreman'
+        r.command "#{app.foreman_binary} export #{app.foreman_export_flags}"
         r.cwd app.release_path
         r.user 'root'
         r.group 'root'
-        r.run_action :run
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r.action :nothing
+        r
       end
 
-      def service_perform_action
-        r = Chef::Resource::Service.new(
-          new_resource.name,
-          run_context
-        )
+      def supervisor_resource
+        r = service new_resource.name
         r.provider Chef::Provider::Service::Upstart
         r.supports :status => true, :restart => true, :reload => true
-        r.run_action :nothing
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r.action :nothing
+        r
       end
 
-      def create_monit_check
-        r = Chef::Resource::PushitMonit.new(
-          new_resource.name,
-          run_context
-        )
-        r.check(
-          :name => new_resource.name,
-          :pid_file => app.upstart_pid,
-          :start_program => "/sbin/start #{new_resource.name}",
-          :stop_program => "/sbin/stop #{new_resource.name}",
-          :uid => 'root',
-          :gid => 'root',
-          :group => app.monit_group
-        )
-        r.run_action(:install)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-      end
-
-      def create_logrotate_config
-        log_path = app.logrotate_logs_path
-        name = app.name
-        username = user.username
-        group = user.group
-
-        logrotate_app name do
-          cookbook 'logrotate'
-          path log_path
-          frequency 'daily'
-          rotate 180
-          options %w( missingok dateext delaycompress notifempty compress )
-          create "644 #{username} #{group}"
-        end
-      end
-
-      def create_vhost_config
-        r = Chef::Resource::PushitVhost.new(
-          new_resource.name,
-          run_context
-        )
+      def vhost_config_resource
+        r = pushit_vhost new_resource.name
         r.http_port app.http_port
         r.https_port app.https_port
         r.server_name app.server_name
@@ -315,88 +241,33 @@ class Chef
           Pushit::Certs.keys_directory,
           "#{app.webserver_certificate}.key"
         )
-        r.config_cookbook new_resource.vhost_config_cookbook if new_resource.vhost_config_cookbook
-        r.config_source new_resource.vhost_config_source if new_resource.vhost_config_source
-        r.run_action(:create)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r.config_cookbook new_resource.vhost_config_cookbook
+        r.config_source new_resource.vhost_config_source || "nginx_#{new_resource.framework}.conf.erb"
+        r.action :nothing
+        r
       end
 
-      def create_ssl_cert(certificate)
-        r = Chef::Resource::CertificateManage.new(
-          certificate,
-          run_context
-        )
-        r.owner user.username
-        r.group user.group
+      def ssl_cert_resource(certificate)
+        r = certificate_manage certificate
+        r.owner user_username
+        r.group user_group
         r.cert_path Pushit::Certs.ssl_path
         r.cert_file "#{certificate}.pem"
         r.key_file "#{certificate}.key"
         r.chain_file "#{certificate}-bundle.crt"
         r.nginx_cert false
-        r.run_action(:create)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r.action :nothing
+        r
       end
 
-      def create_procfile_if_missing
-        r = Chef::Resource::File.new(
-          app.procfile,
-          run_context
-        )
+      def procfile_resource
+        r = file app.procfile
         r.content app.procfile_default_entry(new_resource.framework)
-        r.owner user.username
-        r.group user.group
+        r.owner user_username
+        r.group user_group
         r.not_if { app.procfile? }
-        r.run_action(:create)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-      end
-
-      def create_newrelic_notification
-        r = newrelic_deployment config['env']['NEW_RELIC_APP_NAME'] do
-          api_key config['env']['NEW_RELIC_API_KEY']
-          revision app.version
-          user config['owner']
-          action :nothing
-          only_if do
-            (config.key?('env') &&
-             config['env'].key?('NEW_RELIC_API_KEY') &&
-             config['env'].key?('NEW_RELIC_APP_NAME')) &&
-              config['environment'] != 'test'
-          end
-        end.run_action(:create)
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-      end
-
-      def create_campfire_notification(action = :announce_start)
-        r = Chef::Resource::CampfireDeployment.new(
-          new_resource.name,
-          run_context
-        )
-        r.account config['env']['CAMPFIRE_DEPLOYMENT_ACCOUNT']
-        r.token config['env']['CAMPFIRE_DEPLOYMENT_TOKEN']
-        r.room config['env']['CAMPFIRE_DEPLOYMENT_ROOM']
-        r.release(
-          deployer: user.username,
-          environment: new_resource.environment,
-          revision: new_resource.revision,
-          application: new_resource.name
-        )
-        r.run_action(action)
-        r.not_if do
-          app.environment == 'test'
-        end
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
-      end
-
-      def escape_env(vars = {})
-        vars.inject({}) do |hash, (key, value)|
-          hash[key.upcase] = value.gsub(/"/) { %q(\") }
-          hash
-        end
+        r.action :nothing
+        r
       end
     end
   end

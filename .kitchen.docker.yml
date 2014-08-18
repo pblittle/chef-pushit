@@ -1,14 +1,11 @@
 ---
 #<% require 'kitchen-sync' %>
 
-driver_plugin: vagrant
-
-driver_config:
-  require_chef_omnibus: true
-  customize:
-    cpus: 2
-    memory: 1536
-    cpuexecutioncap: 75
+driver:
+  name: docker
+  provision_command: curl -L http://www.opscode.com/chef/install.sh | bash
+  socket: <%= ENV['DOCKER_HOST'] %>
+  use_sudo: false
 
 provisioner:
   name: chef_zero
@@ -16,14 +13,14 @@ provisioner:
   chef_omnibus_url: https://www.getchef.com/chef/install.sh
 
 platforms:
-- name: ubuntu-12.04-base
+- name: ubuntu-12.04
   driver_config:
     box: opscode-ubuntu-12.04
     box_url: http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-12.04_chef-provisionerless.box
-  run_list: &default_run_list
+  run_list:
     - recipe[apt::default]
     - recipe[build-essential::default]
-  attributes: &default_attributes
+  attributes:
     mysql:
       bind_address: 'localhost'
       server_debian_password: 'password'
@@ -58,9 +55,6 @@ suites:
     'test/data_bags'
 
 - name: custom-vhost
-  excludes:
-    - ubuntu-12.04-base
-    - ubuntu-12.04-node
   run_list:
     - recipe[pushit_test::custom-vhost]
   data_bags_path:

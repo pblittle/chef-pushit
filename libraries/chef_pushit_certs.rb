@@ -24,8 +24,8 @@ require_relative 'chef_pushit'
 
 class Chef
   module Pushit
+    # Model class for pushit certificate
     class Certs
-
       def self.ssl_path
         ::File.join(Pushit.pushit_path, 'ssl')
       end

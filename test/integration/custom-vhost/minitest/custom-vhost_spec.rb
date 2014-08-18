@@ -6,7 +6,9 @@ require 'minitest/spec'
 describe 'pushit_test::custom-vhost' do
 
   let(:vhost_config_path) do
-    ::File.join('', 'opt', 'pushit', 'nginx', 'sites-available', 'vhost.conf')
+    ::File.join(
+      '', 'opt', 'pushit', 'nginx', 'sites-available', 'rails-example.conf'
+    )
   end
 
   it 'config file exists' do
@@ -16,8 +18,4 @@ describe 'pushit_test::custom-vhost' do
   it 'has used our custom template' do
     assert ::File.readlines(vhost_config_path).grep(/TEST PASSES/).length > 0
   end
-
-#   it 'shouldnt pass this' do
-#     file(vhost_config_path).must_include 'TEST NO PASS'
-#   end
 end

@@ -135,5 +135,11 @@ describe 'pushit_test::user' do
         ::File.join(pushit_home, '.ssh', 'id_dsa.pub')
       ).include?('ssh-dsa')
     end
+
+    it 'notifies resources that subscribe to it' do
+      assert(::File.file?("/tmp/kitchen/cache/pushit_user_notification_flag"),
+        "/tmp/kitchen/cache/pushit_user_notification_flag does not exist"
+      )
+    end
   end
 end

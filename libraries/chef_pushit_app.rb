@@ -23,9 +23,10 @@
 require_relative 'chef_pushit'
 
 class Chef
+  # pushit module
   module Pushit
+    # Model class for pushit apps
     class App
-
       include Mixin::App
 
       def initialize(name)
@@ -33,7 +34,7 @@ class Chef
       end
 
       def config
-        @config ||= Chef::Pushit.app_data_bag(@name)
+        @config ||= Pushit.pushit_app_config(@name)
       end
 
       def user
@@ -74,8 +75,8 @@ class Chef
         ::File.join(shared_path, 'log')
       end
 
-      def logrotate_logs_path
-        ::File.join(log_path, '*.log')
+      def shared_directories
+        %w( cached-copy config system vendor_bundle log pids )
       end
 
       def pid_path
@@ -188,16 +189,14 @@ class Chef
         return unless ::File.directory?(::File.join(cached_copy_dir, '.git'))
 
         Dir.chdir(cached_copy_dir) do
-          `git rev-parse HEAD`.chomp
+          shellout = Mixlib::ShellOut.new('git rev-parse HEAD')
+          shellout.run_command
+          shellout.stdout.chomp
         end
       end
 
-      def monit_group
-        "pushit_#{name}"
-      end
-
       def restart_command
-        "$(which monit) -g #{monit_group} restart"
+        "kill -USR2 `cat #{upstart_pid}`"
       end
     end
   end

@@ -21,34 +21,19 @@ require_relative 'provider_pushit_app'
 
 class Chef
   class Provider
-
     # Convenience class for using the app resource with
     # the nodejs framework (provider)
     class PushitNodejs < Chef::Provider::PushitApp
-
-      def initialize(new_resource, run_context = nil)
-        @new_resource = new_resource
-        @run_context = run_context
-
-        @framework = 'nodejs'
-
-        super(new_resource, run_context)
-      end
-
-      def load_current_resource; end
-
       private
 
-      def create_deploy_revision
+      def deploy_revision_resource
         app_provider = self
 
-        owner = config['owner']
-        group = config['group']
+        username = user_username
+        group = user_group
+        ssh_directory = user_ssh_directory
 
-        r = Chef::Resource::DeployRevision.new(
-          new_resource.name,
-          run_context
-        )
+        r = deploy_revision new_resource.name
         r.action new_resource.deploy_action
         r.deploy_to app.path
 
@@ -58,15 +43,15 @@ class Chef
 
         if config['deploy_key'] && !config['deploy_key'].empty?
           wrapper = "#{config['deploy_key']}_deploy_wrapper.sh"
-          wrapper_path = ::File.join(app.user.ssh_directory, wrapper)
+          wrapper_path = ::File.join(ssh_directory, wrapper)
 
           r.ssh_wrapper wrapper_path
         end
 
         r.environment app.env_vars
 
-        r.user Etc.getpwnam(owner).name
-        r.group Etc.getgrnam(group).name
+        r.user username
+        r.group group
 
         r.symlink_before_migrate(
           new_resource.symlink_before_migrate
@@ -76,10 +61,8 @@ class Chef
         r.migration_command nil
 
         r.before_migrate do
-          app_provider.send(:create_dotenv)
-
-          app_provider.send(:npm_install)
           app_provider.send(:before_migrate)
+          app_provider.send(:npm_install_resource).action :run
         end
 
         r.before_symlink do
@@ -100,23 +83,19 @@ class Chef
           app_provider.send(:after_restart)
         end
 
-        r.run_action(new_resource.deploy_action)
+        r.action :nothing
 
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r
       end
 
-      def npm_install
-        r = Chef::Resource::Execute.new(
-          "Install #{new_resource.name} dependencies",
-          run_context
-        )
+      def npm_install_resource
+        r = execute "Install #{new_resource.name} dependencies"
         r.command "#{Pushit::Nodejs.npm_binary} install"
         r.cwd app.release_path
         r.user 'root'
         r.group 'root'
-        r.run_action :run
-
-        new_resource.updated_by_last_action(true) if r.updated_by_last_action?
+        r.action :nothing
+        r
       end
     end
   end
