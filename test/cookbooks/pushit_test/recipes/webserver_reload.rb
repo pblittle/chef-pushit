@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
 # Cookbook Name:: pushit_test
-# Recipe:: custom_vhost
+# Recipe:: webserver
 #
 # Author:: P. Barrett Little (<barrett@barrettlittle.com>)
 #
@@ -22,19 +22,6 @@
 
 include_recipe 'pushit_test::base'
 
-app = 'rails-example'
-
-pushit_database app
-
-pushit_webserver 'nginx'
-
-pushit_rails app do
-  deploy_action 'deploy'
-  environment 'test'
-  precompile_assets true
-  migrate true
-  unicorn_worker_processes 1
-  revision 'master'
-  vhost_config_cookbook 'pushit_test'
-  vhost_config_source 'custom_vhost.conf.erb'
+pushit_webserver 'nginx' do
+  action :reload
 end

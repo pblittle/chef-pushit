@@ -24,9 +24,22 @@ include_recipe 'pushit_test::base'
 
 pushit_user 'deploy'
 
+flag_path = "#{Chef::Config[:file_cache_path]}/pushit_user_notification_flag"
+file 'delete user flag' do
+  path   flag_path
+  action :delete
+end
+
 pushit_user 'foo' do
   group 'foo'
   home '/home/foo'
   ssh_private_key '-----BEGIN DSA PRIVATE KEY-----'
   ssh_public_key 'ssh-dsa'
+end
+
+file 'add user flag' do
+  path    flag_path
+  action  :nothing
+  content 'I am here'
+  subscribes :create, "pushit_user[foo]"
 end

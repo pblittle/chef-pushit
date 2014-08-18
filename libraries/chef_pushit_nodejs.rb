@@ -21,12 +21,13 @@
 #
 
 require_relative 'chef_pushit'
+require 'English'
 
 class Chef
   module Pushit
+    # model class for nodejs pushit apps
     class Nodejs
       class << self
-
         def prefix_path
           ::File.join('', 'usr', 'local')
         end
@@ -44,7 +45,7 @@ class Chef
         end
 
         def installed?
-          system("#{node_binary} -v") && $?.success?
+          system("#{node_binary} -v") && $CHILD_STATUS.success?
         end
       end
     end

@@ -23,9 +23,10 @@
 require_relative 'chef_pushit'
 
 class Chef
+  # pushit module
   module Pushit
+    # Model class for pushit apps
     class App
-
       include Mixin::App
 
       def initialize(name)
@@ -75,11 +76,7 @@ class Chef
       end
 
       def shared_directories
-        %w( cached-copy config system vendor_bundle )
-      end
-
-      def logrotate_logs_path
-        ::File.join(log_path, '*.log')
+        %w( cached-copy config system vendor_bundle log pids )
       end
 
       def pid_path
@@ -198,12 +195,8 @@ class Chef
         end
       end
 
-      def monit_group
-        "pushit_#{name}"
-      end
-
       def restart_command
-        "$(which monit) -g #{monit_group} restart"
+        "kill -USR2 `cat #{upstart_pid}`"
       end
     end
   end
