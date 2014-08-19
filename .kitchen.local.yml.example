@@ -1,48 +1,74 @@
 ---
 platforms:
-- name: ubuntu-12.04-base
-  driver_config:
-    box: ck-base
+  - name: ubuntu-12.04-base
+    driver_config:
+      box: ck-base
 
-- name: ubuntu-12.04-ruby
-  driver_config:
-    box: ck-ruby
-  run_list: *default_run_list
-  attributes: *default_attributes
+  - name: ubuntu-12.04-ruby
+    driver_config:
+      box: ck-ruby
+    run_list: &default_run_list
+      - recipe[apt::default]
+      - recipe[build-essential::default]
+    attributes: &default_attributes
+      mysql:
+        bind_address: 'localhost'
+        server_debian_password: 'password'
+        server_repl_password: 'password'
+        server_root_password: 'password'
+        tunable:
+          lower_case_table_names: 1
+      nginx:
+        default_site_enabled: false
+        dir: '/opt/pushit/nginx'
+        log_dir: '/opt/pushit/nginx/log'
+        pid: '/opt/pushit/nginx/run/nginx.pid'
+        install_method: 'source'
+        source:
+          version: '1.4.4'
+          conf_path: '/opt/pushit/nginx/nginx.conf'
+          sbin_path: '/opt/pushit/nginx/sbin/nginx'
 
-- name: ubuntu-12.04-node
-  driver_config:
-    box: ck-node
-  run_list:  *default_run_list
-  attributes: *default_attributes
+  - name: ubuntu-12.04-node
+    driver_config:
+      box: ck-node
+    run_list:  *default_run_list
+    attributes: *default_attributes
 
 suites:
-- name: user
-  excludes:
-    - ubuntu-12.04-base
-    - ubuntu-12.04-node
+  - name: user
+    excludes:
+      - ubuntu-12.04-base
+      - ubuntu-12.04-node
 
-- name: webserver
-  excludes:
-    - ubuntu-12.04-base
-    - ubuntu-12.04-node
+  - name: webserver
+    excludes:
+      - ubuntu-12.04-base
+      - ubuntu-12.04-node
 
-- name: database
-  excludes:
-    - ubuntu-12.04-base
-    - ubuntu-12.04-node
+  - name: custom-vhost
+    excludes:
+      - ubuntu-12.04-base
+      - ubuntu-12.04-node
 
-- name: nodejs
-  excludes:
-    - ubuntu-12.04-ruby
-    - ubuntu-12.04-node
+  - name: database
+    excludes:
+      - ubuntu-12.04-base
+      - ubuntu-12.04-node
 
-- name: ruby
-  excludes:
-    - ubuntu-12.04-base
-    - ubuntu-12.04-ruby
+  - name: nodejs
+    excludes:
+      - ubuntu-12.04-ruby
+      - ubuntu-12.04-node
 
-- name: rails
-  excludes:
-    - ubuntu-12.04-base
-    - ubuntu-12.04-node
+  - name: ruby
+    excludes:
+      - ubuntu-12.04-base
+      - ubuntu-12.04-ruby
+
+  - name: rails
+    excludes:
+      - ubuntu-12.04-base
+      - ubuntu-12.04-node
+
+  - name: local_dummy

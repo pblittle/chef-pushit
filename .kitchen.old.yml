@@ -42,23 +42,8 @@ platforms:
           conf_path: '/opt/pushit/nginx/nginx.conf'
           sbin_path: '/opt/pushit/nginx/sbin/nginx'
 
-  - name: ubuntu-12.04-ruby
-    driver_config:
-      box: ck-ruby
-    run_list: *default_run_list
-    attributes: *default_attributes
-
-  - name: ubuntu-12.04-node
-    driver_config:
-      box: ck-node
-    run_list:  *default_run_list
-    attributes: *default_attributes
-
 suites:
   - name: user
-    excludes:
-      - ubuntu-12.04-base
-      - ubuntu-12.04-node
     run_list:
       - recipe[pushit_test::user]
     data_bags_path:
@@ -67,9 +52,6 @@ suites:
       'test/encrypted_data_bag_secret'
 
   - name: webserver
-    excludes:
-      - ubuntu-12.04-base
-      - ubuntu-12.04-node
     run_list:
       - recipe[pushit_test::webserver]
     data_bags_path:
@@ -87,18 +69,12 @@ suites:
       'test/encrypted_data_bag_secret'
 
   - name: database
-    excludes:
-      - ubuntu-12.04-base
-      - ubuntu-12.04-node
     run_list:
       - recipe[pushit_test::database]
     data_bags_path:
       'test/data_bags'
 
   - name: nodejs
-    excludes:
-      - ubuntu-12.04-ruby
-      - ubuntu-12.04-node
     run_list:
       - recipe[pushit_test::nodejs]
     data_bags_path:
@@ -107,23 +83,15 @@ suites:
       'test/encrypted_data_bag_secret'
 
   - name: ruby
-    excludes:
-      - ubuntu-12.04-base
-      - ubuntu-12.04-ruby
     run_list:
       - recipe[pushit_test::ruby]
     data_bags_path:
       'test/data_bags'
 
   - name: rails
-    excludes:
-      - ubuntu-12.04-base
-      - ubuntu-12.04-node
     run_list:
       - recipe[pushit_test::rails]
     data_bags_path:
       'test/data_bags'
     encrypted_data_bag_secret_key_path:
       'test/encrypted_data_bag_secret'
-
-  - name: project_dummy

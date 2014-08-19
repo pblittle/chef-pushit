@@ -33,7 +33,7 @@ class Chef
         end
 
         service 'nginx' do
-          action [:enable, :start]
+          action :start
         end
 
         webserver_config_resource.action :create

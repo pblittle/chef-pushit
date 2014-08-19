@@ -99,7 +99,7 @@ describe 'pushit_test::rails' do
 
   it 'has created the shared app directories' do
     pushit_app_shared_dirs.each do |dir|
-      assert File.directory?(pushit_app_shared_path, dir)
+      assert File.directory?(::File.join(pushit_app_shared_path, dir))
     end
   end
 
