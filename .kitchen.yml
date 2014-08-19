@@ -17,7 +17,7 @@ provisioner:
 
 platforms:
   - name: ubuntu-12.04-base
-    driver_config:
+    driver_config: &driver_config
       box: opscode-ubuntu-12.04
       box_url: http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-12.04_chef-provisionerless.box
     run_list: &default_run_list
@@ -43,14 +43,12 @@ platforms:
           sbin_path: '/opt/pushit/nginx/sbin/nginx'
 
   - name: ubuntu-12.04-ruby
-    driver_config:
-      box: ck-ruby
+    driver_config: *driver_config
     run_list: *default_run_list
     attributes: *default_attributes
 
   - name: ubuntu-12.04-node
-    driver_config:
-      box: ck-node
+    driver_config: *driver_config
     run_list:  *default_run_list
     attributes: *default_attributes
 
@@ -125,5 +123,3 @@ suites:
       'test/data_bags'
     encrypted_data_bag_secret_key_path:
       'test/encrypted_data_bag_secret'
-
-  - name: project_dummy
