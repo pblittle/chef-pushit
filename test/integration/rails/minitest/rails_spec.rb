@@ -101,10 +101,12 @@ describe 'pushit_test::rails' do
     )
   end
 
-  it 'has created a pids directory' do
-    assert File.directory?(
-      ::File.join(pushit_app_path, 'shared', 'pids')
-    )
+  %w( cached-copy config system vendor_bundle log pids sockets ).each do |dir|
+    it "has created a #{dir} directory in the shared directory" do
+      assert File.directory?(
+        ::File.join(pushit_app_path, 'shared', dir)
+      )
+    end
   end
 
   it 'has created a service config' do
