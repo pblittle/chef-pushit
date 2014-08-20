@@ -4,8 +4,7 @@ require_relative '../../libraries/chef_pushit'
 describe "#{Chef::Provider::PushitRails}.create" do
   let(:chef_run) do
     ChefSpec::Runner.new(
-      :step_into => %w(pushit_rails pushit_app pushit_base),# deploy_revision),
-      :log_level => :debug
+      :step_into => %w(pushit_rails pushit_app pushit_base)
     ).converge('pushit_test::rails')
   end
 
@@ -114,7 +113,11 @@ describe "#{Chef::Provider::PushitRails}.create" do
     expect(chef_run).to create_directory('/opt/pushit/apps/rails-example/shared')
   end
 
-  # TODO: need to add logic to test we create the shared directories
+  it "creates the shared directories in '/opt/pushit/apps/rails-example/shared'" do
+    %w( cached-copy config system vendor_bundle log pids sockets ).each do |dir|
+      expect(chef_run).to create_directory("/opt/pushit/apps/rails-example/shared/#{dir}")
+    end
+  end
 
   it 'creates the ruby-version file' do
     expect(chef_run).to create_template('/opt/pushit/apps/rails-example/shared/ruby-version')
@@ -188,7 +191,7 @@ describe "#{Chef::Provider::PushitRails}.create" do
   end
 
   it 'creates the .env file' do
-  #pending 'not stepping into deploy_revision'
+  pending 'not stepping into deploy_revision'
     expect(chef_run).to create_template('/opt/pushit/apps/rails-example/shared/env')
   end
 
@@ -221,5 +224,4 @@ describe "#{Chef::Provider::PushitRails}.create" do
   # TODO: creates the procfile and restarts when it changes
   # TODO: runs foreman
   # TODO: creates a service resource for the app
-
 end

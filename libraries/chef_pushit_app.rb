@@ -76,7 +76,7 @@ class Chef
       end
 
       def shared_directories
-        %w( cached-copy config system vendor_bundle log pids )
+        %w( cached-copy config system vendor_bundle log pids sockets )
       end
 
       def pid_path

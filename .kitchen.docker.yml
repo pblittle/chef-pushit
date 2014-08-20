@@ -13,14 +13,14 @@ provisioner:
   chef_omnibus_url: https://www.getchef.com/chef/install.sh
 
 platforms:
-- name: ubuntu-12.04
-  driver_config:
+- name: ubuntu-12.04-base
+  driver_config: &driver_config
     box: opscode-ubuntu-12.04
     box_url: http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-12.04_chef-provisionerless.box
-  run_list:
+  run_list: &run_list
     - recipe[apt::default]
     - recipe[build-essential::default]
-  attributes:
+  attributes: &attributes
     mysql:
       bind_address: 'localhost'
       server_debian_password: 'password'
@@ -39,53 +39,13 @@ platforms:
         conf_path: '/opt/pushit/nginx/nginx.conf'
         sbin_path: '/opt/pushit/nginx/sbin/nginx'
 
-suites:
-- name: user
-  run_list:
-    - recipe[pushit_test::user]
-  data_bags_path:
-    'test/data_bags'
-  encrypted_data_bag_secret_key_path:
-    'test/encrypted_data_bag_secret'
 
-- name: webserver
-  run_list:
-    - recipe[pushit_test::webserver]
-  data_bags_path:
-    'test/data_bags'
+  - name: ubuntu-12.04-ruby
+    driver_config: *driver_config
+    run_list:  *default_run_list
+    attributes: *default_attributes
 
-- name: custom-vhost
-  run_list:
-    - recipe[pushit_test::custom-vhost]
-  data_bags_path:
-    'test/data_bags'
-  encrypted_data_bag_secret_key_path:
-    'test/encrypted_data_bag_secret'
-
-- name: database
-  run_list:
-    - recipe[pushit_test::database]
-  data_bags_path:
-    'test/data_bags'
-
-- name: nodejs
-  run_list:
-    - recipe[pushit_test::nodejs]
-  data_bags_path:
-    'test/data_bags'
-  encrypted_data_bag_secret_key_path:
-    'test/encrypted_data_bag_secret'
-
-- name: ruby
-  run_list:
-    - recipe[pushit_test::ruby]
-  data_bags_path:
-    'test/data_bags'
-
-- name: rails
-  run_list:
-    - recipe[pushit_test::rails]
-  data_bags_path:
-    'test/data_bags'
-  encrypted_data_bag_secret_key_path:
-    'test/encrypted_data_bag_secret'
+  - name: ubuntu-12.04-node
+    driver_config: *driver_config
+    run_list:  *default_run_list
+    attributes: *default_attributes

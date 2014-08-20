@@ -11,8 +11,12 @@ describe 'pushit_test::rails' do
 
   let(:pushit_app_path) { ::File.join(pushit_path, 'apps', pushit_app) }
 
+  let(:pushit_app_current_path) { ::File.join(pushit_app_path, 'current') }
+
+  let(:pushit_app_shared_path) { ::File.join(pushit_app_path, 'shared') }
+
   let(:pushit_pid_path) do
-    ::File.join(pushit_app_path, 'shared', 'pids', 'upstart.pid')
+    ::File.join(pushit_app_shared_path, 'pids', 'upstart.pid')
   end
 
   let(:upstart_config_path) do
@@ -20,23 +24,23 @@ describe 'pushit_test::rails' do
   end
 
   let(:database_yaml_path) do
-    ::File.join(pushit_app_path, 'current', 'config', 'database.yml')
+    ::File.join(pushit_app_current_path, 'config', 'database.yml')
   end
 
   let(:dotenv_path) do
-    ::File.join(pushit_app_path, 'current', '.env')
+    ::File.join(pushit_app_current_path, '.env')
   end
 
   let(:ruby_bin_path) do
     ::File.join(pushit_path, 'rubies', '2.1.1', 'bin')
   end
 
-  let(:pushit_app_log_path) do
-    ::File.join(pushit_app_path, 'shared', 'log')
+  let(:bundler_binstubs_path) do
+    ::File.join(pushit_app_current_path, 'bin')
   end
 
-  let(:bundler_binstubs_path) do
-    ::File.join(pushit_app_path, 'current', 'bin')
+  let(:pushit_app_shared_dirs) do
+    %w( cached-copy config system vendor_bundle log pids sockets )
   end
 
   it 'has created the base pushit directory' do
@@ -47,18 +51,12 @@ describe 'pushit_test::rails' do
     assert File.directory?(pushit_app_path)
   end
 
-  it 'has created a log directory' do
-    assert File.directory?(pushit_app_log_path)
-  end
-
   it 'has created an upstart config file' do
     assert File.file?(upstart_config_path)
   end
 
   it 'has symlinked the current release' do
-    assert File.symlink?(
-      ::File.join(pushit_app_path, 'current')
-    )
+    assert File.symlink?(pushit_app_current_path)
   end
 
   it 'has symlinked the .env file' do
@@ -90,27 +88,29 @@ describe 'pushit_test::rails' do
   end
 
   it 'has created bundler binstubs' do
-    assert File.directory?(
-      ::File.join(bundler_binstubs_path)
-    )
+    assert File.directory?(bundler_binstubs_path)
   end
 
   it 'has vendored the bundled gems' do
     assert File.directory?(
-      ::File.join(pushit_app_path, 'current', 'vendor', 'bundle', 'ruby', '2.1.0', 'gems')
+      ::File.join(pushit_app_current_path, 'vendor', 'bundle', 'ruby', '2.1.0', 'gems')
     )
   end
 
-  it 'has created a pids directory' do
-    assert File.directory?(
-      ::File.join(pushit_app_path, 'shared', 'pids')
-    )
+  it 'has created the shared app directories' do
+    pushit_app_shared_dirs.each do |dir|
+      assert File.directory?(::File.join(pushit_app_shared_path, dir))
+    end
   end
 
   it 'has created a service config' do
     assert File.file?(
       ::File.join('', 'etc', 'init', "#{pushit_app}.conf")
     )
+  end
+
+  it 'starts the unicorn workers after converge' do
+    assert File.file?(pushit_pid_path)
   end
 
   it 'starts the rails app service after converge' do
