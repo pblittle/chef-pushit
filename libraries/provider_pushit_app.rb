@@ -228,7 +228,7 @@ class Chef
       def service_resource
         r = service new_resource.name
         r.provider Chef::Provider::Service::Upstart
-        r.supports :status => true, :restart => true, :reload => true
+        r.supports :status => true, :restart => false, :reload => false
         r.action :nothing
         r
       end
