@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Chef::Provider::PushitVhost do
   let(:chef_run) do
     ChefSpec::Runner.new(
-      step_into => %w(pushit_vhost)
+      :step_into => %w(pushit_vhost)
     ).converge('pushit_test::vhost')
   end
 
