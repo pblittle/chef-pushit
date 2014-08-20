@@ -1,5 +1,4 @@
 require 'spec_helper'
-require_relative '../../libraries/chef_pushit'
 
 describe "#{Chef::Provider::PushitRails}.create" do
   let(:chef_run) do
@@ -8,9 +7,24 @@ describe "#{Chef::Provider::PushitRails}.create" do
     ).converge('pushit_test::rails')
   end
 
+  let(:app_version) do
+    'IamAdummyVersionOfYourApp'
+  end
+
+  let(:app_stub) do
+    Chef::Pushit::App.new 'rails-example'
+  end
+
   before do
+    allow(Chef::Pushit::App).to receive(:new).and_return(app_stub)
+    # Must stub this method so that we can get a "version" for pushit without actually pulling git code
+    allow(app_stub).to receive(:version).and_return(app_version)
+
+    # Need a default stub for the databag.load method or we get errors.
     allow(Chef::DataBagItem).to receive(:load).and_return(Hash.new)
 
+    # Stub out the pushit_apps databag with a test app
+    # TODO: we can trim this WAY down I bet
     allow(Chef::DataBagItem).to(
       receive(:load).with('pushit_apps', 'rails-example').and_return(
         'id' =>  'rails-example',
@@ -125,7 +139,6 @@ describe "#{Chef::Provider::PushitRails}.create" do
 
   # TODO: do we need to re-do the foreman stuff too??
   it 'restarts the app if the ruby version changes' do
-    pending 'need to figure out how to do monit'
     expect(chef_run.template('/opt/pushit/apps/rails-example/shared/ruby-version')).to(
       notify('service[rails-example]').to(:restart).delayed
     )
@@ -136,7 +149,6 @@ describe "#{Chef::Provider::PushitRails}.create" do
   end
 
   it 'restarts the app if the database config changes' do
-    pending 'need to figure out how to do monit'
     expect(chef_run.template('/opt/pushit/apps/rails-example/shared/config/database.yml')).to(
       notify('service[rails-example]').to(:restart).delayed
     )
@@ -147,7 +159,6 @@ describe "#{Chef::Provider::PushitRails}.create" do
   end
 
   it 'restarts the app if the filestore config changes' do
-    pending 'need to figure out how to do monit'
     expect(chef_run.template('/opt/pushit/apps/rails-example/shared/config/filestore.yml')).to(
       notify('service[rails-example]').to(:restart).delayed
     )
@@ -158,7 +169,6 @@ describe "#{Chef::Provider::PushitRails}.create" do
   end
 
   it 'restarts the app if the unicron config changes' do
-    pending 'need to figure out how to do monit'
     expect(chef_run.template('/opt/pushit/apps/rails-example/shared/config/unicorn.rb')).to(
       notify('service[rails-example]').to(:restart).delayed
     )
@@ -191,7 +201,6 @@ describe "#{Chef::Provider::PushitRails}.create" do
   end
 
   it 'creates the .env file' do
-  pending 'not stepping into deploy_revision'
     expect(chef_run).to create_template('/opt/pushit/apps/rails-example/shared/env')
   end
 

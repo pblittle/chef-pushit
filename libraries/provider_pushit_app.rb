@@ -27,69 +27,109 @@ class Chef
       use_inline_resources if defined?(use_inline_resources)
 
       def whyrun_supported?
-        true # TODO: make sure that nodejs::install_from_source is kosher.
+        false # TODO: make sure that nodejs::install_from_source is kosher, and need to deal with unknown release dir
       end
 
       def action_create
         super
 
+        add_pre_app_directory_resources
+
+        app_directory_resources.each { |dir| dir.action :create }
+
+        add_after_app_directory_resources
+
+        add_pre_deploy_resources
+
+        converge_by 'deploy the new app' do
+          r = deploy_resource
+          r.action new_resource.deploy_action
+          customize_deploy_revision_resource(r)
+        end
+
+        add_post_deploy_resources
+      end
+
+      def add_pre_app_directory_resources
         recipe_eval do
           run_context.include_recipe 'nodejs::install_from_source'
         end
 
-        gem_dependency_resources.each { |gem| gem.action :install }
-
-        app_directory_resources.each { |dir| dir.action :create }
-
-        if new_resource.framework == 'rails'
-          shared_directory_resources.each { |dir| dir.action :create }
-
-          pushit_ruby_resource.action :create
-          ruby_version_file_resource.action :create
-
-          if app.database
-            database_config_resource.action :create
-            filestore_config_resource.action :create
-          end
-
-          unicorn_config_resource.action :create if app.webserver?
+        gem_dependency_resources.each do |gem|
+          gem.action :install
+          gem.notifies :restart, "service[#{new_resource.name}]"
         end
+      end
 
-        if app.database_certificate?
-          ssl_cert_resource(app.database_certificate).action :create
-        end
+      def add_after_app_directory_resources; end
+
+      def add_pre_deploy_resources
+        dotenv_file_resource.action :create
 
         if app.webserver?
           vhost_config_resource.action :create
 
-          if app.webserver_certificate?
-            ssl_cert_resource(app.webserver_certificate).action :create
-          end
-        end
-
-        converge_by 'deploy the new app' do
-          deploy_revision_resource.action new_resource.deploy_action
+          ssl_cert_resource(app.webserver_certificate).action(:create) if app.webserver_certificate?
         end
       end
 
-      def deploy_revision_resource; end
+      def deploy_resource
+        app_provider = self
 
-      def before_migrate
-        dotenv_file_resource.action :create
+        username = user_username
+        group = user_group
+        ssh_directory = user_ssh_directory
+
+        r = deploy_revision new_resource.name
+        r.action :nothing
+        r.deploy_to app.path
+
+        r.repository config['repo']
+        r.revision new_resource.revision
+        r.shallow_clone true
+
+        if config['deploy_key'] && !config['deploy_key'].empty?
+          wrapper = "#{config['deploy_key']}_deploy_wrapper.sh"
+          wrapper_path = ::File.join(ssh_directory, wrapper)
+
+          r.ssh_wrapper wrapper_path
+        end
+
+        r.environment app.env_vars
+
+        r.user username
+        r.group group
+
+        r.symlink_before_migrate(new_resource.symlink_before_migrate)
+
+        r.before_symlink{ app_provider.send(:before_symlink) }
+
+        r.notifies :run, "execute[run foreman]"
+        r.notifies :restart, "service[#{new_resource.name}]"
+        r
       end
 
-      def before_symlink
-        config_file_resources.each { |conf| conf.action :create }
-      end
+      def customize_deploy_revision_resource(deploy_resource); end
 
-      def before_restart
+      def before_migrate; end
+
+      def before_symlink; end
+
+      def before_restart; end
+
+      def add_post_deploy_resources
+        # TODO: NONE OF THESE support why_run unless we do something about the revision dir.
+        config_file_resources.each do |conf|
+          conf.action   :create
+          conf.notifies :restart, "service[#{new_resource.name}]"
+        end
+
         procfile_resource.action :create
-        foreman_export_resource.action :run
-        supervisor_resource.action [:enable, :start]
+        foreman_export_resource.action :nothing # it will run from notifications if it is needed
+        service_resource.action :start
       end
 
-      def after_restart; end
-
+      # TODO: what methods can be protected and/or private?
       protected
 
       def app
@@ -133,29 +173,6 @@ class Chef
         end
       end
 
-      def pushit_ruby_resource
-        r = pushit_ruby ruby.version
-        r.environment ruby.environment
-        r.user user_username
-        r.group user_group
-        r.action :nothing
-        r
-      end
-
-      def ruby_version_file_resource
-        r = template ::File.join(app.shared_path, 'ruby-version')
-        r.source 'ruby-version.erb'
-        r.cookbook 'pushit'
-        r.owner user_username
-        r.group user_group
-        r.mode '0644'
-        r.variables(
-          :ruby_version => ruby.version
-        )
-        r.action :nothing
-        r
-      end
-
       def app_directory_resources
         [app.path, app.shared_path].map do |dir|
           r = directory dir
@@ -163,18 +180,6 @@ class Chef
           r. group user_group
           r. recursive true
           r. mode 00755
-          r.action :nothing
-          r
-        end
-      end
-
-      def shared_directory_resources
-        app.shared_directories.map do |dir|
-          r = directory ::File.join(app.shared_path, dir)
-          r.owner user_username
-          r.group user_group
-          r.recursive true
-          r.mode 00755
           r.action :nothing
           r
         end
@@ -214,10 +219,13 @@ class Chef
         r.user 'root'
         r.group 'root'
         r.action :nothing
+        r.subscribes :run, "template[::File.join(app.shared_path, 'env')]"
+        r.subscribes :run, "file[app.procfile]"
+        r.notifies :restart, "service[#{new_resource.name}]"
         r
       end
 
-      def supervisor_resource
+      def service_resource
         r = service new_resource.name
         r.provider Chef::Provider::Service::Upstart
         r.supports :status => true, :restart => true, :reload => true
@@ -257,6 +265,7 @@ class Chef
         r.chain_file "#{certificate}-bundle.crt"
         r.nginx_cert false
         r.action :nothing
+        r.notifies :reload, "pushit_vhost[#{new_resource.name}]"
         r
       end
 

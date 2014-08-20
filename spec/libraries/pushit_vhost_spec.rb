@@ -24,13 +24,12 @@ describe Chef::Provider::PushitVhost do
   end
 
   it 'adds a nginx site' do
-    pending 'need to figure out the matchers for this'
+    pending 'need to figure out the matchers for this because it is a definition rather than a resource'
     expect(chef_run).to enable_nginx_site('/opt/pushit/nginx/sites-available/rails-example.conf')
   end
 
   it 'notifes nginx reload if vhost config changes' do
-    pending 'the internals of vhost need to do this, not vhost itself'
-    vhost = chef_run.pushit_vhost('rails-example')
-    expect(vhost).to notify('pushit_webserver[rails-example]').to(:reload).delayed
+    vhost_config = chef_run.template('/opt/pushit/nginx/sites-available/rails-example.conf')
+    expect(vhost_config).to notify('pushit_webserver[nginx]').to(:reload).delayed
   end
 end

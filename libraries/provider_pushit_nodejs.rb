@@ -26,37 +26,7 @@ class Chef
     class PushitNodejs < Chef::Provider::PushitApp
       private
 
-      def deploy_revision_resource
-        app_provider = self
-
-        username = user_username
-        group = user_group
-        ssh_directory = user_ssh_directory
-
-        r = deploy_revision new_resource.name
-        r.action new_resource.deploy_action
-        r.deploy_to app.path
-
-        r.repository config['repo']
-        r.revision new_resource.revision
-        r.shallow_clone true
-
-        if config['deploy_key'] && !config['deploy_key'].empty?
-          wrapper = "#{config['deploy_key']}_deploy_wrapper.sh"
-          wrapper_path = ::File.join(ssh_directory, wrapper)
-
-          r.ssh_wrapper wrapper_path
-        end
-
-        r.environment app.env_vars
-
-        r.user username
-        r.group group
-
-        r.symlink_before_migrate(
-          new_resource.symlink_before_migrate
-        )
-
+      def customize_deploy_revision_resource(r)
         r.migrate false
         r.migration_command nil
 
@@ -65,26 +35,9 @@ class Chef
           app_provider.send(:npm_install_resource).action :run
         end
 
-        r.before_symlink do
-          app_provider.send(:before_symlink)
-        end
-
         r.before_restart do
           app_provider.send(:before_restart)
         end
-
-        command = app.restart_command
-        r.restart_command do
-          output = `#{command}`
-          ::Chef::Log.debug "restart #{new_resource.name} returned\n #{output}"
-        end
-
-        r.after_restart do
-          app_provider.send(:after_restart)
-        end
-
-        r.action :nothing
-
         r
       end
 

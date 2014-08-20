@@ -45,7 +45,7 @@ class Chef
         end
 
         def installed?
-          system("#{node_binary} -v") && $CHILD_STATUS.success?
+          system("#{node_binary} -v > /dev/null") && $CHILD_STATUS.success?
         end
       end
     end

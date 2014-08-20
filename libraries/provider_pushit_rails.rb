@@ -36,78 +36,88 @@ class Chef
 
       private
 
-      def deploy_revision_resource
-        app_provider = self
+      def add_after_app_directory_resources
+        super
+        shared_directory_resources.each { |dir| dir.action :create }
 
-        username = user_username
-        group = user_group
-        ssh_directory = user_ssh_directory
+        pushit_ruby_resource.action :create
+        ruby_version_file_resource.action :create
 
-        bundle_binary = app.bundle_binary
+        if app.database
+          database_config_resource.action :create
+          ssl_cert_resource(app.database_certificate).action(:create) if app.database_certificate?
 
-        r = deploy_revision new_resource.name
-        r.deploy_to app.path
-
-        r.repository config['repo']
-        r.revision new_resource.revision
-        r.shallow_clone true
-
-        if config['deploy_key'] && !config['deploy_key'].empty?
-          wrapper = "#{config['deploy_key']}_deploy_wrapper.sh"
-          wrapper_path = ::File.join(ssh_directory, wrapper)
-
-          r.ssh_wrapper wrapper_path
+          filestore_config_resource.action :create
         end
 
-        r.environment app.env_vars
+        unicorn_config_resource.action :create if app.webserver?
+      end
 
-        r.user username
-        r.group group
-
-        r.symlink_before_migrate(
-          new_resource.symlink_before_migrate
-        )
-
+      def customize_deploy_revision_resource(r)
         r.migrate new_resource.migrate
-        r.migration_command "#{bundle_binary} exec rake db:migrate"
+        r.migration_command "#{app.bundle_binary} exec rake db:migrate"
 
         r.before_migrate do
           app_provider.send(:before_migrate)
           app_provider.send(:bundle_install)
         end
+        r
+      end
 
-        r.before_symlink do
-          app_provider.send(:before_symlink)
-        end
-
-        precompile_assets = new_resource.precompile_assets
-        precompile_command = new_resource.precompile_command
-
-        r.before_restart do
-          if precompile_assets
-
-            bundle_precompile_command = "sudo su - #{username} -c 'cd #{release_path} && source ./.env && #{bundle_binary} exec rake #{precompile_command}'"
-
-            begin
-              require 'bundler'
-              Bundler.clean_system(bundle_precompile_command)
-            rescue => e
-              Chef::Log.warn e.backtrace
+      def add_post_deploy_resources
+        if new_resource.precompile_assets
+          bundle_precompile_command = "sudo su - #{user_username} -c 'cd #{app.release_path} && source ./.env && #{app.bundle_binary} exec rake #{new_resource.precompile_command}'"
+          ruby_block 'precompile assests' do
+            block do
+              begin
+                require 'bundler'
+                Bundler.clean_system(bundle_precompile_command)
+              rescue => e
+                Chef::Log.warn e.backtrace
+              end
             end
+            action :nothing
+            subscribes :run, "deploy_revision[#{new_resource.name}]", :immediate
           end
-
-          app_provider.send(:before_restart)
         end
 
-        command = app.restart_command
-        r.restart_command do
-          output = `#{command}`
-          ::Chef::Log.debug "restart #{new_resource.name} returned\n #{output}"
-        end
+        super
+      end
 
-        r.after_restart do
-          app_provider.send(:after_restart)
+      def shared_directory_resources
+        app.shared_directories.map do |dir|
+          r = directory ::File.join(app.shared_path, dir)
+          r.owner user_username
+          r.group user_group
+          r.recursive true
+          r.mode 00755
+          r.action :nothing
+          r
         end
+      end
+
+      def pushit_ruby_resource
+        r = pushit_ruby ruby.version
+        r.environment ruby.environment
+        r.user user_username
+        r.group user_group
+        r.notifies :restart, "service[#{new_resource.name}]"
+        r.action :nothing
+        r
+      end
+
+      def ruby_version_file_resource
+        r = template ::File.join(app.shared_path, 'ruby-version')
+        r.source 'ruby-version.erb'
+        r.cookbook 'pushit'
+        r.owner user_username
+        r.group user_group
+        r.mode '0644'
+        r.variables(
+          :ruby_version => ruby.version
+        )
+        r.notifies :restart, "service[#{new_resource.name}]"
+        r.action :nothing
         r
       end
 
@@ -122,6 +132,7 @@ class Chef
           :database => app.database.to_hash,
           :environment => new_resource.environment
         )
+        r.notifies :restart, "service[#{new_resource.name}]"
         r.action :nothing
         r
       end
@@ -137,22 +148,9 @@ class Chef
           :database => app.database.to_hash,
           :environment => new_resource.environment
         )
+        r.notifies :restart, "service[#{new_resource.name}]"
         r.action :nothing
         r
-      end
-
-      def worker_processes
-        if config['env'] && config['env']['UNICORN_WORKER_PROCESSES'].to_i > 0
-          worker_count = config['env']['UNICORN_WORKER_PROCESSES'].to_i
-        else
-          worker_count = new_resource.unicorn_worker_processes
-        end
-
-        unless worker_count && worker_count > 0
-          fail StandardError, 'Unicorn worker count must be a positive integer'
-        end
-
-        worker_count
       end
 
       def unicorn_config_resource
@@ -174,8 +172,23 @@ class Chef
           :worker_timeout => new_resource.unicorn_worker_timeout,
           :working_directory => app.current_path
         )
+        r.notifies :restart, "service[#{new_resource.name}]"
         r.action :nothing
         r
+      end
+
+      def worker_processes
+        if config['env'] && config['env']['UNICORN_WORKER_PROCESSES'].to_i > 0
+          worker_count = config['env']['UNICORN_WORKER_PROCESSES'].to_i
+        else
+          worker_count = new_resource.unicorn_worker_processes
+        end
+
+        unless worker_count && worker_count > 0
+          fail StandardError, 'Unicorn worker count must be a positive integer'
+        end
+
+        worker_count
       end
 
       def bundle_install

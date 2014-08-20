@@ -26,7 +26,7 @@ class Chef
       self.resource_name = 'pushit_vhost'
 
       default_action :create
-      actions :create
+      actions :create, :reload
 
       attribute :app_name, :kind_of => String, :name_attribute => true
 

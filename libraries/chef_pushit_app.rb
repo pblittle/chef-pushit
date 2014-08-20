@@ -186,6 +186,7 @@ class Chef
       end
 
       def version
+        # this is evil!  Either return a sane default or throw an error (the caller throws an error anyway)
         return unless ::File.directory?(::File.join(cached_copy_dir, '.git'))
 
         Dir.chdir(cached_copy_dir) do
