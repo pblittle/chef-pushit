@@ -24,3 +24,10 @@
 * Extend `LWRPBase` rather than `Resource`
 * Stop using `run_action`
 * Add chefspec testing
+
+0.11.x
+========
+0.11.0
+--------
+* PUSHIT-13 moved all resources outside of the deploy callbacks.
+* added notifications between various resources so all configs take immediate effect
