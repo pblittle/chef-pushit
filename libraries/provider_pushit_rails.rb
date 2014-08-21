@@ -38,6 +38,7 @@ class Chef
 
       def add_after_app_directory_resources
         super
+        app_provider = self
         shared_directory_resources.each { |dir| dir.action :create }
 
         pushit_ruby_resource.action :create
@@ -64,13 +65,17 @@ class Chef
         r
       end
 
+      # We have to build the command inside the ruby block because `app.release_path` isn't available
+      # at resource collection time.  This also means we need a local variable that gets us access to `app`
       def add_post_deploy_resources
         if new_resource.precompile_assets
-          bundle_precompile_command = "sudo su - #{user_username} -c 'cd #{app.release_path} && source ./.env && #{app.bundle_binary} exec rake #{new_resource.precompile_command}'"
+          app_local = app
           ruby_block 'precompile assests' do
             block do
               begin
                 require 'bundler'
+                app = app_local
+                bundle_precompile_command = "sudo su - #{user_username} -c 'cd #{app.release_path} && source ./.env && #{app.bundle_binary} exec rake #{new_resource.precompile_command}'"
                 Bundler.clean_system(bundle_precompile_command)
               rescue => e
                 Chef::Log.warn e.backtrace
@@ -166,8 +171,8 @@ class Chef
           :listen_socket => app.upstream_socket,
           :upstart_pid => app.upstart_pid,
           :preload_app => new_resource.unicorn_preload_app,
-          :stderr_path => ::File.join(app.current_path, 'log', 'stderr.log'),
-          :stdout_path => ::File.join(app.current_path, 'log', 'stdout.log'),
+          :stderr_path => ::File.join(app.shared_path, 'log', 'stderr.log'),
+          :stdout_path => ::File.join(app.shared_path, 'log', 'stdout.log'),
           :worker_processes => worker_processes,
           :worker_timeout => new_resource.unicorn_worker_timeout,
           :working_directory => app.current_path

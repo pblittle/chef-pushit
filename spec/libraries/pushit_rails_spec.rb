@@ -84,110 +84,113 @@ describe "#{Chef::Provider::PushitRails}.create" do
         ]
       )
     )
-
-    my_deploy_double = double('deploy')
-    deploy_resource = nil
-    allow(Chef::Provider::Deploy::Revision).to receive(:new){ |resource, run_context|
-      deploy_resource = resource
-    }.and_return(my_deploy_double)
-    allow(my_deploy_double).to receive(:action=)
-    allow(my_deploy_double).to receive(:run_action) do
-      puts "*****************\n\n*****************#{deploy_resource.action}*\n*\n*\n********************"
-      recipe_eval(deploy_resource.before_migrate)
-    end
-    # {
-#       deploy_resource.callback(:before_migrate, deploy_resource.new_resource.before_migrate)
-#       deploy_resource.callback(:before_symlink, deploy_resource.new_resource.before_symlink)
-#       deploy_resource.callback(:before_restart, deploy_resource.new_resource.before_restart)
-#       deploy_resource.callback(:after_restart, deploy_resource.new_resource.after_restart)
-#       puts "*****************\n\n*****************#{deploy_resource.new_resource.before_migrate}*\n*\n*\n********************"
-#     }
   end
 
-  include Chef::Pushit
+  app_path = ::File.join %w( / opt pushit apps rails-example )
+  shared_path = ::File.join app_path, 'shared'
+  config_path = ::File.join shared_path, 'config'
 
-  Chef::Pushit::PUSHIT_APP_GEM_DEPENDENCIES.each do |gem|
+  PUSHIT_APP_GEM_DEPENDENCIES =
+    [
+      { :name => 'bundler', :version => '1.7.0' },
+      { :name => 'foreman', :version => '0.74.0' },
+      { :name => 'unicorn', :version => '4.8.3' }
+    ].freeze
+
+  PUSHIT_APP_GEM_DEPENDENCIES.each do |gem|
     it "installs the #{gem[:name]} gem" do
       expect(chef_run).to install_chef_gem(gem[:name])
     end
 
     it "restarts the app when #{gem[:name]} gem is installed or updated" do
-      pending 'need to figure this out WRT monit'
-      expect(chef_run.install_chef_gem(gem[:name])).to(
+      expect(chef_run.chef_gem(gem[:name])).to(
         notify('service[rails-example]').to(:restart).delayed
       )
     end
   end
 
   it 'creates the app directory' do
-    expect(chef_run).to create_directory('/opt/pushit/apps/rails-example')
+    expect(chef_run).to create_directory(app_path)
   end
 
   it 'creates the app shared directory' do
-    expect(chef_run).to create_directory('/opt/pushit/apps/rails-example/shared')
+    expect(chef_run).to create_directory(shared_path)
   end
 
-  it "creates the shared directories in '/opt/pushit/apps/rails-example/shared'" do
+  it "creates the shared directories in '#{shared_path}'" do
     %w( cached-copy config system vendor_bundle log pids sockets ).each do |dir|
-      expect(chef_run).to create_directory("/opt/pushit/apps/rails-example/shared/#{dir}")
+      expect(chef_run).to create_directory(::File.join(shared_path, dir))
     end
   end
 
   it 'creates the ruby-version file' do
-    expect(chef_run).to create_template('/opt/pushit/apps/rails-example/shared/ruby-version')
+    expect(chef_run).to create_template(::File.join(shared_path, 'ruby-version'))
   end
 
   # TODO: do we need to re-do the foreman stuff too??
   it 'restarts the app if the ruby version changes' do
-    expect(chef_run.template('/opt/pushit/apps/rails-example/shared/ruby-version')).to(
-      notify('service[rails-example]').to(:restart).delayed
-    )
+    expect(chef_run.template(::File.join(shared_path, 'ruby-version'))).to(
+      notify('service[rails-example]').to(:restart).delayed)
+  end
+
+  it 'installs ruby' do
+    expect(chef_run).to create_pushit_ruby('2.1.1')
+  end
+
+  it 'restarts the app if the ruby changes' do
+    expect(chef_run.pushit_ruby('2.1.1')).to notify('service[rails-example]').to(:restart).delayed
   end
 
   it 'adds the database config' do
-    expect(chef_run).to create_template('/opt/pushit/apps/rails-example/shared/config/database.yml')
+    expect(chef_run).to create_template(::File.join(config_path, 'database.yml'))
   end
 
   it 'restarts the app if the database config changes' do
-    expect(chef_run.template('/opt/pushit/apps/rails-example/shared/config/database.yml')).to(
+    expect(chef_run.template(::File.join(config_path, 'database.yml'))).to(
+      notify('service[rails-example]').to(:restart).delayed)
+  end
+
+  it 'creates the database ssl cert' do
+    pending 'we need to figure out where database.certificate went'
+    expect(chef_run).to certificate_manage(::File.join(config_path, 'database.yml'))
+  end
+
+  # TODO: restart the app, or run foreman??, or does the database config template change and we get this free?
+  it 'restarts the app if the database certificate changes' do
+    pending 'we need to figure out where database.certificate went'
+    expect(chef_run.certificate_manage(::File.join(config_path, 'database.yml'))).to(
       notify('service[rails-example]').to(:restart).delayed
     )
   end
 
   it 'adds the filestore config' do
-    expect(chef_run).to create_template('/opt/pushit/apps/rails-example/shared/config/filestore.yml')
+    expect(chef_run).to create_template(::File.join(config_path, 'filestore.yml'))
   end
 
   it 'restarts the app if the filestore config changes' do
-    expect(chef_run.template('/opt/pushit/apps/rails-example/shared/config/filestore.yml')).to(
+    expect(chef_run.template(::File.join(config_path, 'filestore.yml'))).to(
       notify('service[rails-example]').to(:restart).delayed
     )
   end
 
   it 'adds the unicorn config' do
-    expect(chef_run).to create_template('/opt/pushit/apps/rails-example/shared/config/unicorn.rb')
+    expect(chef_run).to create_template(::File.join(config_path, 'unicorn.rb'))
   end
 
+  # TODO: this doesn't impact foreman, does it??
   it 'restarts the app if the unicron config changes' do
-    expect(chef_run.template('/opt/pushit/apps/rails-example/shared/config/unicorn.rb')).to(
+    expect(chef_run.template(::File.join(config_path, 'unicorn.rb'))).to(
       notify('service[rails-example]').to(:restart).delayed
     )
   end
 
-  # TODO: what happens with a new cert?  nginx reload?
   it 'creates the webserver ssl cert' do
-    pending
-    expect(chef_run).to certificate_manage('/opt/pushit/apps/rails-example/shared/config/database.yml')
-    expect(chef_run.certificate_manage('/opt/pushit/apps/rails-example/shared/config/database.yml')).to(
-      notify('service[nginx]').to(:reload).delayed
-    )
+    expect(chef_run).to create_certificate_manage('dummy')
   end
 
-  it 'creates the database ssl cert' do
-    pending 'we need to figure out where database.certificate went'
-    expect(chef_run).to certificate_manage('/opt/pushit/apps/rails-example/shared/config/database.yml')
-    expect(chef_run.certificate_manage('/opt/pushit/apps/rails-example/shared/config/database.yml')).to(
-      notify('service[nginx]').to(:reload).delayed
+  it 'restarts nginx if a new webserver cert is found' do
+    expect(chef_run.certificate_manage('dummy')).to(
+      notify('pushit_vhost[rails-example]').to(:reload).delayed
     )
   end
 
@@ -195,42 +198,56 @@ describe "#{Chef::Provider::PushitRails}.create" do
     expect(chef_run).to create_pushit_vhost('rails-example')
   end
 
-  it 'restarts the webserver if the vhost is updated' do
-    pending
-    expect(chef_run.create_pushit_vhost('rails-example')).to(notify('service[nginx]').to(:reload).delayed)
+  it 'creates the env file' do
+    expect(chef_run).to create_template(::File.join(shared_path, 'env'))
   end
 
-  it 'creates the .env file' do
-    expect(chef_run).to create_template('/opt/pushit/apps/rails-example/shared/env')
-  end
-
-  # TODO: this will cause two deploys if shared/env is a new file
   it 're-runs the foreman job if the env file changes' do
-    pending 'not stepping into deploy revision'
-    expect(chef_run.template('/opt/pushit/apps/rails-example/shared/env')).to(
-      notify('execute[run_foreman]').to(:run).delayed
+    expect(chef_run.execute('run foreman')).to(
+      subscribe_to("template[#{::File.join(shared_path, 'env')}]").on(:run).delayed
     )
+  end
+
+  it 'creates a foreman resource (for others to notify)' do
+    foreman_resource = chef_run.execute('run foreman')
+    expect(foreman_resource).to do_nothing
+  end
+
+  it 'restarts the app if foreman runs' do
+    expect(chef_run.execute('run foreman')).to notify('service[rails-example]').to(:restart).delayed
   end
 
   it 'creates the resources custom config files' do
-    pending 'not stepping into the deploy_revision resource'
-    expect(chef_run).to create_cookbook_file('/opt/pushit/app/rails-example/config/test_file.txt')
+    expect(chef_run).to create_cookbook_file(::File.join(app_path, 'releases', app_version, 'test_file.txt'))
   end
 
   it 'restarts the app if any config files change' do
-    pending 'need to figure out how to do monit'
-    expect(chef_run.cookbook_file('/opt/pushit/app/rails-example/config/test_file.txt')).to(
-      notify('service[rails-example]').to(:restart).delayed
-    )
+    expect(chef_run.cookbook_file(::File.join(app_path, 'releases', app_version, 'test_file.txt'))).to(
+      notify('service[rails-example]').to(:restart).delayed)
   end
 
-  # Hm..... this could be interesting. How do we get it to run the deploy?
   it 'creates the procfile for rails-example app' do
-    pending 'what is the proc file??'
-    expect(chef_run).to create_file('/opt/pushit/apps/rails-example/releases/b41e9a3676edb38a28463c23112a25a23d850cf1/Procfile')
+    expect(chef_run).to create_file('rails-example Procfile')
   end
 
-  # TODO: creates the procfile and restarts when it changes
-  # TODO: runs foreman
-  # TODO: creates a service resource for the app
+  it 'runs foreman if the procfile changes' do
+    expect(chef_run.file(::File.join(app_path, 'releases', app_version, 'Procfile'))).to(
+      notify('execute[run foreman]').to(:run).delayed)
+  end
+
+  it 'deploys the app' do
+    expect(chef_run).to deploy_deploy_revision('rails-example')
+  end
+
+  it 'runs foreman if the app deploys' do
+    expect(chef_run.deploy_revision('rails-example')).to notify('execute[run foreman]').to(:run).delayed
+  end
+
+  it 'creates a service config for the app' do
+    expect(chef_run.service('rails-example'))
+  end
+
+  it 'starts the app service' do
+    expect(chef_run).to start_service('rails-example')
+  end
 end

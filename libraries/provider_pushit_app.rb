@@ -24,6 +24,10 @@ class Chef
     # Base class for building an app. This class should
     # not be implemented outside of subclass inheritance.
     class PushitApp < Chef::Provider::PushitBase
+      # This gives us access to the `lazy` method for delayed attribute evaluation
+      # without it, we'd need to set attributes inside a resource block, rather than
+      # with the r.attribute syntax.
+      include Chef::Mixin::ParamsValidate
       use_inline_resources if defined?(use_inline_resources)
 
       def whyrun_supported?
@@ -196,6 +200,7 @@ class Chef
           :env => Pushit.escape_env(app.env_vars)
         )
         r.action :nothing
+        r.notifies :run, "execute[run foreman]"
         r
       end
 
@@ -214,13 +219,11 @@ class Chef
 
       def foreman_export_resource
         r = execute 'run foreman'
-        r.command "#{app.foreman_binary} export #{app.foreman_export_flags}"
-        r.cwd app.release_path
+        r.command lazy{ "#{app.foreman_binary} export " && app.foreman_export_flags }
+        r.cwd lazy{ app.release_path }
         r.user 'root'
         r.group 'root'
         r.action :nothing
-        r.subscribes :run, "template[::File.join(app.shared_path, 'env')]"
-        r.subscribes :run, "file[app.procfile]"
         r.notifies :restart, "service[#{new_resource.name}]"
         r
       end
@@ -270,12 +273,14 @@ class Chef
       end
 
       def procfile_resource
-        r = file app.procfile
+        r = file "#{app.name} Procfile"
+        r.path lazy{app.procfile}
         r.content app.procfile_default_entry(new_resource.framework)
         r.owner user_username
         r.group user_group
         r.not_if { app.procfile? }
         r.action :nothing
+        r.notifies :run, "execute[run foreman]"
         r
       end
     end
