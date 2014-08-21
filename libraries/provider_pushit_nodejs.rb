@@ -27,6 +27,8 @@ class Chef
       private
 
       def customize_deploy_revision_resource(r)
+        app_provider = self
+
         r.migrate false
         r.migration_command nil
 

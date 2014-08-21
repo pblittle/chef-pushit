@@ -129,7 +129,7 @@ class Chef
         end
 
         procfile_resource.action :create
-        foreman_export_resource.action :nothing # it will run from notifications if it is needed
+        foreman_export_resource.action :nothing # we count on notifications to run it.
         service_resource.action :start
       end
 
@@ -206,7 +206,8 @@ class Chef
 
       def config_file_resources
         new_resource.config_files.map do |file|
-          r = cookbook_file ::File.join(app.release_path, file)
+          r = cookbook_file "#{app.name}'s #{file} file"
+          r.path lazy{ ::File.join(app.release_path, file) }
           r.source file
           r.cookbook new_resource.cookbook_name.to_s
           r.owner user_username
@@ -218,13 +219,20 @@ class Chef
       end
 
       def foreman_export_resource
+        service_resource = service "foremans special #{new_resource.name} restarter" do
+          service_name new_resource.name
+          action :nothing
+          supports :restart => false, :status =>true, :reload => false
+          provider Chef::Provider::Service::Upstart
+        end
+
         r = execute 'run foreman'
-        r.command lazy{ "#{app.foreman_binary} export " && app.foreman_export_flags }
+        r.command lazy{ "#{app.foreman_binary} export " + app.foreman_export_flags }
         r.cwd lazy{ app.release_path }
         r.user 'root'
         r.group 'root'
         r.action :nothing
-        r.notifies :restart, "service[#{new_resource.name}]"
+        r.notifies :restart, "service[foremans special #{new_resource.name} restarter]"
         r
       end
 
@@ -232,6 +240,7 @@ class Chef
         r = service new_resource.name
         r.provider Chef::Provider::Service::Upstart
         r.supports :status => true, :restart => false, :reload => false
+        r.only_if { ::File.exist? "/etc/init/#{app.name}" }
         r.action :nothing
         r
       end

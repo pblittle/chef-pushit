@@ -38,7 +38,6 @@ class Chef
 
       def add_after_app_directory_resources
         super
-        app_provider = self
         shared_directory_resources.each { |dir| dir.action :create }
 
         pushit_ruby_resource.action :create
@@ -55,6 +54,7 @@ class Chef
       end
 
       def customize_deploy_revision_resource(r)
+        app_provider = self
         r.migrate new_resource.migrate
         r.migration_command "#{app.bundle_binary} exec rake db:migrate"
 

@@ -104,7 +104,7 @@ suites:
     encrypted_data_bag_secret_key_path:
       'test/encrypted_data_bag_secret'
 
-  - name: ruby
+  - name: rubies
     excludes:
       - ubuntu-12.04-base
       - ubuntu-12.04-ruby
