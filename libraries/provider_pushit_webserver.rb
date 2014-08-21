@@ -43,7 +43,7 @@ class Chef
         super
 
         service 'nginx' do
-          action [:stop, :disable]
+          action :stop
         end
 
         webserver_config_resource.action :delete

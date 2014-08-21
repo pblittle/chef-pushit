@@ -34,15 +34,22 @@ class Chef
       def action_create
         pushit_webserver 'nginx'
 
-        # need to re-declare this on the global resource collection
-        # eventually pushit_webserver needs a 'vhost' attribute for vhosts.
-        service 'nginx'
-
         vhost_config_resource.action :create
+
+        # need to re-declare this on the global resource collection so that the nginx_site definition
+        # can notify it.  Eventually pushit_webserver needs a 'vhost' attribute for vhosts. so that
+        # the resource can already exist from the nginx install.
+        service('nginx'){ action :nothing }
 
         nginx_site config_file do
           enable true
           notifies :reload, 'pushit_webserver[nginx]'
+        end
+      end
+
+      def action_reload
+        pushit_webserver "nginx" do
+          action :reload
         end
       end
 
