@@ -248,6 +248,8 @@ describe "#{Chef::Provider::PushitRails}.create" do
   end
 
   it 'starts the app service' do
+    allow(::File).to receive(:exist?)
+    allow(::File).to receive(:exist?).with("/etc/init/rails-example.conf").and_return(true)
     expect(chef_run).to start_service('rails-example')
   end
 end

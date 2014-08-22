@@ -240,7 +240,7 @@ class Chef
         r = service new_resource.name
         r.provider Chef::Provider::Service::Upstart
         r.supports :status => true, :restart => false, :reload => false
-        r.only_if { ::File.exist? "/etc/init/#{app.name}" }
+        r.only_if { ::File.exist? "/etc/init/#{app.name}.conf" }
         r.action :nothing
         r
       end
