@@ -68,8 +68,8 @@ class Chef
       # We have to build the command inside the ruby block because `app.release_path` isn't available
       # at resource collection time.  This also means we need a local variable that gets us access to `app`
       def add_post_deploy_resources
+        app_local = app
         if new_resource.precompile_assets
-          app_local = app
           ruby_block 'precompile assests' do
             block do
               begin
@@ -87,6 +87,21 @@ class Chef
         end
 
         super
+
+        # Re-open the service resources for the app and overrides the restart command
+        service_resources = run_context.resource_collection.find('service' => [app_local.name, "foremans special #{app_local.name} restarter"]).each do |service_resource|
+          command = <<-EOF
+            if [ -e #{app_local.upstart_pid} ]
+            then
+              kill -USR2 `cat #{app_local.upstart_pid}`
+            else
+              start #{app_local.name}
+            fi
+          EOF
+
+          service_resource.restart_command command
+          service_resource.supports :restart => true, :status => true, :reload => false
+        end
       end
 
       def shared_directory_resources

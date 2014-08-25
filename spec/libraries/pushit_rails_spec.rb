@@ -15,6 +15,18 @@ describe "#{Chef::Provider::PushitRails}.create" do
     Chef::Pushit::App.new 'rails-example'
   end
 
+  let(:restart_command) do
+    command = <<-EOF
+        if [ -e /opt/pushit/apps/rails-example/shared/pids/upstart.pid ]
+        then
+          kill -USR2 `cat /opt/pushit/apps/rails-example/shared/pids/upstart.pid`
+        else
+          start rails-example
+        fi
+    EOF
+    command.split("\n").map{ |line| line.strip }.join("\n")
+  end
+
   before do
     allow(Chef::Pushit::App).to receive(:new).and_return(app_stub)
     # Must stub this method so that we can get a "version" for pushit without actually pulling git code
@@ -251,5 +263,13 @@ describe "#{Chef::Provider::PushitRails}.create" do
     allow(::File).to receive(:exist?)
     allow(::File).to receive(:exist?).with("/etc/init/rails-example.conf").and_return(true)
     expect(chef_run).to start_service('rails-example')
+  end
+
+  ['rails-example', 'foremans special rails-example restarter'].each do |name|
+    it "overrides the restart command on the service[#{name}] resource" do
+      resource = chef_run.service(name)
+      restart_command = resource.restart_command.split("\n").map{ |line| line.strip }.join("\n")
+      expect(restart_command).to eq(restart_command)
+    end
   end
 end

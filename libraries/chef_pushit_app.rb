@@ -195,10 +195,6 @@ class Chef
           shellout.stdout.chomp
         end
       end
-
-      def restart_command
-        "kill -USR2 `cat #{upstart_pid}`"
-      end
     end
   end
 end
