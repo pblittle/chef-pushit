@@ -26,7 +26,7 @@ require 'English'
 class Chef
   module Pushit
     # model class for nodejs pushit apps
-    class Nodejs < Chef::Pushit::App
+    class Nodejs
       class << self
         def prefix_path
           ::File.join('', 'usr', 'local')
@@ -47,10 +47,6 @@ class Chef
         def installed?
           system("#{node_binary} -v > /dev/null") && $CHILD_STATUS.success?
         end
-      end
-
-      def procfile_default_entry
-        'web: npm start'
       end
     end
   end

@@ -112,8 +112,15 @@ class Chef
         ::File.exist?(procfile)
       end
 
-      def procfile_default_entry
-        fail "Can't use a provider_pushit_app, please use a child class"
+      def procfile_default_entry(framework)
+        case framework
+        when 'rails'
+          'web: bundle exec unicorn -p $PORT -c ./config/unicorn.rb'
+        when 'nodejs'
+          'web: npm start'
+        else
+          fail "Unknown pushit framework '#{framework}"
+        end
       end
 
       def foreman_export_flags
@@ -179,13 +186,18 @@ class Chef
       end
 
       def version
-        raise Exception.new('Version not available') unless ::File.directory?(::File.join(cached_copy_dir, '.git'))
+        # TODO: this is evil!  Either return a sane default or throw an error (the caller throws an error anyway)
+        return unless ::File.directory?(::File.join(cached_copy_dir, '.git'))
 
         Dir.chdir(cached_copy_dir) do
           shellout = Mixlib::ShellOut.new('git rev-parse HEAD')
           shellout.run_command
           shellout.stdout.chomp
         end
+      end
+
+      def restart_command
+        "kill -USR2 `cat #{upstart_pid}`"
       end
     end
   end

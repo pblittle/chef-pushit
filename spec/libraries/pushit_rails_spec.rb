@@ -12,11 +12,11 @@ describe "#{Chef::Provider::PushitRails}.create" do
   end
 
   let(:app_stub) do
-    Chef::Pushit::Rails.new 'rails-example'
+    Chef::Pushit::App.new 'rails-example'
   end
 
   before do
-    allow(Chef::Pushit::Rails).to receive(:new).and_return(app_stub)
+    allow(Chef::Pushit::App).to receive(:new).and_return(app_stub)
     # Must stub this method so that we can get a "version" for pushit without actually pulling git code
     allow(app_stub).to receive(:version).and_return(app_version)
 
@@ -251,13 +251,5 @@ describe "#{Chef::Provider::PushitRails}.create" do
     allow(::File).to receive(:exist?)
     allow(::File).to receive(:exist?).with("/etc/init/rails-example.conf").and_return(true)
     expect(chef_run).to start_service('rails-example')
-  end
-
-  ['rails-example', 'foremans special rails-example restarter'].each do |name|
-    it "overrides the restart command on the service[#{name}] resource" do
-      resource = chef_run.service(name)
-      restart_command = resource.restart_command
-      expect(restart_command).to eq(app_stub.restart_command)
-    end
   end
 end

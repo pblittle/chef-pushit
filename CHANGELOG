@@ -35,7 +35,3 @@
 0.11.2
 ----------
 * PUSHIT-38 Restart app when database or filestore config changes
-
-0.11.4
-------------
-* PUSHIT-39 uses USR2 rather than stop start, to restart apps
