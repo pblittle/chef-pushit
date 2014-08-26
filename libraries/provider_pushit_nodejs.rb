@@ -24,6 +24,10 @@ class Chef
     # Convenience class for using the app resource with
     # the nodejs framework (provider)
     class PushitNodejs < Chef::Provider::PushitApp
+      def app
+        @app ||= Chef::Pushit::Nodejs.new(new_resource.name)
+      end
+
       private
 
       def customize_deploy_revision_resource(r)

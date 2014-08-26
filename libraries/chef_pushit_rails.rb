@@ -20,37 +20,25 @@
 # limitations under the License.
 #
 
-require_relative 'chef_pushit'
-require 'English'
+#require_relative 'chef_pushit_app'
 
 class Chef
   module Pushit
-    # model class for nodejs pushit apps
-    class Nodejs < Chef::Pushit::App
-      class << self
-        def prefix_path
-          ::File.join('', 'usr', 'local')
-        end
-
-        def bin_path
-          ::File.join(prefix_path, 'bin')
-        end
-
-        def node_binary
-          ::File.join(bin_path, 'node')
-        end
-
-        def npm_binary
-          ::File.join(bin_path, 'npm')
-        end
-
-        def installed?
-          system("#{node_binary} -v > /dev/null") && $CHILD_STATUS.success?
-        end
+    # helper methods for rails app.  This app contains the "model" for rails apps
+    class Rails < Chef::Pushit::App
+      def restart_command
+        command = <<-EOF
+          if [ -e #{upstart_pid} ]
+          then
+            kill -USR2 `cat #{upstart_pid}`
+          else
+            start #{name}
+          fi
+        EOF
       end
 
       def procfile_default_entry
-        'web: npm start'
+        'web: bundle exec unicorn -p $PORT -c ./config/unicorn.rb'
       end
     end
   end

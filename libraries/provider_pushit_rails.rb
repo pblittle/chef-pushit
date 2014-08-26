@@ -34,6 +34,10 @@ class Chef
         super
       end
 
+      def app
+        app ||= Chef::Pushit::Rails.new(new_resource.name)
+      end
+
       private
 
       def add_after_app_directory_resources
@@ -90,16 +94,7 @@ class Chef
 
         # Re-open the service resources for the app and overrides the restart command
         service_resources = run_context.resource_collection.find('service' => [app_local.name, "foremans special #{app_local.name} restarter"]).each do |service_resource|
-          command = <<-EOF
-            if [ -e #{app_local.upstart_pid} ]
-            then
-              kill -USR2 `cat #{app_local.upstart_pid}`
-            else
-              start #{app_local.name}
-            fi
-          EOF
-
-          service_resource.restart_command command
+          service_resource.restart_command app_local.restart_command
           service_resource.supports :restart => true, :status => true, :reload => false
         end
       end

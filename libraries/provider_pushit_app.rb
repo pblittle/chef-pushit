@@ -284,7 +284,7 @@ class Chef
       def procfile_resource
         r = file "#{app.name} Procfile"
         r.path lazy{app.procfile}
-        r.content app.procfile_default_entry(new_resource.framework)
+        r.content app.procfile_default_entry
         r.owner user_username
         r.group user_group
         r.not_if { app.procfile? }
