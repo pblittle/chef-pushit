@@ -32,7 +32,13 @@ class Chef
           then
             kill -USR2 `cat #{upstart_pid}`
           else
-            start #{name}
+            stderr=$(start #{name})
+            # If the start failed because the app started while we were looking..
+            if [[ $stderr == .*already running.* ]]
+            then
+              sleep 3
+              kill -USR2 `cat #{upstart_pid}`
+            fi
           fi
         EOF
       end
