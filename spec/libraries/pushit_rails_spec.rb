@@ -202,19 +202,12 @@ describe "#{Chef::Provider::PushitRails}.create" do
     expect(chef_run).to create_template(::File.join(shared_path, 'env'))
   end
 
-  it 're-runs the foreman job if the env file changes' do
-    expect(chef_run.execute('run foreman')).to(
-      subscribe_to("template[#{::File.join(shared_path, 'env')}]").on(:run).delayed
-    )
-  end
-
-  it 'creates a foreman resource (for others to notify)' do
-    foreman_resource = chef_run.execute('run foreman')
-    expect(foreman_resource).to do_nothing
+  it 'runs foreman export' do
+    expect(chef_run).to run_foreman_export('rails-example')
   end
 
   it 'restarts the app if foreman runs' do
-    expect(chef_run.execute('run foreman')).to notify('service[rails-example]').to(:restart).delayed
+    expect(chef_run.foreman_export('rails-example')).to notify('service[rails-example]').to(:restart).delayed
   end
 
   it 'creates the resources custom config files' do
@@ -230,17 +223,8 @@ describe "#{Chef::Provider::PushitRails}.create" do
     expect(chef_run).to create_file('rails-example Procfile')
   end
 
-  it 'runs foreman if the procfile changes' do
-    expect(chef_run.file(::File.join(app_path, 'releases', app_version, 'Procfile'))).to(
-      notify('execute[run foreman]').to(:run).delayed)
-  end
-
   it 'deploys the app' do
     expect(chef_run).to deploy_deploy_revision('rails-example')
-  end
-
-  it 'runs foreman if the app deploys' do
-    expect(chef_run.deploy_revision('rails-example')).to notify('execute[run foreman]').to(:run).delayed
   end
 
   it 'creates a service config for the app' do

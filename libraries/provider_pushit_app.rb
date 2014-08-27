@@ -108,7 +108,6 @@ class Chef
 
         r.before_symlink{ app_provider.send(:before_symlink) }
 
-        r.notifies :run, "execute[run foreman]"
         r.notifies :restart, "service[#{new_resource.name}]"
         r
       end
@@ -129,7 +128,7 @@ class Chef
         end
 
         procfile_resource.action :create
-        foreman_export_resource.action :nothing # we count on notifications to run it.
+        foreman_export_resource.action :run
         service_resource.action :start
       end
 
@@ -200,7 +199,6 @@ class Chef
           :env => Pushit.escape_env(app.env_vars)
         )
         r.action :nothing
-        r.notifies :run, "execute[run foreman]"
         r
       end
 
@@ -219,20 +217,14 @@ class Chef
       end
 
       def foreman_export_resource
-        service_resource = service "foremans special #{new_resource.name} restarter" do
-          service_name new_resource.name
-          action :nothing
-          supports :restart => false, :status =>true, :reload => false
-          provider Chef::Provider::Service::Upstart
-        end
-
-        r = execute 'run foreman'
-        r.command lazy{ "#{app.foreman_binary} export " + app.foreman_export_flags }
-        r.cwd lazy{ app.release_path }
-        r.user 'root'
-        r.group 'root'
-        r.action :nothing
-        r.notifies :restart, "service[foremans special #{new_resource.name} restarter]"
+        r = foreman_export app.name
+        r.format :upstart
+        r.log app.log_path
+        r.user app.config['owner']
+        r.env app.envfile
+        r.root app.release_path
+        r.pid_dir app.pid_path
+        r.notifies :restart, "service[#{new_resource.name}]"
         r
       end
 
@@ -289,7 +281,6 @@ class Chef
         r.group user_group
         r.not_if { app.procfile? }
         r.action :nothing
-        r.notifies :run, "execute[run foreman]"
         r
       end
     end
