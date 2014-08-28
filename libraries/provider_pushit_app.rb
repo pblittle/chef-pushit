@@ -221,9 +221,10 @@ class Chef
         r.format :upstart
         r.log app.log_path
         r.user app.config['owner']
-        r.env app.envfile
-        r.root app.release_path
+        r.env lazy {app.envfile }
+        r.root lazy {app.release_path }
         r.pid_dir app.pid_path
+        r.location '/etc/init'
         r.notifies :restart, "service[#{new_resource.name}]"
         r
       end

@@ -60,7 +60,7 @@ class Chef
 
         r.before_migrate do
           app_provider.send(:before_migrate)
-          app_provider.send(:bundle_install)
+          app_provider.send(:bundle_install, release_path)
         end
         r
       end
@@ -196,8 +196,8 @@ class Chef
         worker_count
       end
 
-      def bundle_install
-        install_command = "sudo su - #{user_username} -c 'cd #{app.release_path} && #{app.bundle_binary} install #{app.bundle_flags}'"
+      def bundle_install(release_path)
+        install_command = "sudo su - #{user_username} -c 'cd #{release_path} && #{app.bundle_binary} install #{app.bundle_flags}'"
 
         begin
           require 'bundler'
