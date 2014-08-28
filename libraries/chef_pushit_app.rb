@@ -181,23 +181,12 @@ class Chef
         ::File.join(current_path, 'public')
       end
 
-      def cached_copy_dir
-        ::File.join(shared_path, 'cached-copy')
-      end
-
       def version
-        # TODO: this is evil!  Either return a sane default or throw an error (the caller throws an error anyway)
-        return unless ::File.directory?(::File.join(cached_copy_dir, '.git'))
-
-        Dir.chdir(cached_copy_dir) do
-          shellout = Mixlib::ShellOut.new('git rev-parse HEAD')
-          shellout.run_command
-          shellout.stdout.chomp
+        unless ::File.symlink?(current_path)
+          raise Exception.new "#{current_path} symlink does not exist"
         end
-      end
 
-      def restart_command
-        "kill -USR2 `cat #{upstart_pid}`"
+        Pathname.new(current_path).realpath.basename
       end
     end
   end
