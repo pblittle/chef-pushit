@@ -34,7 +34,7 @@ class Chef
 
         r.before_migrate do
           app_provider.send(:before_migrate)
-          app_provider.send(:npm_install_resource).action :run
+          app_provider.send(:npm_install_resource, release_path).action :run
         end
 
         r.before_restart do
@@ -43,10 +43,10 @@ class Chef
         r
       end
 
-      def npm_install_resource
+      def npm_install_resource(release_path)
         r = execute "Install #{new_resource.name} dependencies"
         r.command "#{Pushit::Nodejs.npm_binary} install"
-        r.cwd app.release_path
+        r.cwd release_path
         r.user 'root'
         r.group 'root'
         r.action :nothing
