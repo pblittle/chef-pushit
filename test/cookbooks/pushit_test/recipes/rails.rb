@@ -36,15 +36,6 @@ pushit_rails app do
   unicorn_worker_processes 1
   revision 'b41e9a3676edb38a28463c23112a25a23d850cf1'
   config_files ['test_file.txt']
-  symlink_before_migrate({
-    'pids' => 'pids',
-    'log' => 'log',
-    'env' => '.env',
-    'ruby-version' => '.ruby-version',
-    'config/database.yml' => 'config/database.yml',
-    'config/filestore.yml' => 'config/filestore.yml',
-    'config/unicorn.rb' => 'config/unicorn.rb'
-  })
 end
 
 pushit_rails app do
