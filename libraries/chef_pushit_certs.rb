@@ -30,11 +30,11 @@ class Chef
         ::File.join(Pushit.pushit_path, 'ssl')
       end
 
-      def self.certs_directory
+      def self.certs_path
         ::File.join(ssl_path, 'certs')
       end
 
-      def self.keys_directory
+      def self.keys_path
         ::File.join(ssl_path, 'private')
       end
     end

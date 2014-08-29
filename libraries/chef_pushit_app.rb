@@ -47,8 +47,7 @@ class Chef
       end
 
       def database
-        database_config = config['database'] || {}
-        @database ||= Pushit::Database.new(database_config)
+        @database ||= Pushit::Database.new(config['database'] || {})
       end
 
       def name
@@ -164,15 +163,6 @@ class Chef
         webserver_certificate? ? config['webserver']['certificate'] : nil
       end
 
-      def database_certificate?
-        @database &&
-          (@database.sslkey && @database.sslcert && @database.sslca)
-      end
-
-      def database_certificate
-        @database.certificate
-      end
-
       def server_name
         config['webserver']['server_name'] || '_'
       end
@@ -183,7 +173,7 @@ class Chef
 
       def version
         unless ::File.symlink?(current_path)
-          raise Exception.new "#{current_path} symlink does not exist"
+          fail "#{current_path} symlink does not exist"
         end
 
         Pathname.new(current_path).realpath.basename

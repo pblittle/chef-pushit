@@ -80,15 +80,19 @@ class Chef
       end
 
       def sslkey
-        @sslkey ||= @args['sslkey'] || options['sslkey']
+        @sslkey ||= ::File.join(Pushit::Certs.keys_path, "#{certificate}.key")
       end
 
       def sslcert
-        @sslcert ||= @args['sslcert'] || options['sslcert']
+        @sslcert ||= ::File.join(Pushit::Certs.certs_path, "#{certificate}.pem")
       end
 
       def sslca
-        @sslca ||= @args['sslca'] || options['sslca']
+        @sslca ||= ::File.join(Pushit::Certs.certs_path, "#{certificate}-bundle.crt")
+      end
+
+      def certificate
+        @args['certificate']
       end
 
       private

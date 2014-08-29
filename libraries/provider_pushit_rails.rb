@@ -45,8 +45,11 @@ class Chef
 
         if app.database
           database_config_resource.action :create
-          ssl_cert_resource(app.database_certificate).action(:create) if app.database_certificate?
-
+          if app.database.certificate
+            certificate_resource = ssl_cert_resource(app.database.certificate)
+            certificate_resource.action(:create)
+            certificate_resource.notifies :restart, "service[#{app.name}]"
+          end
           filestore_config_resource.action :create
         end
 
