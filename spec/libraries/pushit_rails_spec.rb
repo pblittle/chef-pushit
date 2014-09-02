@@ -48,15 +48,12 @@ describe "#{Chef::Provider::PushitRails}.create" do
           'username' =>  'root',
           'password' =>  'password',
           'port' =>  5432,
+          'certificate' => 'database-cert',
           'options' =>  {
-            'foo' =>  'bar',
-            'sslca' =>   '/opt/pushit/certs/certs/cleardb-bundle.crt',
-            # 'sslcert' => '/opt/pushit/certs/certs/cleardb.pem',
-            'sslkey' =>  '/opt/pushit/certs/private/cleardb.key'
+            'foo' =>  'bar'
           },
           'root_username' =>  'root',
-          'root_password' =>  'password',
-          'certificate' => 'dummy'
+          'root_password' =>  'password'
         },
         'env' =>  {
           'FOO' =>  'bar',
@@ -151,14 +148,12 @@ describe "#{Chef::Provider::PushitRails}.create" do
   end
 
   it 'creates the database ssl cert' do
-    pending 'we need to figure out where database.certificate went'
-    expect(chef_run).to certificate_manage(::File.join(config_path, 'database.yml'))
+    expect(chef_run).to create_certificate_manage('database-cert')
   end
 
   # TODO: restart the app, or run foreman??, or does the database config template change and we get this free?
   it 'restarts the app if the database certificate changes' do
-    pending 'we need to figure out where database.certificate went'
-    expect(chef_run.certificate_manage(::File.join(config_path, 'database.yml'))).to(
+    expect(chef_run.certificate_manage('database-cert')).to(
       notify('service[rails-example]').to(:restart).delayed
     )
   end
