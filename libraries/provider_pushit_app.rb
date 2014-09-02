@@ -70,11 +70,13 @@ class Chef
       def add_pre_deploy_resources
         dotenv_file_resource.action :create
 
-        if app.webserver?
-          vhost_config_resource.action :create
+        return unless app.webserver?
+        vhost_config_resource.action :create
 
-          ssl_cert_resource(app.webserver_certificate).action(:create) if app.webserver_certificate?
-        end
+        return unless app.webserver_certificate?
+        r = ssl_cert_resource(app.webserver_certificate)
+        r.notifies :reload, "pushit_vhost[#{new_resource.name}]"
+        r.action(:create)
       end
 
       def deploy_resource
@@ -106,13 +108,13 @@ class Chef
 
         r.symlink_before_migrate(new_resource.symlink_before_migrate)
 
-        r.before_symlink{ app_provider.send(:before_symlink) }
+        r.before_symlink { app_provider.send(:before_symlink) }
 
         r.notifies :restart, "service[#{new_resource.name}]"
         r
       end
 
-      def customize_deploy_revision_resource(deploy_resource); end
+      def customize_deploy_revision_resource(_deploy_resource); end
 
       def before_migrate; end
 
@@ -123,7 +125,7 @@ class Chef
       def add_post_deploy_resources
         # TODO: NONE OF THESE support why_run unless we do something about the revision dir.
         config_file_resources.each do |conf|
-          conf.action   :create
+          conf.action :create
           conf.notifies :restart, "service[#{new_resource.name}]"
         end
 
@@ -133,6 +135,7 @@ class Chef
       end
 
       # TODO: what methods can be protected and/or private?
+
       protected
 
       def app
@@ -205,7 +208,7 @@ class Chef
       def config_file_resources
         new_resource.config_files.map do |file|
           r = cookbook_file "#{app.name}'s #{file} file"
-          r.path lazy{ ::File.join(app.release_path, file) }
+          r.path lazy { ::File.join(app.release_path, file) }
           r.source file
           r.cookbook new_resource.cookbook_name.to_s
           r.owner user_username
@@ -221,8 +224,8 @@ class Chef
         r.format :upstart
         r.log app.log_path
         r.user app.config['owner']
-        r.env lazy {app.envfile }
-        r.root lazy {app.release_path }
+        r.env lazy { app.envfile }
+        r.root lazy { app.release_path }
         r.pid_dir app.pid_path
         r.location '/etc/init'
         r.notifies :restart, "service[#{new_resource.name}]"
@@ -247,11 +250,11 @@ class Chef
         r.upstream_socket app.upstream_socket
         r.use_ssl app.webserver_certificate?
         r.ssl_certificate ::File.join(
-          Pushit::Certs.certs_directory,
+          Pushit::Certs.certs_path,
           "#{app.webserver_certificate}-bundle.crt"
         )
         r.ssl_certificate_key ::File.join(
-          Pushit::Certs.keys_directory,
+          Pushit::Certs.keys_path,
           "#{app.webserver_certificate}.key"
         )
         r.config_cookbook new_resource.vhost_config_cookbook
@@ -270,13 +273,12 @@ class Chef
         r.chain_file "#{certificate}-bundle.crt"
         r.nginx_cert false
         r.action :nothing
-        r.notifies :reload, "pushit_vhost[#{new_resource.name}]"
         r
       end
 
       def procfile_resource
         r = file "#{app.name} Procfile"
-        r.path lazy{app.procfile}
+        r.path lazy { app.procfile }
         r.content app.procfile_default_entry(new_resource.framework)
         r.owner user_username
         r.group user_group

@@ -43,10 +43,13 @@ class Chef
         pushit_ruby_resource.action :create
         ruby_version_file_resource.action :create
 
-        if app.database
+        if app.database?
           database_config_resource.action :create
-          ssl_cert_resource(app.database_certificate).action(:create) if app.database_certificate?
-
+          if app.database_certificate
+            certificate_resource = ssl_cert_resource(app.database_certificate)
+            certificate_resource.action(:create)
+            certificate_resource.notifies :restart, "service[#{app.name}]"
+          end
           filestore_config_resource.action :create
         end
 
@@ -134,7 +137,7 @@ class Chef
         r.group user_group
         r.mode '0644'
         r.variables(
-          :database => app.database.to_hash,
+          :database => app.database_config,
           :environment => new_resource.environment
         )
         r.notifies :restart, "service[#{new_resource.name}]"
@@ -150,7 +153,7 @@ class Chef
         r.group user_group
         r.mode '0644'
         r.variables(
-          :database => app.database.to_hash,
+          :database => app.database_config,
           :environment => new_resource.environment
         )
         r.notifies :restart, "service[#{new_resource.name}]"
