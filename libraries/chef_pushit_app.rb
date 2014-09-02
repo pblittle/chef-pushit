@@ -46,8 +46,17 @@ class Chef
         @ruby ||= Pushit::Ruby.new(ruby_version)
       end
 
-      def database
-        @database ||= Pushit::Database.new(config['database'] || {})
+      def database?
+        return !database.nil?
+      end
+
+      def database_certificate
+        database.certificate
+      end
+
+      def database_config
+        fail(Exception, "No database configuration available for #{name}") unless database?
+        return database.to_hash
       end
 
       def name
@@ -173,10 +182,16 @@ class Chef
 
       def version
         unless ::File.symlink?(current_path)
-          fail "#{current_path} symlink does not exist"
+          fail Exception, "#{current_path} symlink does not exist"
         end
 
         Pathname.new(current_path).realpath.basename
+      end
+
+      private
+
+      def database
+        @database ||= config['database'] ? Pushit::Database.new(config['database']) : nil
       end
     end
   end
