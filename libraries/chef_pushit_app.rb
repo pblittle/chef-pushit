@@ -47,7 +47,7 @@ class Chef
       end
 
       def database?
-        return !database.nil?
+        !database.nil?
       end
 
       def database_certificate
@@ -55,8 +55,8 @@ class Chef
       end
 
       def database_config
-        fail(Exception, "No database configuration available for #{name}") unless database?
-        return database.to_hash
+        fail Exception, "No database configuration available for #{name}" unless database?
+        database.to_hash
       end
 
       def name
@@ -181,9 +181,7 @@ class Chef
       end
 
       def version
-        unless ::File.symlink?(current_path)
-          fail Exception, "#{current_path} symlink does not exist"
-        end
+        fail Exception, "#{current_path} symlink does not exist" unless ::File.symlink?(current_path)
 
         Pathname.new(current_path).realpath.basename
       end
