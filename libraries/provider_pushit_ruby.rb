@@ -68,9 +68,11 @@ class Chef
 
         git "#{Chef::Config[:file_cache_path]}/chruby" do
           repository 'https://github.com/postmodern/chruby.git'
-          reference 'v0.3.8'
+          reference "v#{node['pushit']['chruby']['version']}"
           user 'root'
           group 'root'
+          action :nothing
+          not_if "chruby --version | grep -F #{node['pushit']['chruby']['version']}"
         end
       end
 
@@ -79,6 +81,8 @@ class Chef
           command 'make install'
           cwd "#{Chef::Config[:file_cache_path]}/chruby"
           user 'root'
+          action :nothing
+          not_if "chruby --version | grep -F #{node['pushit']['chruby']['version']}"
         end
       end
 
@@ -92,6 +96,7 @@ class Chef
             :rubies_path => ruby.rubies_path,
             :default_ruby => new_resource.name
           )
+          action :nothing
         end
       end
 
