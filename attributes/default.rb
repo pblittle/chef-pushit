@@ -34,7 +34,7 @@ default[:nodejs][:npm] = '1.4.21'
 
 override['nginx']['version'] = '1.4.4'
 override['nginx']['source']['version'] = '1.4.4'
-override['nginx']['openssl_source']['version']  = '1.0.1h'
+override['nginx']['openssl_source']['version']  = '1.0.1i'
 
 default['nginx']['init_style'] = 'upstart'
 default['nginx']['install_method'] = 'source'
