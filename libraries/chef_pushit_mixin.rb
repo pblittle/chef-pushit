@@ -41,8 +41,7 @@ class Chef
             '--without development:test',
             "--path #{bundle_path}",
             "--binstubs #{bundler_binstubs_path}",
-            "--gemfile #{gemfile_path}",
-            '-j4'
+            "--gemfile #{gemfile_path}"
           ].join(' ')
         end
 

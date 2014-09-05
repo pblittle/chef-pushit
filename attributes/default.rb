@@ -20,33 +20,35 @@
 # limitations under the License.
 #
 
-node.default['authorization']['sudo']['include_sudoers_d'] = true
+default['authorization']['sudo']['include_sudoers_d'] = true
 
-node.default['build-essential']['compile_time'] = true
+default['build-essential']['compile_time'] = true
 
-node.default[:mysql][:remove_anonymous_users] = true
-node.default[:mysql][:remove_test_database] = true
-node.default[:mysql][:tunable][:lower_case_table_names] = 1
+default[:mysql][:remove_anonymous_users] = true
+default[:mysql][:remove_test_database] = true
+default[:mysql][:tunable][:lower_case_table_names] = 1
 
-node.default[:nodejs][:install_method] = 'source'
-node.default[:nodejs][:version] = '0.10.29'
-node.default[:nodejs][:npm] = '1.4.21'
+default[:nodejs][:install_method] = 'source'
+default[:nodejs][:version] = '0.10.29'
+default[:nodejs][:npm] = '1.4.21'
 
-node.override['nginx']['version'] = '1.4.4'
-node.override['nginx']['source']['version'] = '1.4.4'
-node.override['nginx']['openssl_source']['version']  = '1.0.1h'
+override['nginx']['version'] = '1.4.4'
+override['nginx']['source']['version'] = '1.4.4'
+override['nginx']['openssl_source']['version']  = '1.0.1i'
 
-node.default['nginx']['init_style'] = 'upstart'
-node.default['nginx']['install_method'] = 'source'
-node.default['nginx']['default_site_enabled'] = false
-node.default['nginx']['dir'] = '/opt/pushit/nginx'
-node.default['nginx']['log_dir'] = '/opt/pushit/nginx/log'
-node.default['nginx']['binary'] = '/opt/pushit/nginx/sbin/nginx'
-node.default['nginx']['source']['modules'] = [
+default['nginx']['init_style'] = 'upstart'
+default['nginx']['install_method'] = 'source'
+default['nginx']['default_site_enabled'] = false
+default['nginx']['dir'] = '/opt/pushit/nginx'
+default['nginx']['log_dir'] = '/opt/pushit/nginx/log'
+default['nginx']['binary'] = '/opt/pushit/nginx/sbin/nginx'
+default['nginx']['source']['modules'] = [
   'nginx::http_gzip_static_module',
   'nginx::http_ssl_module',
   'nginx::http_stub_status_module'
 ]
-node.default['nginx']['gzip_static'] = 'on'
+default['nginx']['gzip_static'] = 'on'
+
+default['pushit']['chruby']['version'] = '0.3.8'
 
 include_attribute 'nginx::source'
