@@ -89,7 +89,7 @@ describe "#{Chef::Provider::PushitRails}.create" do
 
   PUSHIT_APP_GEM_DEPENDENCIES =
     [
-      { :name => 'bundler', :version => '1.7.0' },
+      { :name => 'bundler', :version => '1.7.2' },
       { :name => 'foreman', :version => '0.74.0' },
       { :name => 'unicorn', :version => '4.8.3' }
     ].freeze
