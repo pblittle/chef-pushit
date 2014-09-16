@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
-# Cookbook Name:: pushit_test
-# Recipe:: webserver
+# Cookbook Name:: pushit
+# Library:: webserver
 #
 # Author:: P. Barrett Little (<barrett@barrettlittle.com>)
 #
@@ -20,20 +20,31 @@
 # limitations under the License.
 #
 
-include_recipe 'pushit_test::base'
+require_relative 'chef_pushit'
 
-flag_path = "#{Chef::Config[:file_cache_path]}/pushit_webserver_notification_flag"
+class Chef
+  module Pushit
+    # model class for pushit webserver
+    class Webserver
+      class << self
+        def config_dir
+          prefix
+        end
 
-file 'delete webserver flag' do
-  path flag_path
-  action :delete
-end
+        def log_dir
+          ::File.join(prefix, 'log')
+        end
 
-pushit_webserver 'nginx'
+        def pid_path
+          ::File.join(prefix, 'run', 'nginx.pid')
+        end
 
-file 'add webserver flag' do
-  path flag_path
-  action :nothing
-  content 'I am here'
-  subscribes :create, 'pushit_webserver[nginx]'
+        private
+
+        def prefix
+          ::File.join(Chef::Pushit.pushit_path, 'nginx')
+        end
+      end
+    end
+  end
 end
