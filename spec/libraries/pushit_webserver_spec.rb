@@ -3,7 +3,7 @@ require 'spec_helper'
 describe "#{Chef::Provider::PushitWebserver}.create" do
   let(:chef_run) do
     ChefSpec::Runner.new(
-      step_into: ['pushit_webserver', 'pushit_base']
+      step_into: %w(pushit_webserver pushit_base)
     ).converge('pushit_test::webserver')
   end
 
@@ -23,7 +23,7 @@ end
 describe "#{Chef::Provider::PushitWebserver}.delete" do
   let(:chef_run) do
     ChefSpec::Runner.new(
-      step_into: ['pushit_webserver']
+      step_into: %w(pushit_webserver)
     ).converge('pushit_test::webserver_delete')
   end
 
@@ -43,7 +43,7 @@ end
 describe "#{Chef::Provider::PushitWebserver}.restart" do
   let(:chef_run) do
     ChefSpec::Runner.new(
-      step_into: ['pushit_webserver']
+      step_into: %w(pushit_webserver)
     ).converge('pushit_test::webserver_restart')
   end
 
@@ -55,7 +55,7 @@ end
 describe "#{Chef::Provider::PushitWebserver}.reload" do
   let(:chef_run) do
     ChefSpec::Runner.new(
-      step_into: ['pushit_webserver']
+      step_into: %w(pushit_webserver)
     ).converge('pushit_test::webserver_reload')
   end
 
