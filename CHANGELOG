@@ -1,43 +1,22 @@
-0.4.x
-=======
-0.4.196
-----------
-* Last known good version, includes custom template fix.
-
-0.8.x
-======
-0.8.0
----------
-* Still not fully functional - DON'T use this version.
-
-0.9.X
-=======
-0.9.12
--------
-* PUSHIT-10 - https://tinyrobot.atlassian.net/browse/PUSHIT-10 fix migrate command
-
-0.10.x
-========
-0.10.0
--------
-* Fixed most rubocop errors
-* Extend `LWRPBase` rather than `Resource`
-* Stop using `run_action`
-* Add chefspec testing
-
 0.11.x
 ========
-0.11.0
---------
-* PUSHIT-13 moved all resources outside of the deploy callbacks.
-* added notifications between various resources so all configs take immediate effect
-
-0.11.2
+0.11.12
 ----------
-* PUSHIT-38 Restart app when database or filestore config changes
+* Fixed nginx log locations
 
 0.11.6
 -----------
 * PUSHIT-42 Adopt the foreman cookbook
 * PUSHIT-41 Use current dir (actually fixed the version method to work better and use release_dir from the deploy resource where appropriate)
-* PUSHIT-37 Support rolebacks
+* PUSHIT-37 Support rollbacks
+
+0.11.2
+----------
+* PUSHIT-38 Restart app when database or filestore config changes
+
+0.11.0
+--------
+* PUSHIT-13 moved all resources outside of the deploy callbacks.
+* added notifications between various resources so all configs take immediate effect
+
+
