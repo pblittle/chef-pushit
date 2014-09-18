@@ -18,8 +18,8 @@ http {
   server_name_in_redirect off;
   server_tokens off;
 
-  access_log <%= @log_path %>/access.log;
-  error_log <%= @log_path %>/error.log;
+  access_log <%= @log_dir %>/access.log;
+  error_log <%= @log_dir %>/error.log;
 
   sendfile on;
 

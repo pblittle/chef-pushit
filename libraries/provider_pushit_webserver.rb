@@ -67,11 +67,11 @@ class Chef
 
       def webserver_config_resource
         template 'nginx.conf' do
-          path "#{new_resource.config_path}/nginx.conf"
+          path ::File.join(new_resource.config_path, 'nginx.conf')
           cookbook new_resource.config_cookbook
           source new_resource.config_source
-          owner 'root'
-          group 'root'
+          owner new_resource.user
+          group new_resource.group
           mode '0644'
           variables(
             :log_dir => new_resource.log_dir,

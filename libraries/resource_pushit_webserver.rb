@@ -19,9 +19,11 @@
 
 require 'chef/resource/lwrp_base'
 
+require_relative 'chef_pushit_webserver'
+
 class Chef
   class Resource
-    # Resource for creating webservers for pushit apps
+    # Resource for creating a webserver for your pushit apps
     class PushitWebserver < Chef::Resource::LWRPBase
       self.resource_name = 'pushit_webserver'
 
@@ -52,7 +54,7 @@ class Chef
           :config_path,
           arg,
           :kind_of => [String],
-          :default => node['nginx']['dir']
+          :default => Pushit::Webserver.config_dir
         )
       end
 
@@ -70,7 +72,7 @@ class Chef
           :pid_file,
           arg,
           :kind_of => [String],
-          :default => node['nginx']['pid']
+          :default => Pushit::Webserver.pid_path
         )
       end
 
@@ -79,7 +81,7 @@ class Chef
           :log_dir,
           arg,
           :kind_of => [String],
-          :default => node['nginx']['log_dir']
+          :default => Pushit::Webserver.log_dir
         )
       end
 

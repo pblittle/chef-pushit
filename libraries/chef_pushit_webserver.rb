@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
-# Cookbook Name:: pushit_test
-# Recipe:: webserver_reload
+# Cookbook Name:: pushit
+# Library:: webserver
 #
 # Author:: P. Barrett Little (<barrett@barrettlittle.com>)
 #
@@ -20,8 +20,31 @@
 # limitations under the License.
 #
 
-include_recipe 'pushit_test::base'
+require_relative 'chef_pushit'
 
-pushit_webserver 'nginx' do
-  action :reload
+class Chef
+  module Pushit
+    # model class for pushit webserver
+    class Webserver
+      class << self
+        def config_dir
+          prefix
+        end
+
+        def log_dir
+          ::File.join(prefix, 'log')
+        end
+
+        def pid_path
+          ::File.join(prefix, 'run', 'nginx.pid')
+        end
+
+        private
+
+        def prefix
+          ::File.join(Chef::Pushit.pushit_path, 'nginx')
+        end
+      end
+    end
+  end
 end
