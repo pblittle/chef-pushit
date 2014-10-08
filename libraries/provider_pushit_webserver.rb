@@ -28,15 +28,20 @@ class Chef
       def action_create
         super
 
+        node.normal['nginx']['log_dir'] = new_resource.log_dir
+        node.normal['nginx']['pid'] = new_resource.pid_file
+        node.normal['nginx']['dir'] = new_resource.config_path
+
         recipe_eval do
           run_context.include_recipe 'nginx::default'
+          update_nginx_template_resource
         end
+
+        update_nginx_template_resource
 
         service 'nginx' do
           action :start
         end
-
-        webserver_config_resource.action :create
       end
 
       def action_delete
@@ -46,7 +51,7 @@ class Chef
           action :stop
         end
 
-        webserver_config_resource.action :delete
+        # TODO: how do we delete the config (or do we)
       end
 
       def action_restart
@@ -63,21 +68,21 @@ class Chef
         end
       end
 
-      private
+      def update_nginx_template_resource
+        begin
+          nginx_template = run_context.resource_collection.find('template[nginx.conf]')
 
-      def webserver_config_resource
-        template 'nginx.conf' do
-          path ::File.join(new_resource.config_path, 'nginx.conf')
-          cookbook new_resource.config_cookbook
-          source new_resource.config_source
-          owner new_resource.user
-          group new_resource.group
-          mode '0644'
-          variables(
+          nginx_template.source 'nginx.conf.erb'
+          nginx_template.cookbook 'pushit'
+          nginx_template.owner node.normal['nginx']['user'] = new_resource.user
+          nginx_template.group node.normal['nginx']['group'] = new_resource.group
+          nginx_template.mode '0644'
+          nginx_template.variables(
             :log_dir => new_resource.log_dir,
             :pid_file => new_resource.pid_file,
             :config_path => new_resource.config_path
           )
+        rescue Chef::Exceptions::ResourceNotFound
         end
       end
     end

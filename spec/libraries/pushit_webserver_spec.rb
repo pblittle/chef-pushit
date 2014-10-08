@@ -11,10 +11,6 @@ describe "#{Chef::Provider::PushitWebserver}.create" do
     expect(chef_run).to create_pushit_user('deploy')
   end
 
-  it 'creates an nginx config' do
-    expect(chef_run).to create_template('nginx.conf')
-  end
-
   it 'is subscribed to by the test' do
     expect(chef_run.file('add webserver flag')).to subscribe_to('pushit_webserver[nginx]').on(:create).delayed
   end
@@ -25,10 +21,6 @@ describe "#{Chef::Provider::PushitWebserver}.delete" do
     ChefSpec::Runner.new(
       step_into: %w(pushit_webserver)
     ).converge('pushit_test::webserver_delete')
-  end
-
-  it 'removes nginx config' do
-    expect(chef_run).to delete_template('nginx.conf')
   end
 
   it 'does not create the nginx config' do

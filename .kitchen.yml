@@ -33,9 +33,6 @@ platforms:
           lower_case_table_names: 1
       nginx:
         default_site_enabled: false
-        dir: '/opt/pushit/nginx'
-        log_dir: '/opt/pushit/nginx/log'
-        pid: '/opt/pushit/nginx/run/nginx.pid'
         install_method: 'source'
         source:
           version: '1.4.4'
