@@ -10,7 +10,7 @@ describe Chef::Provider::PushitVhost do
   before do
     allow(Chef::DataBagItem).to(
       receive(:load).with('pushit_apps', 'rails-example').and_return(
-        {'id' =>'rails-example'}
+        'id' => 'rails-example'
       )
     )
   end

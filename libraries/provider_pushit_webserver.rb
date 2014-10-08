@@ -71,19 +71,20 @@ class Chef
       def update_nginx_template_resource
         begin
           nginx_template = run_context.resource_collection.find('template[nginx.conf]')
-
-          nginx_template.source 'nginx.conf.erb'
-          nginx_template.cookbook 'pushit'
-          nginx_template.owner node.normal['nginx']['user'] = new_resource.user
-          nginx_template.group node.normal['nginx']['group'] = new_resource.group
-          nginx_template.mode '0644'
-          nginx_template.variables(
-            :log_dir => new_resource.log_dir,
-            :pid_file => new_resource.pid_file,
-            :config_path => new_resource.config_path
-          )
         rescue Chef::Exceptions::ResourceNotFound
+          return false
         end
+
+        nginx_template.source 'nginx.conf.erb'
+        nginx_template.cookbook 'pushit'
+        nginx_template.owner node.normal['nginx']['user'] = new_resource.user
+        nginx_template.group node.normal['nginx']['group'] = new_resource.group
+        nginx_template.mode '0644'
+        nginx_template.variables(
+          :log_dir => new_resource.log_dir,
+          :pid_file => new_resource.pid_file,
+          :config_path => new_resource.config_path
+        )
       end
     end
   end

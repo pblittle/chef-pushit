@@ -10,7 +10,7 @@ describe "#{Chef::Provider::PushitRuby}.create" do
   before do
     stub_command("#{Chef::Pushit::Nodejs.node_binary} -v > /dev/null").and_return(true)
     # This stub is to protect a not_if in the ruby_build::default recipe
-    stub_command("git --version >/dev/null").and_return(true)
+    stub_command('git --version >/dev/null').and_return(true)
     stub_command(/chruby --version.*/).and_return false
   end
 

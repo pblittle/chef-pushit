@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
 # Cookbook Name:: pushit_test
-# Recipe:: database 
+# Recipe:: database
 #
 # Author:: P. Barrett Little (<barrett@barrettlittle.com>)
 #
