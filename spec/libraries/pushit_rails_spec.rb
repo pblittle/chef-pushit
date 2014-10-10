@@ -73,7 +73,7 @@ describe "#{Chef::Provider::PushitRails}.create" do
           {
             'name' =>  'id_rsa_rails-example',
             'data' =>  '-----BEGIN RSA PRIVATE KEY-----\n=rails-example-deploy-key\n-----END RSA PRIVATE KEY-----'
-           }
+          }
         ],
         'ssh_keys' =>  [
           'ssh-rsa == foo',
@@ -228,7 +228,7 @@ describe "#{Chef::Provider::PushitRails}.create" do
 
   it 'starts the app service' do
     allow(::File).to receive(:exist?)
-    allow(::File).to receive(:exist?).with("/etc/init/rails-example.conf").and_return(true)
+    allow(::File).to receive(:exist?).with('/etc/init/rails-example.conf').and_return(true)
     expect(chef_run).to start_service('rails-example')
   end
 end

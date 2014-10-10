@@ -5,10 +5,13 @@ ClassAndModuleChildren:
 Encoding:
   Enabled: false
 LineLength:
-  Max: 200
+  Max: 120
+  Severity: refactor
 HashSyntax:
   EnforcedStyle: hash_rockets
 ClassLength:
   Enabled: false
 MethodLength:
+  Severity: refactor
+SingleSpaceBeforeFirstArg:
   Enabled: false
