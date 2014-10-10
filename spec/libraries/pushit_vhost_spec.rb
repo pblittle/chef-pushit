@@ -56,6 +56,12 @@ describe Chef::Provider::PushitVhost do
     expect(vhost_config).to notify('pushit_webserver[nginx]').to(:reload).delayed
   end
 
+  context 'without ssl' do
+    it 'does not create the webserver ssl cert' do
+      expect(chef_run).not_to create_certificate_manage('dummy')
+    end
+  end
+
   context 'with ssl' do
     let(:chef_run) do
       runner = ChefSpec::Runner.new(:step_into => %w(pushit_vhost))
@@ -71,12 +77,6 @@ describe Chef::Provider::PushitVhost do
       expect(chef_run.certificate_manage('dummy')).to(
           notify('pushit_webserver[nginx]').to(:reload).delayed
       )
-    end
-  end
-
-  context 'without ssl' do
-    it 'does not create the webserver ssl cert' do
-      expect(chef_run).not_to create_certificate_manage('dummy')
     end
   end
 end
