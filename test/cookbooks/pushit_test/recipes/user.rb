@@ -41,5 +41,5 @@ file 'add user flag' do
   path    flag_path
   action  :nothing
   content 'I am here'
-  subscribes :create, "pushit_user[foo]"
+  subscribes :create, 'pushit_user[foo]'
 end

@@ -3,16 +3,12 @@ require 'spec_helper'
 describe "#{Chef::Provider::PushitWebserver}.create" do
   let(:chef_run) do
     ChefSpec::Runner.new(
-      step_into: %w(pushit_webserver pushit_base)
+      step_into => %w(pushit_webserver pushit_base)
     ).converge('pushit_test::webserver')
   end
 
   it 'creates the deploy user' do
     expect(chef_run).to create_pushit_user('deploy')
-  end
-
-  it 'creates an nginx config' do
-    expect(chef_run).to create_template('nginx.conf')
   end
 
   it 'is subscribed to by the test' do
@@ -23,12 +19,8 @@ end
 describe "#{Chef::Provider::PushitWebserver}.delete" do
   let(:chef_run) do
     ChefSpec::Runner.new(
-      step_into: %w(pushit_webserver)
+      step_into => %w(pushit_webserver)
     ).converge('pushit_test::webserver_delete')
-  end
-
-  it 'removes nginx config' do
-    expect(chef_run).to delete_template('nginx.conf')
   end
 
   it 'does not create the nginx config' do
@@ -43,7 +35,7 @@ end
 describe "#{Chef::Provider::PushitWebserver}.restart" do
   let(:chef_run) do
     ChefSpec::Runner.new(
-      step_into: %w(pushit_webserver)
+      step_into => %w(pushit_webserver)
     ).converge('pushit_test::webserver_restart')
   end
 
@@ -55,7 +47,7 @@ end
 describe "#{Chef::Provider::PushitWebserver}.reload" do
   let(:chef_run) do
     ChefSpec::Runner.new(
-      step_into: %w(pushit_webserver)
+      step_into => %w(pushit_webserver)
     ).converge('pushit_test::webserver_reload')
   end
 

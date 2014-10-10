@@ -69,9 +69,8 @@ class Chef
       alias_method :whyrun_supported?, :whyrun_supported
 
       def escape_env(vars = {})
-        vars.inject({}) do |hash, (key, value)|
-          hash[key.upcase] = value.gsub(/"/) { %q(\") }
-          hash
+        vars.each_with_object({}) do |(key, value), hash|
+          hash[key.upcase] = value.gsub(/"/) { '"' }
         end
       end
     end
