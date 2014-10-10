@@ -37,6 +37,38 @@ class Chef
       def self.keys_path
         ::File.join(ssl_path, 'private')
       end
+
+      def self.key_extension
+        '.key'
+      end
+
+      def self.cert_extension
+        '.crt'
+      end
+
+      def self.bundle_extension
+        '-bundle.crt'
+      end
+
+      def self.chain_extension
+        '.chain'
+      end
+
+      def self.cert_file(cert_name)
+        ::File.join(certs_path, cert_name + cert_extension)
+      end
+
+      def self.key_file(cert_name)
+        ::File.join(keys_path, cert_name + key_extension)
+      end
+
+      def self.chain_file(cert_name)
+        ::File.join(certs_path, cert_name + chain_extension)
+      end
+
+      def self.bundle_file(cert_name)
+        ::File.join(certs_path, cert_name + bundle_extension)
+      end
     end
   end
 end

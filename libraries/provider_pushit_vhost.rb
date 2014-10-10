@@ -20,11 +20,12 @@
 require 'chef/provider/lwrp_base'
 
 require_relative 'provider_pushit_app'
+require_relative 'chef_pushit_certs'
 
 class Chef
   class Provider
     # provider class for creating a vhost config for pushit apps
-    class PushitVhost < Chef::Provider::LWRPBase
+    class PushitVhost < Chef::Provider::PushitBase
       use_inline_resources if defined?(use_inline_resources)
 
       def whyrun_supported?
@@ -34,6 +35,7 @@ class Chef
       def action_create
         pushit_webserver 'nginx'
 
+        certificate.action :create if new_resource.ssl_certificate
         vhost_config_resource.action :create
 
         # need to re-declare this on the global resource collection so that the nginx_site definition
@@ -69,7 +71,25 @@ class Chef
         )
       end
 
+      def certificate
+        r = certificate_manage new_resource.ssl_certificate
+        r.owner user.username
+        r.group user.group
+        r.cert_path Pushit::Certs.ssl_path
+        r.cert_file Pushit::Certs.bundle_file(new_resource.ssl_certificate)
+        r.key_file Pushit::Certs.key_file(new_resource.ssl_certificate)
+        r.nginx_cert true
+        r.action :nothing
+        r.notifies :reload, 'pushit_webserver[nginx]'
+        r
+      end
+
       def vhost_config_resource
+        if new_resource.ssl_certificate
+          cert = Pushit::Certs.bundle_file(new_resource.ssl_certificate)
+          key = Pushit::Certs.key_file(new_resource.ssl_certificate)
+        end
+
         r = template config_path
         r.source new_resource.config_source
         r.cookbook new_resource.config_cookbook
@@ -82,8 +102,8 @@ class Chef
           :server_name => new_resource.server_name,
           :listen_port => new_resource.http_port,
           :use_ssl => new_resource.use_ssl,
-          :ssl_certificate => new_resource.ssl_certificate,
-          :ssl_certificate_key => new_resource.ssl_certificate_key,
+          :ssl_certificate => cert,
+          :ssl_certificate_key => key,
           :ssl_listen_port => new_resource.https_port,
           :upstream_ip => new_resource.upstream_ip,
           :upstream_port => new_resource.upstream_port,

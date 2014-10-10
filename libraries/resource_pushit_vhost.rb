@@ -47,8 +47,6 @@ class Chef
       attribute :use_ssl, :kind_of => [TrueClass, FalseClass], :default => false
 
       attribute :ssl_certificate, :kind_of => String
-      attribute :ssl_certificate_key, :kind_of => String
-      attribute :ssl_certificate_pem, :kind_of => String
     end
   end
 end
