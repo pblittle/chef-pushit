@@ -46,7 +46,7 @@ class Chef
         if app.database?
           database_config_resource.action :create
           if app.database_certificate
-            certificate_resource = ssl_cert_resource(app.database_certificate)
+            certificate_resource = database_cert_resource(app.database_certificate)
             certificate_resource.action(:create)
             certificate_resource.notifies :restart, "service[#{app.name}]"
           end
@@ -78,7 +78,8 @@ class Chef
               begin
                 require 'bundler'
                 app = app_local
-                bundle_precompile_command = "sudo su - #{user_username} -c 'cd #{app.release_path} && source ./.env && #{app.bundle_binary} exec rake #{new_resource.precompile_command}'"
+                bundle_precompile_command = "sudo su - #{user_username} -c 'cd #{app.release_path} "\
+                "&& source ./.env && #{app.bundle_binary} exec rake #{new_resource.precompile_command}'"
                 Bundler.clean_system(bundle_precompile_command)
               rescue => e
                 Chef::Log.warn e.backtrace
@@ -145,6 +146,19 @@ class Chef
         r
       end
 
+      def database_cert_resource(certificate)
+        r = certificate_manage certificate
+        r.owner user_username
+        r.group user_group
+        r.cert_path Pushit::Certs.ssl_path
+        r.cert_file certificate + Pushit::Certs.cert_extension
+        r.key_file certificate + Pushit::Certs.key_extension
+        r.chain_file certificate + Pushit::Certs.chain_extension
+        r.nginx_cert false
+        r.action :nothing
+        r
+      end
+
       def filestore_config_resource
         r = template ::File.join(app.shared_path, 'config', 'filestore.yml')
         r.source 'filestore.yml.erb'
@@ -200,7 +214,8 @@ class Chef
       end
 
       def bundle_install(release_path)
-        install_command = "sudo su - #{user_username} -c 'cd #{release_path} && #{app.bundle_binary} install #{app.bundle_flags}'"
+        install_command = "sudo su - #{user_username} -c 'cd #{release_path} "\
+        "&& #{app.bundle_binary} install #{app.bundle_flags}'"
 
         begin
           require 'bundler'

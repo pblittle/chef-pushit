@@ -1,5 +1,14 @@
 0.11.x
 ========
+0.11.16
+-----------
+* SSL certs are now handled differently.  Webserver certs are nginx style (with cert appended to the chain)
+
+0.11.14
+---------
+* Pushit now modifies the nginx template resource from the nginx recipe, rather than providing its own.
+* Pushit sets nginx attributes to ensure log, pid, and config dirs all exist
+
 0.11.12
 ----------
 * Fixed nginx log locations

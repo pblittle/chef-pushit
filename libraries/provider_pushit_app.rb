@@ -72,11 +72,6 @@ class Chef
 
         return unless app.webserver?
         vhost_config_resource.action :create
-
-        return unless app.webserver_certificate?
-        r = ssl_cert_resource(app.webserver_certificate)
-        r.notifies :reload, "pushit_vhost[#{new_resource.name}]"
-        r.action(:create)
       end
 
       def deploy_resource
@@ -249,29 +244,9 @@ class Chef
         r.upstream_port app.upstream_port
         r.upstream_socket app.upstream_socket
         r.use_ssl app.webserver_certificate?
-        r.ssl_certificate ::File.join(
-          Pushit::Certs.certs_path,
-          "#{app.webserver_certificate}-bundle.crt"
-        )
-        r.ssl_certificate_key ::File.join(
-          Pushit::Certs.keys_path,
-          "#{app.webserver_certificate}.key"
-        )
+        r.ssl_certificate app.webserver_certificate
         r.config_cookbook new_resource.vhost_config_cookbook
         r.config_source new_resource.vhost_config_source || "nginx_#{new_resource.framework}.conf.erb"
-        r.action :nothing
-        r
-      end
-
-      def ssl_cert_resource(certificate)
-        r = certificate_manage certificate
-        r.owner user_username
-        r.group user_group
-        r.cert_path Pushit::Certs.ssl_path
-        r.cert_file "#{certificate}.pem"
-        r.key_file "#{certificate}.key"
-        r.chain_file "#{certificate}-bundle.crt"
-        r.nginx_cert false
         r.action :nothing
         r
       end
