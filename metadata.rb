@@ -12,7 +12,7 @@ long_description IO.read(
   )
 )
 
-version '0.11.17'
+version '0.11.19'
 
 supports 'debian'
 supports 'ubuntu'
