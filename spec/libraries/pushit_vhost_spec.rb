@@ -70,7 +70,11 @@ describe Chef::Provider::PushitVhost do
     end
 
     it 'creates the webserver ssl cert' do
-      expect(chef_run).to create_certificate_manage('dummy')
+      expect(chef_run).to create_certificate_manage('dummy').with(
+        :cert_path => '/opt/pushit/ssl',
+        :cert_file => 'dummy-bundle.crt',
+        :key_file => 'dummy.key'
+      )
     end
 
     it 'restarts nginx if a new webserver cert is found' do

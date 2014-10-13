@@ -76,8 +76,8 @@ class Chef
         r.owner user.username
         r.group user.group
         r.cert_path Pushit::Certs.ssl_path
-        r.cert_file Pushit::Certs.bundle_file(new_resource.ssl_certificate)
-        r.key_file Pushit::Certs.key_file(new_resource.ssl_certificate)
+        r.cert_file ::File.basename(Pushit::Certs.bundle_file(new_resource.ssl_certificate))
+        r.key_file ::File.basename(Pushit::Certs.key_file(new_resource.ssl_certificate))
         r.nginx_cert true
         r.action :nothing
         r.notifies :reload, 'pushit_webserver[nginx]'

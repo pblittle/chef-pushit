@@ -148,7 +148,12 @@ describe "#{Chef::Provider::PushitRails}.create" do
   end
 
   it 'creates the database ssl cert' do
-    expect(chef_run).to create_certificate_manage('database-cert')
+    expect(chef_run).to create_certificate_manage('database-cert').with(
+        :cert_path => '/opt/pushit/ssl',
+        :cert_file => 'database-cert.crt',
+        :chain_file => 'database-cert.chain',
+        :key_file => 'database-cert.key'
+      )
   end
 
   # TODO: restart the app, or run foreman??, or does the database config template change and we get this free?

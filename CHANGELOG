@@ -1,6 +1,10 @@
 0.11.x
 ========
-0.11.16
+0.11.18
+------------
+* Fixed spelling error in 0.11.16 fix
+
+0.11.16 (BAD)
 -----------
 * SSL certs are now handled differently.  Webserver certs are nginx style (with cert appended to the chain)
 
