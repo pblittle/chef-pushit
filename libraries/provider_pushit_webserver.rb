@@ -77,8 +77,6 @@ class Chef
 
         nginx_template.source 'nginx.conf.erb'
         nginx_template.cookbook 'pushit'
-        nginx_template.owner node.normal['nginx']['user'] = new_resource.user
-        nginx_template.group node.normal['nginx']['group'] = new_resource.group
         nginx_template.mode '0644'
         nginx_template.variables(
           :log_dir => new_resource.log_dir,
