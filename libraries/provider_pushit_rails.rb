@@ -151,9 +151,9 @@ class Chef
         r.owner user_username
         r.group user_group
         r.cert_path Pushit::Certs.ssl_path
-        r.cert_file certificate + Pushit::Certs.cert_extension
-        r.key_file certificate + Pushit::Certs.key_extension
-        r.chain_file certificate + Pushit::Certs.chain_extension
+        r.cert_file ::File.basename(Pushit::Certs.cert_file(certificate))
+        r.key_file ::File.basename(Pushit::Certs.key_file(certificate))
+        r.chain_file ::File.basename(Pushit::Certs.chain_file(certificate))
         r.nginx_cert false
         r.action :nothing
         r
