@@ -12,6 +12,7 @@ HashSyntax:
 ClassLength:
   Enabled: false
 MethodLength:
+  Max: 25
   Severity: refactor
 SingleSpaceBeforeFirstArg:
   Enabled: false

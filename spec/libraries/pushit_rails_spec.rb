@@ -179,16 +179,6 @@ describe "#{Chef::Provider::PushitRails}.create" do
     )
   end
 
-  it 'creates the webserver ssl cert' do
-    expect(chef_run).to create_certificate_manage('dummy')
-  end
-
-  it 'restarts nginx if a new webserver cert is found' do
-    expect(chef_run.certificate_manage('dummy')).to(
-      notify('pushit_vhost[rails-example]').to(:reload).delayed
-    )
-  end
-
   it 'creates a vhost config for the app' do
     expect(chef_run).to create_pushit_vhost('rails-example')
   end
