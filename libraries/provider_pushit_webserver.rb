@@ -39,33 +39,35 @@ class Chef
 
         update_nginx_template_resource
 
-        service 'nginx' do
-          action :start
-        end
+        nginx_service.action :start
       end
 
       def action_delete
         super
 
-        service 'nginx' do
-          action :stop
-        end
+        nginx_service.action :stop
 
         # TODO: how do we delete the config (or do we)
       end
 
       def action_restart
         action_create
-        service 'nginx' do
-          action :restart
-        end
+        nginx_service.action :restart
       end
 
       def action_reload
         action_create
-        service 'nginx' do
-          action :reload
+        nginx_service.action :reload
+      end
+
+      private
+
+      def nginx_service
+        r = service 'nginx' do
+          action :nothing
+          supports :restart => true, :reload => true, :status => true
         end
+        r
       end
 
       def update_nginx_template_resource
@@ -83,6 +85,7 @@ class Chef
           :pid_file => new_resource.pid_file,
           :config_path => new_resource.config_path
         )
+        nginx_template.notifies :reload, 'service[nginx]'
       end
     end
   end
