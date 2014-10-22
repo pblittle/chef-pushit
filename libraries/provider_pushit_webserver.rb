@@ -39,13 +39,13 @@ class Chef
 
         update_nginx_template_resource
 
-        nginx_service.action :start
+#        nginx_service.action [:enable, :start]
       end
 
       def action_delete
         super
 
-        nginx_service.action :stop
+        nginx_service.action [:stop, :disable]
 
         # TODO: how do we delete the config (or do we)
       end
