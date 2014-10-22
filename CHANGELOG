@@ -1,6 +1,10 @@
 0.11.x
 ========
-0.11.18
+0.11.20
+-----------
+* Fixed Chef::Pushit::Database to name keys using the functions in Chef::Pushit::Certs
+
+0.11.18 (BAD if you use database certs)
 ------------
 * Fixed spelling error in 0.11.16 fix
 * Gave the nginx user and group ownership of the nginx.conf file
