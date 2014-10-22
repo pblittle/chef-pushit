@@ -15,8 +15,6 @@ RSpec.configure do |config|
   config.log_level = :fatal
 
   config.order = 'random'
-
-  Dir['spec/support/shared/**/*.rb'].each { |file| require file }
 end
 
-at_exit { ChefSpec::Coverage.report! }
+ChefSpec::Coverage.start!
