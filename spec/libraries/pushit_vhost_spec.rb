@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Chef::Provider::PushitVhost do
   let(:chef_run) do
-    ChefSpec::Runner.new(
+    ChefSpec::SoloRunner.new(
       :step_into => %w(pushit_vhost)
     ).converge('pushit_test::vhost')
   end
@@ -64,7 +64,7 @@ describe Chef::Provider::PushitVhost do
 
   context 'with ssl' do
     let(:chef_run) do
-      runner = ChefSpec::Runner.new(:step_into => %w(pushit_vhost))
+      runner = ChefSpec::SoloRunner.new(:step_into => %w(pushit_vhost))
       runner.node.set[:pushit_test_vhost_cert] = 'dummy'
       runner.converge('pushit_test::vhost')
     end
