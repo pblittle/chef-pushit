@@ -21,6 +21,7 @@
 #
 
 require_relative 'chef_pushit'
+require_relative 'chef_pushit_certs'
 
 class Chef
   module Pushit
@@ -80,15 +81,15 @@ class Chef
       end
 
       def sslkey
-        @sslkey ||= certificate ? ::File.join(Pushit::Certs.keys_path, "#{certificate}.key") : nil
+        @sslkey ||= certificate ? Pushit::Certs.key_file(certificate) : nil
       end
 
       def sslcert
-        @sslcert ||= certificate ? ::File.join(Pushit::Certs.certs_path, "#{certificate}.pem") : nil
+        @sslcert ||= certificate ? Pushit::Certs.cert_file(certificate) : nil
       end
 
       def sslca
-        @sslca ||= certificate ? ::File.join(Pushit::Certs.certs_path, "#{certificate}-bundle.crt") : nil
+        @sslca ||= certificate ? Pushit::Certs.chain_file(certificate) : nil
       end
 
       def certificate

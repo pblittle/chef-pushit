@@ -75,15 +75,11 @@ class Chef
           app_local = app
           ruby_block 'precompile assests' do
             block do
-              begin
-                require 'bundler'
-                app = app_local
-                bundle_precompile_command = "sudo su - #{user_username} -c 'cd #{app.release_path} "\
-                "&& source ./.env && #{app.bundle_binary} exec rake #{new_resource.precompile_command}'"
-                Bundler.clean_system(bundle_precompile_command)
-              rescue => e
-                Chef::Log.warn e.backtrace
-              end
+              require 'bundler'
+              app = app_local
+              bundle_precompile_command = "sudo su - #{user_username} -c 'cd #{app.release_path} "\
+              "&& source ./.env && #{app.bundle_binary} exec rake #{new_resource.precompile_command}'"
+              Bundler.clean_system(bundle_precompile_command)
             end
             action :nothing
             subscribes :run, "deploy_revision[#{new_resource.name}]", :immediate
@@ -217,12 +213,8 @@ class Chef
         install_command = "sudo su - #{user_username} -c 'cd #{release_path} "\
         "&& #{app.bundle_binary} install #{app.bundle_flags}'"
 
-        begin
-          require 'bundler'
-          Bundler.clean_system(install_command)
-        rescue => e
-          Chef::Log.warn e.backtrace
-        end
+        require 'bundler'
+        Bundler.clean_system(install_command)
       end
     end
   end

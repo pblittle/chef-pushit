@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe "#{Chef::Provider::PushitRails}.create" do
   let(:chef_run) do
-    ChefSpec::Runner.new(
+    ChefSpec::SoloRunner.new(
       :step_into => %w(pushit_rails pushit_app pushit_base)
     ).converge('pushit_test::rails')
   end

@@ -19,7 +19,7 @@
 
 if defined?(ChefSpec)
   # pushit_nodejs matchers
-  ChefSpec::Runner.define_runner_method :pushit_nodejs
+  ChefSpec.define_matcher :pushit_nodejs
   def create_pushit_nodejs(app_name)
     ChefSpec::Matchers::ResourceMatcher.new(
       :pushit_nodejs,
@@ -29,7 +29,7 @@ if defined?(ChefSpec)
   end
 
   # pushit_rails matchers
-  ChefSpec::Runner.define_runner_method :pushit_rails
+  ChefSpec.define_matcher :pushit_rails
   def create_pushit_rails(app_name)
     ChefSpec::Matchers::ResourceMatcher.new(
       :pushit_rails,
@@ -39,7 +39,7 @@ if defined?(ChefSpec)
   end
 
   # pushit_ruby matchers
-  ChefSpec::Runner.define_runner_method :pushit_ruby
+  ChefSpec.define_matcher :pushit_ruby
   def create_pushit_ruby(ruby_version)
     ChefSpec::Matchers::ResourceMatcher.new(
       :pushit_ruby,
@@ -48,7 +48,7 @@ if defined?(ChefSpec)
     )
   end
 
-  ChefSpec::Runner.define_runner_method :pushit_user
+  ChefSpec.define_matcher :pushit_user
   def create_pushit_user(user_name)
     ChefSpec::Matchers::ResourceMatcher.new(
       :pushit_user,
@@ -65,7 +65,7 @@ if defined?(ChefSpec)
     )
   end
 
-  ChefSpec::Runner.define_runner_method :pushit_vhost
+  ChefSpec.define_matcher :pushit_vhost
   def create_pushit_vhost(app_name)
     ChefSpec::Matchers::ResourceMatcher.new(
       :pushit_vhost,
@@ -74,7 +74,7 @@ if defined?(ChefSpec)
     )
   end
 
-  ChefSpec::Runner.define_runner_method :pushit_webserver
+  ChefSpec.define_matcher :pushit_webserver
   def create_pushit_webserver(resource_name)
     ChefSpec::Matchers::ResourceMatcher.new(
       :pushit_webserver,

@@ -12,7 +12,7 @@ long_description IO.read(
   )
 )
 
-version '0.11.18'
+version '0.11.20'
 
 supports 'debian'
 supports 'ubuntu'
@@ -24,7 +24,6 @@ depends 'git', '~> 4.0'
 depends 'nginx', '~> 2.6'
 depends 'nodejs', '~> 1.3'
 depends 'ruby_build', '= 0.8.0'
-depends 'runit', '= 1.5.10'
 depends 'ssh', '= 0.6.6'
 depends 'ssh_known_hosts', '~> 1.3'
 depends 'sudo', '~> 2.6'
