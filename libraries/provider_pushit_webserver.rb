@@ -39,7 +39,7 @@ class Chef
 
         update_nginx_template_resource
 
-#        nginx_service.action [:enable, :start]
+        nginx_service.action [:enable, :start]
       end
 
       def action_delete
@@ -63,11 +63,28 @@ class Chef
       private
 
       def nginx_service
-        r = service 'nginx' do
-          action :nothing
-          supports :restart => true, :reload => true, :status => true
+        begin
+          r = run_context.resource.collection.find('service[nginx]')
+        rescue
+          r = new_nginx_service
         end
         r
+      end
+
+      def new_nginx_service
+        template '/etc/init/nginx.conf' do
+          source 'nginx-upstart.conf.erb'
+          cookbook 'nginx'
+          owner  'root'
+          group  node['root_group']
+          mode   '0644'
+        end
+
+        service 'nginx' do
+          action :nothing
+          supports :restart => true, :reload => true, :status => true
+          provider Chef::Provider::Service::Upstart
+        end
       end
 
       def update_nginx_template_resource
