@@ -22,7 +22,14 @@
 
 include_recipe 'pushit_test::base'
 
+pushit_vhost 'nodejs-example' do
+  use_ssl true
+  ssl_certificate node[:pushit_test_vhost_cert] if node[:pushit_test_vhost_cert]
+  config_source 'nginx_nodejs.conf.erb'
+end
+
 pushit_vhost 'rails-example' do
   use_ssl true
   ssl_certificate node[:pushit_test_vhost_cert] if node[:pushit_test_vhost_cert]
+  config_source 'nginx_rails.conf.erb'
 end

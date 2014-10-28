@@ -70,6 +70,17 @@ suites:
     data_bags_path:
       'test/data_bags'
 
+  - name: vhost
+    excludes:
+      - ubuntu-12.04-base
+      - ubuntu-12.04-node
+    run_list:
+      - recipe[pushit_test::vhost]
+    data_bags_path:
+      'test/data_bags'
+    encrypted_data_bag_secret_key_path:
+      'test/encrypted_data_bag_secret'
+
   - name: custom_vhost
     excludes:
       - ubuntu-12.04-base
