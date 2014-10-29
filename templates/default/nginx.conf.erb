@@ -1,7 +1,7 @@
 worker_processes auto;
 daemon off;
 
-pid <%= @pid_file %>;
+pid <%= node['nginx']['pid'] %>;
 
 events {
   worker_connections 1024;
@@ -18,8 +18,8 @@ http {
   server_name_in_redirect off;
   server_tokens off;
 
-  access_log <%= @log_dir %>/access.log;
-  error_log <%= @log_dir %>/error.log;
+  access_log <%= node['nginx']['log_dir'] %>/access.log;
+  error_log <%= node['nginx']['log_dir'] %>/error.log;
 
   sendfile on;
 
@@ -36,6 +36,6 @@ http {
   gzip_proxied any;
   gzip_types text/plain text/css application/x-javascript text/xml application/xml text/javascript application/javascript application/json;
 
-  include <%= @config_path -%>/conf.d/*.conf;
-  include <%= @config_path -%>/sites-enabled/*;
+  include <%= node['nginx']['dir'] -%>/conf.d/*.conf;
+  include <%= node['nginx']['dir'] -%>/sites-enabled/*;
 }
