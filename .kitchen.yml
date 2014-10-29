@@ -53,6 +53,12 @@ suites:
     run_list:
       - recipe[pushit_test::webserver]
 
+  - name: vhost
+    driver_config:
+      box: <%= ENV['KITCHEN_RUBY_BOX'] || opscode-ubuntu-12.04 %>
+    run_list:
+      - recipe[pushit_test::vhost]
+
   - name: custom_vhost
     driver_config:
       box: <%= ENV['KITCHEN_RUBY_BOX'] || opscode-ubuntu-12.04 %>
