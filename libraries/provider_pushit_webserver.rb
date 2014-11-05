@@ -72,6 +72,11 @@ class Chef
         nginx_template.source 'nginx.conf.erb'
         nginx_template.cookbook 'pushit'
         nginx_template.mode '0644'
+        nginx_template.variables(
+          :pid => node['nginx']['pid'],
+          :log_dir => node['nginx']['log_dir'],
+          :conf_dir => node['nginx']['dir']
+        )
       end
 
       def sub_resources_updated?

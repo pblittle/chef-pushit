@@ -85,6 +85,9 @@ class Chef
       end
 
       def vhost_config_resource
+        if new_resource.use_ssl && !new_resource.ssl_certificate
+          raise Exception.new('use_ssl is true, but no ssl_certificate provided')
+        end
         if new_resource.ssl_certificate
           cert = Pushit::Certs.bundle_file(new_resource.ssl_certificate)
           key = Pushit::Certs.key_file(new_resource.ssl_certificate)

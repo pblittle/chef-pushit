@@ -58,6 +58,8 @@ suites:
       box: <%= ENV['KITCHEN_RUBY_BOX'] || opscode-ubuntu-12.04 %>
     run_list:
       - recipe[pushit_test::vhost]
+    attributes:
+      pushit_test_vhost_cert: here
 
   - name: custom_vhost
     driver_config:
