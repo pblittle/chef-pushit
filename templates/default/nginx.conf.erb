@@ -1,7 +1,7 @@
 worker_processes auto;
 daemon off;
 
-pid <%= @pid_file %>;
+pid <%= @pid %>;
 
 events {
   worker_connections 1024;
@@ -36,6 +36,6 @@ http {
   gzip_proxied any;
   gzip_types text/plain text/css application/x-javascript text/xml application/xml text/javascript application/javascript application/json;
 
-  include <%= @config_path -%>/conf.d/*.conf;
-  include <%= @config_path -%>/sites-enabled/*;
+  include <%= @conf_dir -%>/conf.d/*.conf;
+  include <%= @conf_dir -%>/sites-enabled/*;
 }
