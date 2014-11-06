@@ -1,3 +1,11 @@
+0.12.x
+=========
+0.12.0
+--------
+* Major overhaul of nginx interactions
+* Update to test kitchen configs
+* Added Testing.md
+
 0.11.x
 ========
 0.11.20

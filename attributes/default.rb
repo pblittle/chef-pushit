@@ -32,23 +32,4 @@ default[:nodejs][:install_method] = 'source'
 default[:nodejs][:version] = '0.10.29'
 default[:nodejs][:npm] = '1.4.21'
 
-override['nginx']['version'] = '1.4.4'
-override['nginx']['source']['version'] = '1.4.4'
-override['nginx']['openssl_source']['version']  = '1.0.1i'
-override['nginx']['init_style'] = 'upstart'
-
-default['nginx']['install_method'] = 'source'
-default['nginx']['default_site_enabled'] = false
-default['nginx']['dir'] = '/opt/pushit/nginx'
-default['nginx']['log_dir'] = '/opt/pushit/nginx/log'
-default['nginx']['binary'] = '/opt/pushit/nginx/sbin/nginx'
-default['nginx']['source']['modules'] = [
-  'nginx::http_gzip_static_module',
-  'nginx::http_ssl_module',
-  'nginx::http_stub_status_module'
-]
-default['nginx']['gzip_static'] = 'on'
-
 default['pushit']['chruby']['version'] = '0.3.8'
-
-include_attribute 'nginx::source'

@@ -22,87 +22,83 @@ require_relative 'provider_pushit_base'
 class Chef
   class Provider
     # provider for creating a webserver for pushit apps
-    class PushitWebserver < Chef::Provider::PushitBase
-      use_inline_resources if defined?(use_inline_resources)
+    class PushitWebserver < Chef::Provider::LWRPBase
+      include Chef::DSL::IncludeRecipe
 
       def action_create
-        super
+        include_recipe 'nginx::default'
+        nginx_template = find_resource_safely('template[nginx.conf]')
+        update_nginx_template(nginx_template)
 
-        node.normal['nginx']['log_dir'] = new_resource.log_dir
-        node.normal['nginx']['pid'] = new_resource.pid_file
-        node.normal['nginx']['dir'] = new_resource.config_path
+        s = service('nginx')
+        s.action [:enable, :start]
 
-        recipe_eval do
-          run_context.include_recipe 'nginx::default'
-          update_nginx_template_resource
-        end
-
-        update_nginx_template_resource
-
-        nginx_service.action [:enable, :start]
+        new_resource.updated_by_last_action(nginx_template.updated_by_last_action? || s.updated_by_last_action? || sub_resources_updated?)
       end
 
       def action_delete
-        super
+        s = nginx_service
+        s.action [:stop, :disable]
 
-        nginx_service.action [:stop, :disable]
-
-        # TODO: how do we delete the config (or do we)
+        new_resource.updated_by_last_action s.updated?
       end
 
       def action_restart
         action_create
         nginx_service.action :restart
+
+        new_resource.updated_by_last_action true
       end
 
       def action_reload
         action_create
         nginx_service.action :reload
+
+        new_resource.updated_by_last_action true
       end
 
       private
 
       def nginx_service
-        begin
-          r = run_context.resource.collection.find('service[nginx]')
-        rescue
-          r = new_nginx_service
-        end
-        r
-      end
-
-      def new_nginx_service
-        template '/etc/init/nginx.conf' do
-          source 'nginx-upstart.conf.erb'
-          cookbook 'nginx'
-          owner  'root'
-          group  node['root_group']
-          mode   '0644'
-        end
-
         service 'nginx' do
           action :nothing
           supports :restart => true, :reload => true, :status => true
           provider Chef::Provider::Service::Upstart
+          only_if { ::File.exist?('/etc/init/nginx.conf') }
         end
       end
 
-      def update_nginx_template_resource
-        begin
-          nginx_template = run_context.resource_collection.find('template[nginx.conf]')
-        rescue Chef::Exceptions::ResourceNotFound
-          return false
-        end
-
+      def update_nginx_template(nginx_template)
         nginx_template.source 'nginx.conf.erb'
         nginx_template.cookbook 'pushit'
         nginx_template.mode '0644'
         nginx_template.variables(
-          :log_dir => new_resource.log_dir,
-          :pid_file => new_resource.pid_file,
-          :config_path => new_resource.config_path
+          :pid => node['nginx']['pid'],
+          :log_dir => node['nginx']['log_dir'],
+          :conf_dir => node['nginx']['dir']
         )
-        nginx_template.notifies :reload, 'service[nginx]'
+      end
+
+      def sub_resources_updated?
+        updated = false
+        %w( template[/etc/init/nginx.conf]
+            cookbook_file[#{node['nginx']['dir']}/mime.types]
+            bash[compile_nginx_source]
+            service[nginx]
+        ).each do |name|
+          resource = find_resource_safely name
+          next unless resource
+
+          resource = [resource] unless resource.is_a? Array
+          resource.each{ |r| updated ||= r.updated_by_last_action? }
+        end
+        updated
+      end
+
+      def find_resource_safely(name)
+        run_context.resource_collection.find(name)
+      rescue Chef::Exceptions::ResourceNotFound
+        return nil
       end
     end
   end

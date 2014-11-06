@@ -35,5 +35,7 @@ file 'add webserver flag' do
   path flag_path
   action :nothing
   content 'I am here'
-  subscribes :create, 'pushit_webserver[nginx]'
+  # TODO one of these two subscribes needs to work someday
+  subscribes :create, 'template[/opt/pushit/nginx/nginx.conf]'
+  subscribes :create, 'webserver[nginx]'
 end
