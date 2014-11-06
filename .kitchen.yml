@@ -59,7 +59,7 @@ suites:
     run_list:
       - recipe[pushit_test::vhost]
     attributes:
-      pushit_test_vhost_cert: here
+      pushit_test_vhost_cert: dummy
 
   - name: custom_vhost
     driver_config:
