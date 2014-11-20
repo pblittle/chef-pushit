@@ -32,4 +32,5 @@ pushit_vhost 'rails-example' do
   use_ssl true
   ssl_certificate node[:pushit_test_vhost_cert] if node[:pushit_test_vhost_cert]
   config_source 'nginx_rails.conf.erb'
+  upstream_socket '/opt/pushit/dummy/dummy.sock'
 end
