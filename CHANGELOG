@@ -1,10 +1,15 @@
 0.12.x
 =========
-0.12.0
+0.12.4
+-------
+* give vhost a `root` attribute, rather than pulling directly from the app, which may not exist.
+
+0.12.2
 --------
 * Major overhaul of nginx interactions
 * Update to test kitchen configs
 * Added Testing.md
+* Update SSH cookbook
 
 0.11.x
 ========

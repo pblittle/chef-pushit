@@ -30,6 +30,8 @@ class Chef
 
       attribute :app_name, :kind_of => String, :name_attribute => true
 
+      attribute :root, :kind_of => String, :required => true
+
       attribute :config_cookbook, :kind_of => String, :default => 'pushit'
       attribute :config_source, :kind_of => String
 
@@ -45,7 +47,6 @@ class Chef
       attribute :server_name, :kind_of => String, :default => '_'
 
       attribute :use_ssl, :kind_of => [TrueClass, FalseClass], :default => false
-
       attribute :ssl_certificate, :kind_of => String
     end
   end

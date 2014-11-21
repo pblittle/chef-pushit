@@ -57,10 +57,6 @@ class Chef
 
       private
 
-      def app
-        @app ||= Pushit::App.new(new_resource.name)
-      end
-
       def config_file
         "#{new_resource.app_name}.conf"
       end
@@ -103,7 +99,7 @@ class Chef
         r.mode '0644'
         r.variables(
           :app_name => new_resource.app_name,
-          :root => app.root,
+          :root => new_resource.root,
           :server_name => new_resource.server_name,
           :listen_port => new_resource.http_port,
           :use_ssl => new_resource.use_ssl,
