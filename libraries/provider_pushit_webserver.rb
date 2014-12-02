@@ -30,7 +30,7 @@ class Chef
         nginx_template = find_resource_safely('template[nginx.conf]')
         update_nginx_template(nginx_template)
 
-        s = service('nginx')
+        s = nginx_service
         s.action [:enable, :start]
 
         new_resource.updated_by_last_action(nginx_template.updated_by_last_action? || s.updated_by_last_action? || sub_resources_updated?)
