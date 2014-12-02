@@ -7,12 +7,13 @@ describe "#{Chef::Provider::PushitWebserver}.create" do
     ).converge('pushit_test::webserver')
   end
 
-  it 'creates the deploy user' do
-    expect(chef_run).to create_pushit_user('deploy')
-  end
-
   it 'is subscribed to by the test' do
     expect(chef_run.file('add webserver flag')).to subscribe_to('pushit_webserver[nginx]').on(:create).delayed
+  end
+
+  it 'used upstart to run nginx' do
+    expect(chef_run.node.override['nginx']['init_style']).to eq('upstart')
+    expect(chef_run).to start_service('nginx').with(:provider => Chef::Provider::Service::Upstart)
   end
 end
 
@@ -40,6 +41,7 @@ describe "#{Chef::Provider::PushitWebserver}.restart" do
   end
 
   it 'restarts nginx' do
+    pending
     expect(chef_run).to restart_service('nginx')
   end
 end
@@ -51,7 +53,8 @@ describe "#{Chef::Provider::PushitWebserver}.reload" do
     ).converge('pushit_test::webserver_reload')
   end
 
-  it 'restarts nginx' do
+  it 'reloads nginx' do
+    pending
     expect(chef_run).to reload_service('nginx')
   end
 end

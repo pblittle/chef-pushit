@@ -22,19 +22,19 @@
 
 include_recipe 'pushit_test::base'
 
-app = Chef::Pushit::App.new('nodejs-example');
+app = Chef::Pushit::App.new('nodejs-example')
 
 pushit_vhost 'nodejs-example' do
-  use_ssl true
+  use_ssl true if node[:pushit_test_vhost_cert]
   ssl_certificate node[:pushit_test_vhost_cert] if node[:pushit_test_vhost_cert]
   config_source 'nginx_nodejs.conf.erb'
   root app.root
 end
 
-app = Chef::Pushit::App.new('rails-example');
+app = Chef::Pushit::App.new('rails-example')
 
 pushit_vhost 'rails-example' do
-  use_ssl true
+  use_ssl true if node[:pushit_test_vhost_cert]
   ssl_certificate node[:pushit_test_vhost_cert] if node[:pushit_test_vhost_cert]
   config_source 'nginx_rails.conf.erb'
   upstream_socket '/opt/pushit/dummy/dummy.sock'

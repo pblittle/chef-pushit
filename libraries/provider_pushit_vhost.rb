@@ -80,9 +80,10 @@ class Chef
         r
       end
 
+      # rubocop:disable Metrics/MethodLength,
       def vhost_config_resource
         if new_resource.use_ssl && !new_resource.ssl_certificate
-          raise Exception.new('use_ssl is true, but no ssl_certificate provided')
+          fail('use_ssl is true, but no ssl_certificate provided')
         end
         if new_resource.ssl_certificate
           cert = Pushit::Certs.bundle_file(new_resource.ssl_certificate)

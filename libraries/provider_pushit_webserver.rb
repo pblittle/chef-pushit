@@ -33,7 +33,8 @@ class Chef
         s = nginx_service
         s.action [:enable, :start]
 
-        new_resource.updated_by_last_action(nginx_template.updated_by_last_action? || s.updated_by_last_action? || sub_resources_updated?)
+        new_resource.updated_by_last_action(nginx_template.updated_by_last_action? ||
+          s.updated_by_last_action? || sub_resources_updated?)
       end
 
       def action_delete
@@ -90,7 +91,7 @@ class Chef
           next unless resource
 
           resource = [resource] unless resource.is_a? Array
-          resource.each{ |r| updated ||= r.updated_by_last_action? }
+          resource.each { |r| updated ||= r.updated_by_last_action? }
         end
         updated
       end
