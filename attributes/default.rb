@@ -24,13 +24,13 @@ default['authorization']['sudo']['include_sudoers_d'] = true
 
 default['build-essential']['compile_time'] = true
 
-default['mysql']['remove_anonymous_users'] = true
-default['mysql']['remove_test_database'] = true
-default['mysql']['tunable']['lower_case_table_names'] = 1
+default[:mysql][:remove_anonymous_users] = true
+default[:mysql][:remove_test_database] = true
+default[:mysql][:tunable][:lower_case_table_names] = 1
 
-default['nodejs']['install_method'] = 'source'
-default['nodejs']['version'] = '0.10.29'
-default['nodejs']['npm'] = '1.4.21'
+default[:nodejs][:install_method] = 'source'
+default[:nodejs][:version] = '0.10.29'
+default[:nodejs][:npm] = '1.4.21'
 
 default['pushit']['chruby']['version'] = '0.3.8'
 
