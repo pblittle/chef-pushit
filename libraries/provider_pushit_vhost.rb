@@ -57,10 +57,6 @@ class Chef
 
       private
 
-      def app
-        @app ||= Pushit::App.new(new_resource.name)
-      end
-
       def config_file
         "#{new_resource.app_name}.conf"
       end
@@ -84,9 +80,10 @@ class Chef
         r
       end
 
+      # rubocop:disable Metrics/MethodLength,
       def vhost_config_resource
         if new_resource.use_ssl && !new_resource.ssl_certificate
-          raise Exception.new('use_ssl is true, but no ssl_certificate provided')
+          fail('use_ssl is true, but no ssl_certificate provided')
         end
         if new_resource.ssl_certificate
           cert = Pushit::Certs.bundle_file(new_resource.ssl_certificate)
@@ -103,7 +100,7 @@ class Chef
         r.mode '0644'
         r.variables(
           :app_name => new_resource.app_name,
-          :root => app.root,
+          :root => new_resource.root,
           :server_name => new_resource.server_name,
           :listen_port => new_resource.http_port,
           :use_ssl => new_resource.use_ssl,

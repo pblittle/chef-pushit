@@ -33,3 +33,5 @@ default[:nodejs][:version] = '0.10.29'
 default[:nodejs][:npm] = '1.4.21'
 
 default['pushit']['chruby']['version'] = '0.3.8'
+
+include_attribute 'pushit::nginx'
