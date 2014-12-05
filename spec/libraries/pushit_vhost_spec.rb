@@ -19,6 +19,12 @@ describe Chef::Provider::PushitVhost do
     )
 
     allow(Chef::DataBagItem).to(
+      receive(:load).with('pushit_apps', 'nodejs-example').and_return(
+        'id' => 'nodejs-example'
+      )
+    )
+
+    allow(Chef::DataBagItem).to(
       receive(:load).with('users', 'deploy').and_return(
         'id' =>  'deploy',
         'comment' =>  'Application Deployer',
