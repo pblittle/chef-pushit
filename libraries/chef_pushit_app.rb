@@ -105,7 +105,7 @@ class Chef
 
       def env_vars
         e = config['env'] || {}
-        e.merge(bundle_env_vars)
+        e.merge!(bundle_env_vars)
       end
 
       def envfile
