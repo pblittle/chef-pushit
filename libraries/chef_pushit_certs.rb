@@ -26,16 +26,17 @@ class Chef
   module Pushit
     # Model class for pushit certificate
     class Certs
-      def self.ssl_path
-        ::File.join(Pushit.pushit_path, 'ssl')
+      def self.ssl_path(relative_to = nil)
+        return ::File.join(Pushit.pushit_path, 'ssl') unless relative_to
+        ::File.join(Pushit.pushit_path, relative_to, 'ssl')
       end
 
-      def self.certs_path
-        ::File.join(ssl_path, 'certs')
+      def self.certs_path(relative_to = nil)
+        ::File.join(ssl_path(relative_to), 'certs')
       end
 
-      def self.keys_path
-        ::File.join(ssl_path, 'private')
+      def self.keys_path(relative_to = nil)
+        ::File.join(ssl_path(relative_to), 'private')
       end
 
       def self.key_extension
@@ -54,20 +55,20 @@ class Chef
         '.chain'
       end
 
-      def self.cert_file(cert_name)
-        ::File.join(certs_path, cert_name + cert_extension)
+      def self.cert_file(cert_name, relative_to = nil)
+        ::File.join(certs_path(relative_to), cert_name + cert_extension)
       end
 
-      def self.key_file(cert_name)
-        ::File.join(keys_path, cert_name + key_extension)
+      def self.key_file(cert_name, relative_to = nil)
+        ::File.join(keys_path(relative_to), cert_name + key_extension)
       end
 
-      def self.chain_file(cert_name)
-        ::File.join(certs_path, cert_name + chain_extension)
+      def self.chain_file(cert_name, relative_to = nil)
+        ::File.join(certs_path(relative_to), cert_name + chain_extension)
       end
 
-      def self.bundle_file(cert_name)
-        ::File.join(certs_path, cert_name + bundle_extension)
+      def self.bundle_file(cert_name, relative_to = nil)
+        ::File.join(certs_path(relative_to), cert_name + bundle_extension)
       end
     end
   end
