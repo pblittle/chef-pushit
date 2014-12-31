@@ -69,8 +69,8 @@ class Chef
 
       def certificate
         r = certificate_manage new_resource.ssl_certificate
-        r.owner node[:nginx][:user]
-        r.group node[:nginx][:group]
+        r.owner 'root'
+        r.group 'root'
         r.cert_path Pushit::Certs.ssl_path('nginx')
         r.cert_file ::File.basename(Pushit::Certs.bundle_file(new_resource.ssl_certificate, 'nginx'))
         r.key_file ::File.basename(Pushit::Certs.key_file(new_resource.ssl_certificate, 'nginx'))
