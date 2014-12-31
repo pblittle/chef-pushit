@@ -18,7 +18,11 @@ http {
   server_name_in_redirect off;
   server_tokens off;
 
-  access_log <%= @log_dir %>/access.log;
+  log_format elb_log '$remote_addr - $http_x_forwarded_for - '
+                     '$remote_user [$time_local] '
+                     '"$request" $status $body_bytes_sent "$http_referer" '
+                     '"$http_user_agent"';
+  access_log <%= @log_dir %>/access.log elb_log;
   error_log <%= @log_dir %>/error.log;
 
   sendfile on;
