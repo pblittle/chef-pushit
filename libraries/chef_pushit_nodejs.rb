@@ -21,7 +21,7 @@
 #
 
 require_relative 'chef_pushit'
-require 'English'
+require 'mixlib/shellout'
 
 class Chef
   module Pushit
@@ -45,7 +45,7 @@ class Chef
         end
 
         def installed?
-          system("#{node_binary} -v > /dev/null") && $CHILD_STATUS.success?
+          Mixlib::ShellOut.new("#{node_binary} -v > /dev/null").run_command.status.success?
         end
       end
     end
