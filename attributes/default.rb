@@ -20,9 +20,9 @@
 # limitations under the License.
 #
 
-default['authorization']['sudo']['include_sudoers_d'] = true
+default[:authorization][:sudo][:include_sudoers_d] = true
 
-default['build-essential']['compile_time'] = true
+default['build-essential']['compile_time'] = true # ~FC019
 
 default[:mysql][:remove_anonymous_users] = true
 default[:mysql][:remove_test_database] = true
@@ -33,6 +33,6 @@ default[:nodejs][:version] = '0.10.29'
 default[:nodejs][:checksum] = '47379d01f765f87c1a1498b4e65de30e45201de50334954860d7375a8258b15d'
 default[:nodejs][:npm] = '1.4.21'
 
-default['pushit']['chruby']['version'] = '0.3.8'
+default[:pushit][:chruby][:version] = '0.3.8'
 
 include_attribute 'pushit::nginx'
