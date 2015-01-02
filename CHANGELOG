@@ -1,5 +1,15 @@
 0.12.x
 =========
+0.12.8
+-------
+* Allow multiple cert directories and give 'root' ownership of nginx certs
+* Allow recipes to add environment variables to Pushit_apps
+
+0.12.6
+-------
+* fixed nginx service provider to ensure upstart
+* set use_ssl based on the presence (or absence) of certs.
+
 0.12.4
 -------
 * give vhost a `root` attribute, rather than pulling directly from the app, which may not exist.
