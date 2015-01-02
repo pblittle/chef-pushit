@@ -77,7 +77,7 @@ describe Chef::Provider::PushitVhost do
 
     it 'creates the webserver ssl cert' do
       expect(chef_run).to create_certificate_manage('dummy').with(
-        :cert_path => '/opt/pushit/ssl',
+        :cert_path => '/opt/pushit/nginx/ssl',
         :cert_file => 'dummy-bundle.crt',
         :key_file => 'dummy.key'
       )

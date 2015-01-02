@@ -69,11 +69,11 @@ class Chef
 
       def certificate
         r = certificate_manage new_resource.ssl_certificate
-        r.owner user.username
-        r.group user.group
-        r.cert_path Pushit::Certs.ssl_path
-        r.cert_file ::File.basename(Pushit::Certs.bundle_file(new_resource.ssl_certificate))
-        r.key_file ::File.basename(Pushit::Certs.key_file(new_resource.ssl_certificate))
+        r.owner 'root'
+        r.group 'root'
+        r.cert_path Pushit::Certs.ssl_path('nginx')
+        r.cert_file ::File.basename(Pushit::Certs.bundle_file(new_resource.ssl_certificate, 'nginx'))
+        r.key_file ::File.basename(Pushit::Certs.key_file(new_resource.ssl_certificate, 'nginx'))
         r.nginx_cert true
         r.action :nothing
         r.notifies :reload, 'pushit_webserver[nginx]'
@@ -86,8 +86,8 @@ class Chef
           fail('use_ssl is true, but no ssl_certificate provided')
         end
         if new_resource.ssl_certificate
-          cert = Pushit::Certs.bundle_file(new_resource.ssl_certificate)
-          key = Pushit::Certs.key_file(new_resource.ssl_certificate)
+          cert = Pushit::Certs.bundle_file(new_resource.ssl_certificate, 'nginx')
+          key = Pushit::Certs.key_file(new_resource.ssl_certificate, 'nginx')
         else
           cert = key = nil
         end
