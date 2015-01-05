@@ -30,6 +30,7 @@ default[:mysql][:tunable][:lower_case_table_names] = 1
 
 default[:nodejs][:install_method] = 'source'
 default[:nodejs][:version] = '0.10.29'
+default[:nodejs][:checksum] = '47379d01f765f87c1a1498b4e65de30e45201de50334954860d7375a8258b15d'
 default[:nodejs][:npm] = '1.4.21'
 
 default[:pushit][:chruby][:version] = '0.3.8'
