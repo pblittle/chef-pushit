@@ -1,5 +1,9 @@
 0.12.x
 =========
+0.12.10
+----------
+* added the nodejs and nginx checksums so that we don't break in chef 12.
+
 0.12.8
 -------
 * Allow multiple cert directories and give 'root' ownership of nginx certs
