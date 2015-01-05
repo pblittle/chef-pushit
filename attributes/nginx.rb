@@ -13,6 +13,7 @@ override['nginx']['default_site_enabled'] = false
 override['nginx']['install_method'] = 'source'
 
 override['nginx']['source']['version'] = node['nginx']['version']
+override['nginx']['source']['checksum'] = '7c989a58e5408c9593da0bebcd0e4ffc3d892d1316ba5042ddb0be5b0b4102b9'
 override['nginx']['source']['prefix'] = "/opt/nginx-#{node['nginx']['source']['version']}"
 override['nginx']['source']['conf_path'] = '/opt/pushit/nginx/nginx.conf'
 override['nginx']['source']['sbin_path'] = "#{node['nginx']['source']['prefix']}/sbin/nginx"
