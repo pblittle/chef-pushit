@@ -22,6 +22,10 @@ describe 'pushit_test::vhost' do
     it 'nodejs does not support SSLv3' do
       refute File.read(nodejs_config_path).include?('SSLv3')
     end
+
+    it 'redirects all http traffic to https' do
+      assert `curl http://localhost:8080`.include?('301 Moved Permanently')
+    end
   end
 
   describe 'rails vhost' do
@@ -36,6 +40,10 @@ describe 'pushit_test::vhost' do
 
     it 'rails does not support SSLv3' do
       refute File.read(rails_config_path).include?('SSLv3')
+    end
+
+    it 'redirects all http traffic to https' do
+      assert `curl http://localhost`.include?('301 Moved Permanently')
     end
   end
 end

@@ -1,5 +1,10 @@
 0.12.x
 =========
+0.12.12
+---------
+* updated the cipher suite on nginx vhost configs
+* redirect all traffic on http to https
+
 0.12.10
 ----------
 * added the nodejs and nginx checksums so that we don't break in chef 12.

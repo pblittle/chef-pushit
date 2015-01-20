@@ -29,6 +29,8 @@ pushit_vhost 'nodejs-example' do
   ssl_certificate node[:pushit_test_vhost_cert] if node[:pushit_test_vhost_cert]
   config_source 'nginx_nodejs.conf.erb'
   root app.root
+  http_port 8080
+  https_port 8443
 end
 
 app = Chef::Pushit::App.new('rails-example')

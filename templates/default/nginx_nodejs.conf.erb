@@ -6,9 +6,14 @@ upstream <%= @app_name %> {
 }
 
 server {
+  server_name <%= @server_name %>;
+  listen <%= @listen_port %>;
+  return 301 https://$host:<%= @ssl_listen_port %>$request_uri;
+}
+
+server {
   server_name <%= @server_name -%>;
 
-  listen <%= @listen_port %>;
   <% if @use_ssl -%>
   listen <%= @ssl_listen_port %> ssl;
 
@@ -17,7 +22,7 @@ server {
 
   ssl_session_timeout 5m;
   ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
-  ssl_ciphers ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP;
+  ssl_ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS;
   ssl_prefer_server_ciphers on;
   <% end -%>
 
