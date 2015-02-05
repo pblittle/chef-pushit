@@ -35,7 +35,7 @@ def whyrun_supported?
 end
 
 def app
-  @app ||= Pushit.pushit_app_config(new_resource.name)
+  @app ||= Pushit.pushit_app_config(new_resource.name, new_resource.config)
 end
 
 def environment

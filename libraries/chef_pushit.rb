@@ -59,10 +59,11 @@ class Chef
         begin
           config = Chef::DataBagItem.load(PUSHIT_APP_DATA_BAG, name)
         rescue
+          Chef::Log.warn("#{name} databag item does not exist")
           config = {}
         end
 
-        Chef::Mixin::DeepMerge.deep_merge(lwrp_config.to_hash, config)
+        Chef::Mixin::DeepMerge.deep_merge(lwrp_config.to_hash, config.to_hash)
       end
 
       # Depricated
