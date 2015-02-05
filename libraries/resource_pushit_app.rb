@@ -93,6 +93,15 @@ class Chef
           :kind_of => String
         )
       end
+
+      def config(arg = nil)
+        set_or_return(
+          :config,
+          arg,
+          :kind_of => Hash,
+          :default => {}
+        )
+      end
     end
   end
 end

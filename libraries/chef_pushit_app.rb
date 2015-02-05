@@ -29,12 +29,13 @@ class Chef
     class App
       include Mixin::App
 
-      def initialize(name)
+      def initialize(name, lwrp_config = {})
         @name = name
+        @lwrp_config = lwrp_config
       end
 
       def config
-        @config ||= Pushit.pushit_app_config(@name)
+        @config ||= Pushit.pushit_app_config(@name, @lwrp_config)
       end
 
       def user

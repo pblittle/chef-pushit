@@ -36,9 +36,11 @@ pushit_rails app do
   unicorn_worker_processes 1
   revision 'b41e9a3676edb38a28463c23112a25a23d850cf1'
   config_files ['test_file.txt']
+  config node[:pushit_test][app][:config] if node[:pushit_test][app] && node[:pushit_test][app][:config]
 end
 
-pushit_rails app do
+pushit_rails(app + '2') do
+  name app
   deploy_action 'deploy'
   environment 'test'
   precompile_assets true

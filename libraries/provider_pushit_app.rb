@@ -134,7 +134,7 @@ class Chef
       protected
 
       def app
-        @app ||= Pushit::App.new(new_resource.name)
+        @app ||= Pushit::App.new(new_resource.name, new_resource.config)
       end
 
       def config

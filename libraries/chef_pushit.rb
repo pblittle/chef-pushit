@@ -55,13 +55,14 @@ class Chef
         @pushit_apps_path ||= ::File.join(pushit_path, 'apps')
       end
 
-      def pushit_app_config(name)
-        Chef::DataBagItem.load(PUSHIT_APP_DATA_BAG, name)
-      rescue
-        # Currently, we ONLY support certain required attributes from a data bag
-        # Thus, ALL apps need a databag item.  In the future, this will not be the case
-        # and we can check for the existence of an item and return {} if no item exists
-        raise "No databag exists for your app.  #{PUSHIT_APP_DATA_BAG} does not have an item named #{name}"
+      def pushit_app_config(name, lwrp_config = {})
+        begin
+          config = Chef::DataBagItem.load(PUSHIT_APP_DATA_BAG, name)
+        rescue
+          config = {}
+        end
+
+        Chef::Mixin::DeepMerge.deep_merge(lwrp_config.to_hash, config)
       end
 
       # Depricated
