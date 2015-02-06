@@ -275,6 +275,7 @@ describe "#{Chef::Provider::PushitRails}.create" do
       chef_run.converge('pushit_test::rails')
 
       expect(chef_run).to render_file('/opt/pushit/apps/rails-example/shared/env').with_content(/BASE="override"/)
+      expect(chef_run).not_to render_file('/opt/pushit/apps/rails-example/shared/env').with_content(/BASE="foo"/)
     end
 
     it 'does a union of the data bag and lwrp' do
