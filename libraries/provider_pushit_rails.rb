@@ -80,6 +80,7 @@ class Chef
               bundle_precompile_command = "sudo su - #{user_username} -c 'cd #{app.release_path} "\
               "&& source ./.env && #{app.bundle_binary} exec rake #{new_resource.precompile_command}'"
               Bundler.clean_system(bundle_precompile_command)
+              fail("Bundle pre-compile failed") unless $?.exitstatus == 0
             end
             action :nothing
             subscribes :run, "deploy_revision[#{new_resource.name}]", :immediate
@@ -215,6 +216,7 @@ class Chef
 
         require 'bundler'
         Bundler.clean_system(install_command)
+        fail("Bundle install failed") unless $?.exitstatus == 0
       end
     end
   end
