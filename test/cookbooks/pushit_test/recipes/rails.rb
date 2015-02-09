@@ -24,7 +24,9 @@ include_recipe 'pushit_test::base'
 
 app = 'rails-example'
 
-pushit_database app
+pushit_database app do
+  config node[:pushit_test][app][:config][:database]
+end
 
 pushit_webserver 'nginx'
 
@@ -36,7 +38,7 @@ pushit_rails app do
   unicorn_worker_processes 1
   revision 'b41e9a3676edb38a28463c23112a25a23d850cf1'
   config_files ['test_file.txt']
-  config node[:pushit_test][app][:config] if node[:pushit_test][app] && node[:pushit_test][app][:config]
+  config node[:pushit_test][app][:config]
 end
 
 pushit_rails(app + '2') do
@@ -46,5 +48,6 @@ pushit_rails(app + '2') do
   precompile_assets true
   migrate true
   unicorn_worker_processes 1
+  config node[:pushit_test][app][:config]
   revision 'ca0ad715cb68e58e9b28c442f2e17189dc9c29ad'
 end

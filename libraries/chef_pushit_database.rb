@@ -27,7 +27,7 @@ class Chef
   module Pushit
     # Model class for pushit databases
     class Database
-      def initialize(args = {})
+      def initialize(args)
         @args = args
       end
 
@@ -57,7 +57,7 @@ class Chef
       end
 
       def name
-        @name ||= @args['name']
+        @name ||= @args['name'] || @args['database']
       end
 
       def host

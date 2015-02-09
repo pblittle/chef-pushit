@@ -31,7 +31,6 @@ class Chef
     PUSHIT_GROUP ||= 'deploy'.freeze
     PUSHIT_PATH ||= ::File.join('', 'opt', 'pushit').freeze
 
-    PUSHIT_APP_DATA_BAG ||= 'pushit_apps'.freeze
     PUSHIT_APP_GEM_DEPENDENCIES ||= [
       { :name => 'bundler', :version => '1.7.12' },
       { :name => 'foreman', :version => '0.77.0' },
@@ -53,17 +52,6 @@ class Chef
 
       def pushit_apps_path
         @pushit_apps_path ||= ::File.join(pushit_path, 'apps')
-      end
-
-      def pushit_app_config(name, lwrp_config = {})
-        begin
-          config = Chef::DataBagItem.load(PUSHIT_APP_DATA_BAG, name)
-        rescue
-          Chef::Log.warn("#{name} databag item does not exist")
-          config = {}
-        end
-
-        Chef::Mixin::DeepMerge.deep_merge(lwrp_config.to_hash, config.to_hash)
       end
 
       # Depricated

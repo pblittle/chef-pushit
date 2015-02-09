@@ -34,55 +34,43 @@ def whyrun_supported?
   true
 end
 
-def app
-  @app ||= Pushit.pushit_app_config(new_resource.name, new_resource.config)
-end
-
-def environment
-  app['environment']
-end
-
-def database
-  if environment && app['database'].key?(environment)
-    app['database'][environment]
-  else
-    app['database']
-  end
+def config
+  new_resource.config
 end
 
 def connection_details
   {
-    :host => database['host'],
-    :port => database['port'],
-    :username => database['username'],
-    :password => database['password']
+    :host => config['host'],
+    :port => config['port'],
+    :username => config['username'],
+    :password => config['password']
   }
 end
 
 action :create do
 
-  if database['host'] == 'localhost'
+  if config['host'] == 'localhost'
     run_context.node.set_unless['mysql']['server_debian_password'] =
-      database['root_password']
+      config['root_password']
     run_context.node.set_unless['mysql']['server_root_password'] =
-      database['root_password']
+      config['root_password']
     run_context.node.set_unless['mysql']['server_repl_password'] =
-      database['root_password']
+      config['root_password']
 
     run_context.include_recipe 'mysql::server'
   end
 
-  mysql_database_user database['root_username'] do
+  mysql_database_user config['root_username'] do
     connection connection_details
-    password database['password']
-    database_name database['name']
+    password config['password']
+    database_name config['name']
     action :grant
     only_if do
-      database['host'] == 'localhost'
+      config['host'] == 'localhost'
     end
   end
 
-  mysql_database database['name'] do
+  mysql_database config['name'] do
     connection connection_details
     action :create
   end

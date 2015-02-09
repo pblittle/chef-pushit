@@ -99,7 +99,7 @@ class Chef
           :config,
           arg,
           :kind_of => Hash,
-          :default => {}
+          :required => true
         )
       end
     end
