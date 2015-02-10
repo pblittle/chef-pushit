@@ -22,7 +22,7 @@
 
 include_recipe 'pushit_test::base'
 
-app = Chef::Pushit::App.new('nodejs-example')
+app = Chef::Pushit::App.new('nodejs-example', node[:pushit_test][:nodejs][:config])
 
 pushit_vhost 'nodejs-example' do
   use_ssl true if node[:pushit_test_vhost_cert]
@@ -31,7 +31,7 @@ pushit_vhost 'nodejs-example' do
   root app.root
 end
 
-app = Chef::Pushit::App.new('rails-example')
+app = Chef::Pushit::App.new('rails-example', node[:pushit_test]['rails-example'][:config])
 
 pushit_vhost 'rails-example' do
   use_ssl true if node[:pushit_test_vhost_cert]

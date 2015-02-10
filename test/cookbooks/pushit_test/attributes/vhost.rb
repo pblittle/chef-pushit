@@ -1,0 +1,6 @@
+default[:pushit_test][:vhost][:config][:owner] = 'deploy'
+default[:pushit_test][:vhost][:config][:group] = 'deploy'
+default[:pushit_test][:vhost][:config][:ruby] = '2.1.1'
+default[:pushit_test][:vhost][:config][:environment] = 'test'
+default[:pushit_test][:vhost][:config][:webserver][:type] = 'nginx'
+default[:pushit_test][:vhost][:config][:webserver][:server_name] = 'custom-vhost'

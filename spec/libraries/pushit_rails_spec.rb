@@ -2,9 +2,11 @@ require 'spec_helper'
 
 describe 'pushit_test::rails' do
   let(:chef_run) do
-    ChefSpec::SoloRunner.new(
-      :step_into => %w(pushit_rails pushit_app pushit_base)
-    ).converge(described_recipe) do
+    runner = ChefSpec::SoloRunner.new(:step_into => %w(pushit_rails pushit_app pushit_base)) do |node|
+      node.set[:pushit_test]['rails-example'][:config][:database][:certificate] = 'database-cert'
+    end
+
+    runner.converge(described_recipe) do
       # Must stub this method so that we can get a "version" for pushit without actually pulling git code
       allow_any_instance_of(Chef::Pushit::App).to receive(:version).and_return(app_version)
     end
@@ -18,9 +20,6 @@ describe 'pushit_test::rails' do
 
     # Need a default stub for the databag.load method or we get errors.
     allow(Chef::DataBagItem).to receive(:load).and_return(Hash.new)
-
-    # Ensure we're not looking for the app databags anymore
-    expect(Chef::DataBagItem).to_not(receive(:load).with('pushit_apps', 'rails-example'))
 
     allow(Chef::DataBagItem).to(
       receive(:load).with('users', 'deploy').and_return(
@@ -67,17 +66,6 @@ describe 'pushit_test::rails' do
 
   it 'creates the app directory' do
     expect(chef_run).to create_directory(app_path)
-
-
-    require 'pp'
-    puts "\n\n*****************************\n*\n*"
-    pp chef_run.node[:pushit_test]
-    puts "\n*\n*\n*\n****************************"
-
-
-
-
-
   end
 
   it 'creates the app shared directory' do
@@ -115,22 +103,6 @@ describe 'pushit_test::rails' do
   it 'restarts the app if the database config changes' do
     expect(chef_run.template(::File.join(config_path, 'database.yml'))).to(
       notify('service[rails-example]').to(:restart).delayed)
-  end
-
-  it 'creates the database ssl cert' do
-    expect(chef_run).to create_certificate_manage('database-cert').with(
-        :cert_path => '/opt/pushit/ssl',
-        :cert_file => 'database-cert.crt',
-        :chain_file => 'database-cert.chain',
-        :key_file => 'database-cert.key'
-      )
-  end
-
-  # TODO: restart the app, or run foreman??, or does the database config template change and we get this free?
-  it 'restarts the app if the database certificate changes' do
-    expect(chef_run.certificate_manage('database-cert')).to(
-      notify('service[rails-example]').to(:restart).delayed
-    )
   end
 
   it 'adds the filestore config' do
@@ -195,5 +167,21 @@ describe 'pushit_test::rails' do
     allow(::File).to receive(:exist?)
     allow(::File).to receive(:exist?).with('/etc/init/rails-example.conf').and_return(true)
     expect(chef_run).to start_service('rails-example')
+  end
+
+  it 'creates the database ssl cert' do
+    expect(chef_run).to create_certificate_manage('database-cert').with(
+      :cert_path => '/opt/pushit/ssl',
+      :cert_file => 'database-cert.crt',
+      :chain_file => 'database-cert.chain',
+      :key_file => 'database-cert.key'
+    )
+  end
+
+  # TODO: restart the app, or run foreman??, or does the database config template change and we get this free?
+  it 'restarts the app if the database certificate changes' do
+    expect(chef_run.certificate_manage('database-cert')).to(
+      notify('service[rails-example]').to(:restart).delayed
+    )
   end
 end

@@ -24,4 +24,5 @@ include_recipe 'pushit_test::base'
 
 pushit_nodejs 'nodejs-example' do
   environment 'production'
+  config node[:pushit_test][:nodejs][:config]
 end

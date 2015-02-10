@@ -34,9 +34,7 @@ class Chef
         @config = config
       end
 
-      def config
-        @config
-      end
+      attr_reader :config
 
       def user
         @user ||= Pushit::User.new(config['owner'])
@@ -60,9 +58,7 @@ class Chef
         database.to_hash
       end
 
-      def name
-        @name
-      end
+      attr_reader :name
 
       def path
         ::File.join(Pushit.pushit_apps_path, @name)

@@ -22,4 +22,6 @@
 
 include_recipe 'pushit_test::base'
 
-pushit_database 'rails-example'
+pushit_database 'test-database' do
+  config node[:pushit_test]['rails-example'][:config][:database]
+end
