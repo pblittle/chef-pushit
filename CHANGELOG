@@ -1,3 +1,14 @@
+0.13.x
+===========
+0.13.0
+------------
+* use_inline_resources for the pushit_webserver resource
+* -- Breaking -- no longer supports databags for app configs
+* Adds a `config` attribute to the `pushit_app` and `pushit_database` resources.
+This is now the only way to configure these resources.
+* Bumps the versions of bundler, openssl, and foreman
+* Bumps the version of the certificate cookbook
+
 0.12.x
 =========
 0.12.10
