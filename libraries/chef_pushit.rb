@@ -31,10 +31,9 @@ class Chef
     PUSHIT_GROUP ||= 'deploy'.freeze
     PUSHIT_PATH ||= ::File.join('', 'opt', 'pushit').freeze
 
-    PUSHIT_APP_DATA_BAG ||= 'pushit_apps'.freeze
     PUSHIT_APP_GEM_DEPENDENCIES ||= [
-      { :name => 'bundler', :version => '1.7.2' },
-      { :name => 'foreman', :version => '0.74.0' },
+      { :name => 'bundler', :version => '1.7.12' },
+      { :name => 'foreman', :version => '0.77.0' },
       { :name => 'unicorn', :version => '4.8.3' }
     ].freeze
 
@@ -53,15 +52,6 @@ class Chef
 
       def pushit_apps_path
         @pushit_apps_path ||= ::File.join(pushit_path, 'apps')
-      end
-
-      def pushit_app_config(name)
-        Chef::DataBagItem.load(PUSHIT_APP_DATA_BAG, name)
-      rescue
-        # Currently, we ONLY support certain required attributes from a data bag
-        # Thus, ALL apps need a databag item.  In the future, this will not be the case
-        # and we can check for the existence of an item and return {} if no item exists
-        raise "No databag exists for your app.  #{PUSHIT_APP_DATA_BAG} does not have an item named #{name}"
       end
 
       # Depricated

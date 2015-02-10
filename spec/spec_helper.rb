@@ -1,8 +1,6 @@
 require 'chefspec'
 require 'chefspec/berkshelf'
 require_relative 'support/matchers'
-require_relative '../libraries/chef_pushit_app'
-require_relative '../libraries/chef_pushit'
 
 Dir['libraries/**/*.rb'].each { |file| require File.expand_path(file) }
 

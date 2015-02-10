@@ -23,6 +23,7 @@ class Chef
   class Provider
     # provider for creating a webserver for pushit apps
     class PushitWebserver < Chef::Provider::LWRPBase
+      use_inline_resources
       include Chef::DSL::IncludeRecipe
 
       def action_create
@@ -32,30 +33,21 @@ class Chef
 
         s = nginx_service
         s.action [:enable, :start]
-
-        new_resource.updated_by_last_action(nginx_template.updated_by_last_action? ||
-          s.updated_by_last_action? || sub_resources_updated?)
       end
 
       def action_delete
         s = nginx_service
         s.action [:stop, :disable]
-
-        new_resource.updated_by_last_action s.updated?
       end
 
       def action_restart
         action_create
         nginx_service.action :restart
-
-        new_resource.updated_by_last_action true
       end
 
       def action_reload
         action_create
         nginx_service.action :reload
-
-        new_resource.updated_by_last_action true
       end
 
       private

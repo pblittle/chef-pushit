@@ -1,67 +1,25 @@
 require 'spec_helper'
 
-describe "#{Chef::Provider::PushitRails}.create" do
+describe 'pushit_test::rails' do
   let(:chef_run) do
-    ChefSpec::SoloRunner.new(
-      :step_into => %w(pushit_rails pushit_app pushit_base)
-    ).converge('pushit_test::rails')
+    runner = ChefSpec::SoloRunner.new(:step_into => %w(pushit_rails pushit_app pushit_base)) do |node|
+      node.set[:pushit_test]['rails-example'][:config][:database][:certificate] = 'database-cert'
+    end
+
+    runner.converge(described_recipe) do
+      # Must stub this method so that we can get a "version" for pushit without actually pulling git code
+      allow_any_instance_of(Chef::Pushit::App).to receive(:version).and_return(app_version)
+    end
   end
 
   let(:app_version) do
     'IamAdummyVersionOfYourApp'
   end
 
-  let(:app_stub) do
-    Chef::Pushit::App.new 'rails-example'
-  end
-
   before do
-    allow(Chef::Pushit::App).to receive(:new).and_return(app_stub)
-    # Must stub this method so that we can get a "version" for pushit without actually pulling git code
-    allow(app_stub).to receive(:version).and_return(app_version)
 
     # Need a default stub for the databag.load method or we get errors.
     allow(Chef::DataBagItem).to receive(:load).and_return(Hash.new)
-
-    # Stub out the pushit_apps databag with a test app
-    # TODO: we can trim this WAY down I bet
-    allow(Chef::DataBagItem).to(
-      receive(:load).with('pushit_apps', 'rails-example').and_return(
-        'id' =>  'rails-example',
-        'owner' =>  'deploy',
-        'group' =>  'deploy',
-        'repo' =>  'https://github.com/cloud66/sample-rails.4.0.0-mysql.git',
-        'framework' =>  'rails',
-        'ruby' =>  {
-          'version' =>  '2.1.1'
-        },
-        'environment' =>  'test',
-        'webserver' =>  {
-          'type' =>  'nginx',
-          'server_name' =>  'rails-example',
-          'certificate' => 'dummy'
-        },
-        'database' =>  {
-          'host' =>  'localhost',
-          'adapter' =>  'mysql2',
-          'name' =>  'rails-example',
-          'username' =>  'root',
-          'password' =>  'password',
-          'port' =>  5432,
-          'certificate' => 'database-cert',
-          'options' =>  {
-            'foo' =>  'bar'
-          },
-          'root_username' =>  'root',
-          'root_password' =>  'password'
-        },
-        'env' =>  {
-          'FOO' =>  'bar',
-          'RACK_ENV' =>  'test',
-          'RAILS_ENV' =>  'test'
-        }
-      )
-    )
 
     allow(Chef::DataBagItem).to(
       receive(:load).with('users', 'deploy').and_return(
@@ -147,22 +105,6 @@ describe "#{Chef::Provider::PushitRails}.create" do
       notify('service[rails-example]').to(:restart).delayed)
   end
 
-  it 'creates the database ssl cert' do
-    expect(chef_run).to create_certificate_manage('database-cert').with(
-        :cert_path => '/opt/pushit/ssl',
-        :cert_file => 'database-cert.crt',
-        :chain_file => 'database-cert.chain',
-        :key_file => 'database-cert.key'
-      )
-  end
-
-  # TODO: restart the app, or run foreman??, or does the database config template change and we get this free?
-  it 'restarts the app if the database certificate changes' do
-    expect(chef_run.certificate_manage('database-cert')).to(
-      notify('service[rails-example]').to(:restart).delayed
-    )
-  end
-
   it 'adds the filestore config' do
     expect(chef_run).to create_template(::File.join(config_path, 'filestore.yml'))
   end
@@ -225,5 +167,21 @@ describe "#{Chef::Provider::PushitRails}.create" do
     allow(::File).to receive(:exist?)
     allow(::File).to receive(:exist?).with('/etc/init/rails-example.conf').and_return(true)
     expect(chef_run).to start_service('rails-example')
+  end
+
+  it 'creates the database ssl cert' do
+    expect(chef_run).to create_certificate_manage('database-cert').with(
+      :cert_path => '/opt/pushit/ssl',
+      :cert_file => 'database-cert.crt',
+      :chain_file => 'database-cert.chain',
+      :key_file => 'database-cert.key'
+    )
+  end
+
+  # TODO: restart the app, or run foreman??, or does the database config template change and we get this free?
+  it 'restarts the app if the database certificate changes' do
+    expect(chef_run.certificate_manage('database-cert')).to(
+      notify('service[rails-example]').to(:restart).delayed
+    )
   end
 end
