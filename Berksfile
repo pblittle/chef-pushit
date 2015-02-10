@@ -1,4 +1,3 @@
-source 'http://chef-server.carekinesis.net:26200'
 metadata
 
 group :integration do
