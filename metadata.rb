@@ -12,12 +12,12 @@ long_description IO.read(
   )
 )
 
-version '0.12.10'
+version '0.14.0'
 
 supports 'debian'
 supports 'ubuntu'
 
-depends 'certificate', '= 0.5.2'
+depends 'certificate', '= 0.8.1'
 depends 'database', '~> 2.2'
 depends 'foreman', '~> 0.1.3'
 depends 'git', '~> 4.0'

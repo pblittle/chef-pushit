@@ -24,7 +24,9 @@ include_recipe 'pushit_test::base'
 
 app = 'rails-example'
 
-pushit_database app
+pushit_database 'rails-example' do
+  config node[:pushit_test][app][:config][:database]
+end
 
 pushit_webserver 'nginx'
 
@@ -37,4 +39,5 @@ pushit_rails app do
   revision 'master'
   vhost_config_cookbook 'pushit_test'
   vhost_config_source 'custom_vhost.conf.erb'
+  config node[:pushit_test][app][:config]
 end

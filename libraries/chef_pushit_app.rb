@@ -29,13 +29,12 @@ class Chef
     class App
       include Mixin::App
 
-      def initialize(name)
+      def initialize(name, config)
         @name = name
+        @config = config
       end
 
-      def config
-        @config ||= Pushit.pushit_app_config(@name)
-      end
+      attr_reader :config
 
       def user
         @user ||= Pushit::User.new(config['owner'])
@@ -59,12 +58,10 @@ class Chef
         database.to_hash
       end
 
-      def name
-        @name ||= config['id']
-      end
+      attr_reader :name
 
       def path
-        ::File.join(Pushit.pushit_apps_path, config['id'])
+        ::File.join(Pushit.pushit_apps_path, @name)
       end
 
       def current_path
@@ -105,7 +102,7 @@ class Chef
 
       def env_vars
         e = config['env'] || {}
-        e.merge!(bundle_env_vars)
+        e.merge(bundle_env_vars)
       end
 
       def envfile
