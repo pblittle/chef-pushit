@@ -27,7 +27,7 @@ class Chef
     # model class for pushit ruby
     class Ruby
       RUBY_DEFAULT_VERSION ||= '2.0.0-p481'
-      BUNDLER_DEFAULT_VERSION ||= '1.7.2'
+      BUNDLER_DEFAULT_VERSION ||= '1.7.12'
 
       attr_reader :version
       attr_reader :environment
