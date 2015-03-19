@@ -1,5 +1,10 @@
 0.13.x
 ===========
+0.13.4
+---------
+* enable the app services
+* order the ENV varaibles
+
 0.13.2
 --------
 * bump the system bundler to match the new chef bundler version 1.7.12
