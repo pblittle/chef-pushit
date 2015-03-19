@@ -126,7 +126,7 @@ class Chef
 
         procfile_resource.action :create
         foreman_export_resource.action :run
-        service_resource.action :start
+        service_resource.action [:enable, :start]
       end
 
       # TODO: what methods can be protected and/or private?
@@ -194,7 +194,7 @@ class Chef
         r.group user_group
         r.mode '0644'
         r.variables(
-          :env => Pushit.escape_env(app.env_vars)
+          :env => Pushit.escape_env(app.env_vars.sort)
         )
         r.action :nothing
         r
