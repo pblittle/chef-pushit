@@ -48,7 +48,6 @@ def connection_details
 end
 
 action :create do
-
   if config['host'] == 'localhost'
     run_context.node.set_unless['mysql']['server_debian_password'] =
       config['root_password']

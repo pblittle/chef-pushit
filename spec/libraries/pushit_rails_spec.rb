@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'pushit_test::rails' do
   let(:chef_run) do
     runner = ChefSpec::SoloRunner.new(:step_into => %w(pushit_rails pushit_app pushit_base)) do |node|
-      node.set[:pushit_test]['rails-example'][:config][:database][:certificate] = 'database-cert'
+      node.set[:pushit_test]['rails-example'][:config][:database][:certificate] = 'database-cert' # ~FC001
     end
 
     runner.converge(described_recipe) do

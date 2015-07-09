@@ -28,10 +28,15 @@ class Chef
     # Model class for pushit apps
     class App
       include Mixin::App
+      require 'chef/mixin/deep_merge'
 
       def initialize(name, config)
         @name = name
-        @config = config
+        if config.is_a? Hash
+          @config = config
+        else
+          @config = config.reduce(Mash.new) { |a, e| Chef::Mixin::DeepMerge.merge(a, e) }
+        end
       end
 
       attr_reader :config
