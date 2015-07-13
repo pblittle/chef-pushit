@@ -30,6 +30,8 @@ end
 
 pushit_webserver 'nginx'
 
+node.run_state[:test_config_values] = {:env => { :test_val_2 => 'true', :test_val_1 => 'true' }}
+
 pushit_rails app do
   deploy_action 'deploy'
   environment 'test'
@@ -38,7 +40,7 @@ pushit_rails app do
   unicorn_worker_processes 1
   revision 'b41e9a3676edb38a28463c23112a25a23d850cf1'
   config_files ['test_file.txt']
-  config node[:pushit_test][app][:config]
+  config [node[:pushit_test][app][:config], node.run_state[:test_config_values]]
 end
 
 pushit_rails(app + '2') do
@@ -48,6 +50,6 @@ pushit_rails(app + '2') do
   precompile_assets true
   migrate true
   unicorn_worker_processes 1
-  config node[:pushit_test][app][:config]
+  config [node[:pushit_test][app][:config], node.run_state[:test_config_values]]
   revision 'ca0ad715cb68e58e9b28c442f2e17189dc9c29ad'
 end

@@ -67,6 +67,11 @@ describe 'pushit_test::rails' do
     assert ::File.read(dotenv_path).include?(ruby_bin_path)
   end
 
+  it 'correctly merged multiple config hashes' do
+    assert ::File.read(dotenv_path).include?('TEST_VAL_2')
+    assert ::File.read(dotenv_path).include?('TEST_VAL_1="true"')
+  end
+
   it 'has created database.yml' do
     assert File.file?(database_yaml_path)
   end

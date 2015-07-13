@@ -98,7 +98,7 @@ class Chef
         set_or_return(
           :config,
           arg,
-          :kind_of => Hash,
+          :kind_of => [Hash, Array],
           :required => true
         )
       end

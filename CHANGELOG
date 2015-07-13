@@ -1,5 +1,9 @@
 0.13.x
 ===========
+0.13.6
+-------
+* allow multiple hashes for rails_app.config
+
 0.13.4
 ---------
 * enable the app services
