@@ -30,7 +30,7 @@ class Chef
 
       attribute :app_name, :kind_of => String, :name_attribute => true
 
-      attribute :root, :kind_of => String, :required => true
+      attribute :root, :kind_of => String, :default => '/var/www'
 
       attribute :config_cookbook, :kind_of => String, :default => 'pushit'
       attribute :config_source, :kind_of => String
