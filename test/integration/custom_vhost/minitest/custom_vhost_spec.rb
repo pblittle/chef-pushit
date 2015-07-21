@@ -17,5 +17,6 @@ describe 'pushit_test::custom_vhost' do
 
   it 'has used our custom template' do
     assert ::File.readlines(vhost_config_path).grep(/TEST PASSES/).length > 0
+    assert ::File.readlines(vhost_config_path).grep(/test_me/).length > 0
   end
 end

@@ -99,7 +99,7 @@ class Chef
         r.group 'root'
         r.mode '0644'
         r.variables(
-          :app_name => new_resource.app_name,
+          {:app_name => new_resource.app_name,
           :root => new_resource.root,
           :server_name => new_resource.server_name,
           :listen_port => new_resource.http_port,
@@ -109,7 +109,7 @@ class Chef
           :ssl_listen_port => new_resource.https_port,
           :upstream_ip => new_resource.upstream_ip,
           :upstream_port => new_resource.upstream_port,
-          :upstream_socket => new_resource.upstream_socket
+          :upstream_socket => new_resource.upstream_socket}.merge(new_resource.config_variables)
         )
         r.notifies :reload, 'pushit_webserver[nginx]'
         r

@@ -94,6 +94,14 @@ class Chef
         )
       end
 
+      def vhost_config_variables(arg = nil)
+        set_or_return(
+          :vhost_config_variables,
+          arg,
+          :kind_of => Hash
+        )
+      end
+
       def config(arg = nil)
         set_or_return(
           :config,

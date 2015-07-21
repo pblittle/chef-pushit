@@ -247,6 +247,7 @@ class Chef
         r.ssl_certificate app.webserver_certificate
         r.config_cookbook new_resource.vhost_config_cookbook
         r.config_source new_resource.vhost_config_source || "nginx_#{new_resource.framework}.conf.erb"
+        r.config_variables new_resource.vhost_config_variables || {}
         r.root app.root
         r.action :nothing
         r

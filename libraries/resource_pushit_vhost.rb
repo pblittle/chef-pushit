@@ -34,6 +34,7 @@ class Chef
 
       attribute :config_cookbook, :kind_of => String, :default => 'pushit'
       attribute :config_source, :kind_of => String
+      attribute :config_variables, :kind_of => Hash, :default => {}
 
       attribute :install_path, :kind_of => String, :default => '/opt/pushit/nginx'
 

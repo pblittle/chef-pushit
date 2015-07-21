@@ -40,4 +40,5 @@ pushit_rails app do
   vhost_config_cookbook 'pushit_test'
   vhost_config_source 'custom_vhost.conf.erb'
   config node[:pushit_test][app][:config]
+  vhost_config_variables :test_variable => 'test_me'
 end
