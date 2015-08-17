@@ -39,6 +39,24 @@ class Chef
           :name_attribute => true
         )
       end
+
+      def config_source(arg = nil)
+        set_or_return(
+          :config_source,
+          arg,
+          :kind_of => [String],
+          :default => 'nginx.conf.erb'
+        )
+      end
+
+      def config_cookbook(arg = nil)
+        set_or_return(
+          :config_cookbook,
+          arg,
+          :kind_of => [String],
+          :default => 'pushit'
+        )
+      end
     end
   end
 end

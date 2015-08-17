@@ -62,8 +62,8 @@ class Chef
       end
 
       def update_nginx_template(nginx_template)
-        nginx_template.source 'nginx.conf.erb'
-        nginx_template.cookbook 'pushit'
+        nginx_template.source new_resource.config_source
+        nginx_template.cookbook new_resource.config_cookbook
         nginx_template.mode '0644'
         nginx_template.variables(
           :pid => node['nginx']['pid'],
