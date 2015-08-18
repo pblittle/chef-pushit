@@ -66,9 +66,11 @@ class Chef
         nginx_template.cookbook new_resource.config_cookbook
         nginx_template.mode '0644'
         nginx_template.variables(
-          :pid => node['nginx']['pid'],
-          :log_dir => node['nginx']['log_dir'],
-          :conf_dir => node['nginx']['dir']
+          {
+            :pid => node['nginx']['pid'],
+            :log_dir => node['nginx']['log_dir'],
+            :conf_dir => node['nginx']['dir']
+          }.merge(new_resource.config_variables)
         )
       end
 

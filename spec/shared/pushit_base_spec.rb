@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Chef::Provider::PushitBase do
-
   let(:chef_run) do
     runner = ChefSpec::SoloRunner.new
     runner.converge('pushit_test::base')

@@ -4,7 +4,6 @@ require 'minitest/autorun'
 require 'minitest/spec'
 
 describe 'pushit_test::ruby' do
-
   let(:rubies_path) { ::File.join('', 'opt', 'pushit', 'rubies') }
 
   let(:mri_binary) do
@@ -44,7 +43,6 @@ describe 'pushit_test::ruby' do
   end
 
   describe 'install ruby' do
-
     it 'has successfully installed mri' do
       assert system(
         "#{mri_binary} -v | grep -e '1.9.3p448'"
@@ -53,7 +51,6 @@ describe 'pushit_test::ruby' do
   end
 
   describe 'install ruby with env vars' do
-
     it 'has successfully installed ree' do
       assert system(
         "#{ree_binary} -v | grep -e '1.8.7'"

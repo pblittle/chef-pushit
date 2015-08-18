@@ -36,6 +36,10 @@ class Chef
       attribute :config_source, :kind_of => String
       attribute :config_variables, :kind_of => Hash, :default => {}
 
+      attribute :nginx_config_source, :kind_of => String
+      attribute :nginx_config_cookbook, :kind_of => String
+      attribute :nginx_config_variables, :kind_of => Hash, :default => {}
+
       attribute :install_path, :kind_of => String, :default => '/opt/pushit/nginx'
 
       attribute :http_port, :kind_of => Integer, :default => 80

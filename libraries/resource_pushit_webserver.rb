@@ -57,6 +57,15 @@ class Chef
           :default => 'pushit'
         )
       end
+
+      def config_variables(arg = nil)
+        set_or_return(
+          :config_variables,
+          arg,
+          :kind_of => Hash,
+          :default => {}
+        )
+      end
     end
   end
 end

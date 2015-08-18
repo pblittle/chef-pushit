@@ -4,7 +4,6 @@ require 'minitest/autorun'
 require 'minitest/spec'
 
 describe 'pushit_test::custom_vhost' do
-
   let(:vhost_config_path) do
     ::File.join(
       '', 'opt', 'pushit', 'nginx', 'sites-available', 'rails-example.conf'

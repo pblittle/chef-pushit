@@ -17,23 +17,22 @@ describe 'pushit_test::rails' do
   end
 
   before do
-
     # Need a default stub for the databag.load method or we get errors.
-    allow(Chef::DataBagItem).to receive(:load).and_return(Hash.new)
+    allow(Chef::DataBagItem).to receive(:load).and_return({})
 
     allow(Chef::DataBagItem).to(
       receive(:load).with('users', 'deploy').and_return(
-        'id' =>  'deploy',
-        'comment' =>  'Application Deployer',
-        'ssh_private_key' =>  '-----BEGIN RSA PRIVATE KEY-----',
-        'ssh_public_key' =>  'ssh-rsa',
-        'ssh_deploy_keys' =>  [
+        'id' => 'deploy',
+        'comment' => 'Application Deployer',
+        'ssh_private_key' => '-----BEGIN RSA PRIVATE KEY-----',
+        'ssh_public_key' => 'ssh-rsa',
+        'ssh_deploy_keys' => [
           {
-            'name' =>  'id_rsa_rails-example',
-            'data' =>  '-----BEGIN RSA PRIVATE KEY-----\n=rails-example-deploy-key\n-----END RSA PRIVATE KEY-----'
+            'name' => 'id_rsa_rails-example',
+            'data' => '-----BEGIN RSA PRIVATE KEY-----\n=rails-example-deploy-key\n-----END RSA PRIVATE KEY-----'
           }
         ],
-        'ssh_keys' =>  [
+        'ssh_keys' => [
           'ssh-rsa == foo',
           'ssh-rsa == bar'
         ]

@@ -4,9 +4,7 @@ require 'minitest/autorun'
 require 'minitest/spec'
 
 describe 'pushit_test::user' do
-
   describe 'default pushit user' do
-
     let(:pushit_user) { 'deploy' }
     let(:pushit_group) { 'deploy' }
     let(:pushit_home) { '/opt/pushit' }
@@ -75,7 +73,6 @@ describe 'pushit_test::user' do
   end
 
   describe 'custom pushit user' do
-
     let(:pushit_user) { 'foo' }
     let(:pushit_group) { 'foo' }
     let(:pushit_home) { '/home/foo' }
@@ -137,7 +134,8 @@ describe 'pushit_test::user' do
     end
 
     it 'notifies resources that subscribe to it' do
-      assert(::File.file?('/tmp/kitchen/cache/pushit_user_notification_flag'),
+      assert(
+        ::File.file?('/tmp/kitchen/cache/pushit_user_notification_flag'),
         '/tmp/kitchen/cache/pushit_user_notification_flag does not exist'
       )
     end
