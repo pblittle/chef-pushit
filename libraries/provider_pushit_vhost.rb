@@ -33,7 +33,11 @@ class Chef
       end
 
       def action_create
-        pushit_webserver 'nginx'
+        pushit_webserver 'nginx' do
+          config_source new_resource.nginx_config_source
+          config_cookbook new_resource.nginx_config_cookbook
+          config_variables new_resource.nginx_config_variables
+        end
 
         certificate.action :create if new_resource.ssl_certificate
         vhost_config_resource.action :create
@@ -51,6 +55,9 @@ class Chef
 
       def action_reload
         pushit_webserver 'nginx' do
+          config_source new_resource.nginx_config_source
+          config_cookbook new_resource.nginx_config_cookbook
+          config_variables new_resource.nginx_config_variables
           action :reload
         end
       end
@@ -99,17 +106,18 @@ class Chef
         r.group 'root'
         r.mode '0644'
         r.variables(
-          {:app_name => new_resource.app_name,
-          :root => new_resource.root,
-          :server_name => new_resource.server_name,
-          :listen_port => new_resource.http_port,
-          :use_ssl => new_resource.use_ssl,
-          :ssl_certificate => cert,
-          :ssl_certificate_key => key,
-          :ssl_listen_port => new_resource.https_port,
-          :upstream_ip => new_resource.upstream_ip,
-          :upstream_port => new_resource.upstream_port,
-          :upstream_socket => new_resource.upstream_socket}.merge(new_resource.config_variables)
+          { :app_name => new_resource.app_name,
+            :root => new_resource.root,
+            :server_name => new_resource.server_name,
+            :listen_port => new_resource.http_port,
+            :use_ssl => new_resource.use_ssl,
+            :ssl_certificate => cert,
+            :ssl_certificate_key => key,
+            :ssl_listen_port => new_resource.https_port,
+            :upstream_ip => new_resource.upstream_ip,
+            :upstream_port => new_resource.upstream_port,
+            :upstream_socket => new_resource.upstream_socket
+          }.merge(new_resource.config_variables)
         )
         r.notifies :reload, 'pushit_webserver[nginx]'
         r

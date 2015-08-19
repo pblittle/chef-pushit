@@ -29,5 +29,5 @@ default['nginx']['source']['modules'] |= [
   'nginx::http_stub_status_module'
 ]
 
-override['nginx']['openssl_source']['version']  = '1.0.1l'
+override['nginx']['openssl_source']['version'] = '1.0.1l'
 override['nginx']['openssl_source']['url'] = nil # force run_time construction.

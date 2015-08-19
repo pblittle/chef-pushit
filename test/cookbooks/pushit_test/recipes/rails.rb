@@ -30,7 +30,7 @@ end
 
 pushit_webserver 'nginx'
 
-node.run_state[:test_config_values] = {:env => { :test_val_2 => 'true', :test_val_1 => 'true' }}
+node.run_state[:test_config_values] = { :env => { :test_val_2 => 'true', :test_val_1 => 'true' } }
 
 pushit_rails app do
   deploy_action 'deploy'

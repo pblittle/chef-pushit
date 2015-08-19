@@ -102,6 +102,31 @@ class Chef
         )
       end
 
+      def nginx_config_source(arg = nil)
+        set_or_return(
+          :nginx_config_source,
+          arg,
+          :kind_of => String
+        )
+      end
+
+      def nginx_config_cookbook(arg = nil)
+        set_or_return(
+          :nginx_config_cookbook,
+          arg,
+          :kind_of => String
+        )
+      end
+
+      def nginx_config_variables(arg = nil)
+        set_or_return(
+          :nginx_config_variables,
+          arg,
+          :kind_of => Hash,
+          :default => {}
+        )
+      end
+
       def config(arg = nil)
         set_or_return(
           :config,

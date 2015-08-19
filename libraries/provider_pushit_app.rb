@@ -248,6 +248,9 @@ class Chef
         r.config_cookbook new_resource.vhost_config_cookbook
         r.config_source new_resource.vhost_config_source || "nginx_#{new_resource.framework}.conf.erb"
         r.config_variables new_resource.vhost_config_variables || {}
+        r.nginx_config_cookbook new_resource.nginx_config_cookbook
+        r.nginx_config_source new_resource.nginx_config_source
+        r.nginx_config_variables new_resource.nginx_config_variables || {}
         r.root app.root
         r.action :nothing
         r

@@ -1,5 +1,10 @@
 0.13.x
 ===========
+0.13.10
+---------
+* allow a custom nginx.conf source and template
+
+
 0.13.8
 ---------
 * allow specifying config_variables as additional variables to the vhost template for a `pushit_vhost` resource
