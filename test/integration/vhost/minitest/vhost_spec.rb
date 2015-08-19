@@ -4,13 +4,11 @@ require 'minitest/autorun'
 require 'minitest/spec'
 
 describe 'pushit_test::vhost' do
-
   let(:config_path) do
     ::File.join('', 'opt', 'pushit', 'nginx', 'sites-available')
   end
 
   describe 'nodejs vhost' do
-
     let(:nodejs_config_path) do
       ::File.join(config_path, 'nodejs-example.conf')
     end
@@ -25,7 +23,6 @@ describe 'pushit_test::vhost' do
   end
 
   describe 'rails vhost' do
-
     let(:rails_config_path) do
       ::File.join(config_path, 'rails-example.conf')
     end

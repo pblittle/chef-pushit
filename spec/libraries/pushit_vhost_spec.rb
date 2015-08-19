@@ -26,17 +26,17 @@ describe Chef::Provider::PushitVhost do
 
     allow(Chef::DataBagItem).to(
       receive(:load).with('users', 'deploy').and_return(
-        'id' =>  'deploy',
-        'comment' =>  'Application Deployer',
-        'ssh_private_key' =>  '-----BEGIN RSA PRIVATE KEY-----',
-        'ssh_public_key' =>  'ssh-rsa',
-        'ssh_deploy_keys' =>  [
+        'id' => 'deploy',
+        'comment' => 'Application Deployer',
+        'ssh_private_key' => '-----BEGIN RSA PRIVATE KEY-----',
+        'ssh_public_key' => 'ssh-rsa',
+        'ssh_deploy_keys' => [
           {
-            'name' =>  'id_rsa_rails-example',
-            'data' =>  '-----BEGIN RSA PRIVATE KEY-----\n=rails-example-deploy-key\n-----END RSA PRIVATE KEY-----'
+            'name' => 'id_rsa_rails-example',
+            'data' => '-----BEGIN RSA PRIVATE KEY-----\n=rails-example-deploy-key\n-----END RSA PRIVATE KEY-----'
           }
         ],
-        'ssh_keys' =>  [
+        'ssh_keys' => [
           'ssh-rsa == foo',
           'ssh-rsa == bar'
         ]
@@ -85,7 +85,7 @@ describe Chef::Provider::PushitVhost do
 
     it 'restarts nginx if a new webserver cert is found' do
       expect(chef_run.certificate_manage('dummy')).to(
-          notify('pushit_webserver[nginx]').to(:reload).delayed
+        notify('pushit_webserver[nginx]').to(:reload).delayed
       )
     end
   end

@@ -4,7 +4,6 @@ require 'minitest/autorun'
 require 'minitest/spec'
 
 describe 'pushit_test::rails' do
-
   let(:pushit_path) { ::File.join('', 'opt', 'pushit') }
 
   let(:pushit_app) { 'rails-example' }

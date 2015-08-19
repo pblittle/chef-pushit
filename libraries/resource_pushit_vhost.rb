@@ -30,10 +30,15 @@ class Chef
 
       attribute :app_name, :kind_of => String, :name_attribute => true
 
-      attribute :root, :kind_of => String, :required => true
+      attribute :root, :kind_of => String, :default => '/var/www'
 
       attribute :config_cookbook, :kind_of => String, :default => 'pushit'
       attribute :config_source, :kind_of => String
+      attribute :config_variables, :kind_of => Hash, :default => {}
+
+      attribute :nginx_config_source, :kind_of => String
+      attribute :nginx_config_cookbook, :kind_of => String
+      attribute :nginx_config_variables, :kind_of => Hash, :default => {}
 
       attribute :install_path, :kind_of => String, :default => '/opt/pushit/nginx'
 

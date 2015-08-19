@@ -4,7 +4,6 @@ require 'minitest/autorun'
 require 'minitest/spec'
 
 describe 'pushit_test::webserver' do
-
   let(:pushit_path) { ::File.join('', 'opt', 'pushit') }
 
   let(:nginx_install_path) { ::File.join('', 'opt', 'nginx-1.4.4') }
@@ -77,7 +76,8 @@ describe 'pushit_test::webserver' do
 
   it 'exposes nginx resources for notifications' do
     skip 'I need to figure something out here'
-    assert(::File.file?('/tmp/kitchen/cache/pushit_webserver_notification_flag'),
+    assert(
+      ::File.file?('/tmp/kitchen/cache/pushit_webserver_notification_flag'),
       '/tmp/kitchen/cache/pushit_webserver_notification_flag does not exist'
     )
   end
