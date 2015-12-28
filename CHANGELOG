@@ -1,9 +1,12 @@
 0.13.x
 ===========
+0.13.12
+--------
+* allow `skip-ssl-**` arguments in database config
+
 0.13.10
 ---------
 * allow a custom nginx.conf source and template
-
 
 0.13.8
 ---------

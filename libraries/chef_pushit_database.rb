@@ -81,15 +81,15 @@ class Chef
       end
 
       def sslkey
-        @sslkey ||= certificate ? Pushit::Certs.key_file(certificate) : nil
+        @sslkey ||= (certificate && !@args['skip_ssl_key']) ? Pushit::Certs.key_file(certificate) : nil
       end
 
       def sslcert
-        @sslcert ||= certificate ? Pushit::Certs.cert_file(certificate) : nil
+        @sslcert ||= (certificate && !@args['skip_ssl_cert']) ? Pushit::Certs.cert_file(certificate) : nil
       end
 
       def sslca
-        @sslca ||= certificate ? Pushit::Certs.chain_file(certificate) : nil
+        @sslca ||= (certificate && !@args['skip_ssl_ca']) ? Pushit::Certs.chain_file(certificate) : nil
       end
 
       def certificate
