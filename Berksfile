@@ -1,4 +1,4 @@
-source 'http://chef-server.carekinesis.net:26200'
+source ENV['BERKS_SOURCE'] || 'https://supermarket.chef.io'
 metadata
 
 group :integration do
