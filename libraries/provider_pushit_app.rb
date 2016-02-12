@@ -215,13 +215,14 @@ class Chef
       end
 
       def foreman_export_resource
-        r = foreman_export app.name
+        app_local = app
+        r = foreman_export app_local.name
         r.format :upstart
-        r.log app.log_path
-        r.user app.config['owner']
-        r.env lazy { app.envfile }
-        r.root lazy { app.release_path }
-        r.pid_dir app.pid_path
+        r.log app_local.log_path
+        r.user app_local.config['owner']
+        r.env lazy { app_local.envfile }
+        r.root lazy { app_local.release_path }
+        r.pid_dir app_local.pid_path
         r.location '/etc/init'
         r.notifies :restart, "service[#{new_resource.name}]"
         r

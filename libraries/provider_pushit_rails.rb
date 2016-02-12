@@ -74,12 +74,13 @@ class Chef
       def add_post_deploy_resources
         if new_resource.precompile_assets
           app_local = app
+          username = user_username
           ruby_block 'precompile assests' do
             block do
               require 'bundler'
               app = app_local
-              bundle_precompile_command = "sudo su - #{user_username} -c 'cd #{app.release_path} "\
-              "&& source ./.env && #{app.bundle_binary} exec rake #{new_resource.precompile_command}'"
+              bundle_precompile_command = "sudo su - #{username} -c 'cd #{app_local.release_path} "\
+              "&& source ./.env && #{app_local.bundle_binary} exec rake #{new_resource.precompile_command}'"
               Bundler.clean_system(bundle_precompile_command)
               fail('Bundle pre-compile failed') unless $CHILD_STATUS.exitstatus == 0
             end

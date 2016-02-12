@@ -49,7 +49,7 @@ class Chef
           {
             'BUNDLE_GEMFILE' => '',
             'LANG' => 'en_US.UTF-8',
-            'PATH' => "#{bin_paths}:$PATH",
+            'PATH' => "#{bin_paths}:#{ENV['PATH']}",
             'RUBYOPT' => ''
           }
         end
