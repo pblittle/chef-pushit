@@ -1,5 +1,9 @@
 0.14.x
 ===========
+0.14.2
+------
+* update certificate cookbook
+
 0.14.0
 ---------
 * added support for chef 12 by fixing a path variable in the mixin
