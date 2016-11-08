@@ -51,7 +51,7 @@ class Chef
         set_or_return(
           :bundler_version,
           arg,
-          :kind_of => [String]
+          :kind_of => [String, Symbol]
         )
       end
 

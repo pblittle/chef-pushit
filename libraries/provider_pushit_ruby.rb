@@ -41,7 +41,7 @@ class Chef
         chruby_source_resource.action :sync
         chruby_install_resource.action :run
         chruby_sh_resource.action :create
-        bundler_gem_resource.action :install
+        bundler_gem_resource.action ruby.bundler_version == :upgrade ? :upgrade : :install
       end
 
       def ruby
@@ -101,10 +101,11 @@ class Chef
       end
 
       def bundler_gem_resource
-        gem_package 'bundler' do
-          version ruby.bundler_version
+        gem_package "bundler for #{ruby.version}" do
+          package_name 'bundler'
           gem_binary ruby.gem_binary
           options('--no-ri --no-rdoc')
+          version ruby.bundler_version unless ruby.bundler_version == :upgrade
           action :nothing
         end
       end

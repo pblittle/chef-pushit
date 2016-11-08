@@ -32,11 +32,7 @@ class Chef
 
       def initialize(name, config)
         @name = name
-        if config.is_a? Hash
-          @config = config
-        else
-          @config = config.reduce(Mash.new) { |a, e| Chef::Mixin::DeepMerge.merge(a, e) }
-        end
+        @config = config.is_a?(Hash) ? config : config.reduce(Mash.new) { |a, e| Chef::Mixin::DeepMerge.merge(a, e) }
       end
 
       attr_reader :config
@@ -59,7 +55,7 @@ class Chef
       end
 
       def database_config
-        fail Exception, "No database configuration available for #{name}" unless database?
+        raise Exception, "No database configuration available for #{name}" unless database?
         database.to_hash
       end
 
@@ -129,7 +125,7 @@ class Chef
         when 'nodejs'
           'web: npm start'
         else
-          fail "Unknown pushit framework '#{framework}"
+          raise "Unknown pushit framework '#{framework}"
         end
       end
 
@@ -166,7 +162,7 @@ class Chef
       end
 
       def webserver_certificate?
-        self.webserver? && config['webserver']['certificate'] &&
+        webserver? && config['webserver']['certificate'] &&
           !config['webserver']['certificate'].empty?
       end
 
@@ -183,7 +179,7 @@ class Chef
       end
 
       def version
-        fail Exception, "#{current_path} symlink does not exist" unless ::File.symlink?(current_path)
+        raise Exception, "#{current_path} symlink does not exist" unless ::File.symlink?(current_path)
 
         Pathname.new(current_path).realpath.basename
       end

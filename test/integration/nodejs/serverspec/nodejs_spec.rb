@@ -1,9 +1,7 @@
 # encoding: utf-8
+require 'spec_helper'
 
-require 'minitest/autorun'
-require 'minitest/spec'
-
-describe 'pushit_test::nodejs' do
+context 'pushit_test::nodejs' do
   let(:pushit_path) { ::File.join('', 'opt', 'pushit') }
 
   let(:pushit_app) { 'nodejs-example' }
@@ -23,56 +21,40 @@ describe 'pushit_test::nodejs' do
   end
 
   it 'has created the base pushit directory' do
-    assert File.directory?(pushit_path)
+    expect(file(pushit_path)).to be_directory
   end
 
   it 'has created a nodejs app in pushit base' do
-    assert File.directory?(pushit_app_path)
+    expect(file(pushit_app_path)).to be_directory
   end
 
   it 'has created a log directory' do
     skip 'currently upstart is logging to /var/log/upstart'
-    assert File.directory?(pushit_app_log_path)
+    expect(file(pushit_app_log_path)).to be_directory
   end
 
   it 'has created an upstart config file' do
-    assert File.file?(upstart_config_path)
+    expect(file(upstart_config_path)).to be_file
   end
 
   it 'has symlinked the current release' do
-    assert File.symlink?(
-      ::File.join(pushit_app_path, 'current')
-    )
+    expect(file(::File.join(pushit_app_path, 'current'))).to be_symlink
   end
 
   it 'has created a pids directory' do
     skip 'nodejs apps are not writing a pid currently'
-    assert File.directory?(
-      ::File.join(pushit_app_path, 'shared', 'pids')
-    )
-  end
-
-  it 'has symlinked the current directory' do
-    assert File.symlink?(
-      ::File.join(pushit_app_path, 'current')
-    )
+    expect(file(::File.join(pushit_app_path, 'shared', 'pids'))).to be_directory
   end
 
   it 'has symlinked the .env file' do
-    assert File.symlink?(
-      ::File.join(pushit_app_path, 'current', '.env')
-    )
+    expect(file(::File.join(pushit_app_path, 'current', '.env'))).to be_symlink
   end
 
   it 'has created a service config' do
-    assert File.file?(
-      ::File.join('', 'etc', 'init', "#{pushit_app}.conf")
-    )
+    expect(file(::File.join('', 'etc', 'init', "#{pushit_app}.conf"))).to be_file
   end
 
   it 'starts the nodejs app service after converge' do
-    assert system(
-      "service #{pushit_app} status | grep -e 'start/running'"
-    )
+    expect(service(pushit_app)).to be_running
   end
 end

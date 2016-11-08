@@ -201,9 +201,10 @@ class Chef
       end
 
       def config_file_resources
+        app_local = app
         new_resource.config_files.map do |file|
-          r = cookbook_file "#{app.name}'s #{file} file"
-          r.path lazy { ::File.join(app.release_path, file) }
+          r = cookbook_file "#{app_local.name}'s #{file} file"
+          r.path lazy { ::File.join(app_local.release_path, file) }
           r.source file
           r.cookbook new_resource.cookbook_name.to_s
           r.owner user_username
