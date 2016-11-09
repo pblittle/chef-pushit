@@ -1,5 +1,10 @@
 0.14.x
 ===========
+0.14.4
+------
+* Fixed a bug to allow bundler version to be specified
+* Changed tests over to serverspec from minitest
+
 0.14.2
 ------
 * update certificate cookbook
@@ -112,5 +117,3 @@ This is now the only way to configure these resources.
 --------
 * PUSHIT-13 moved all resources outside of the deploy callbacks.
 * added notifications between various resources so all configs take immediate effect
-
-
