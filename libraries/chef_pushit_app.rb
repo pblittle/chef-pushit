@@ -32,7 +32,12 @@ class Chef
 
       def initialize(name, config)
         @name = name
-        @config = config.is_a?(Hash) ? config : config.reduce(Mash.new) { |a, e| Chef::Mixin::DeepMerge.merge(a, e) }
+        @config =
+          if config.is_a?(Hash)
+            config
+          else
+            config.reduce(Mash.new) { |a, e| Chef::Mixin::DeepMerge.merge(a, e) }
+          end
       end
 
       attr_reader :config
