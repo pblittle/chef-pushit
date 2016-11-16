@@ -1,9 +1,16 @@
 0.14.x
 ===========
+0.14.6
+-------
+* fixed a bunch of locations where variable scope was killing us.
+
 0.14.4
 ------
 * Fixed a bug to allow bundler version to be specified
 * Changed tests over to serverspec from minitest
+* updated gems
+* ran `rubocop -a` to fix rubocop issues
+
 
 0.14.2
 ------

@@ -81,9 +81,10 @@ class Chef
         group = user_group
         ssh_directory = user_ssh_directory
 
+        app_local = app
         r = deploy_revision new_resource.name
         r.action :nothing
-        r.deploy_to app.path
+        r.deploy_to app_local.path
 
         r.repository config['repo']
         r.revision new_resource.revision
@@ -96,7 +97,7 @@ class Chef
           r.ssh_wrapper wrapper_path
         end
 
-        r.environment app.env_vars
+        r.environment app_local.env_vars
 
         r.user username
         r.group group
@@ -187,14 +188,15 @@ class Chef
       end
 
       def dotenv_file_resource
-        r = template ::File.join(app.shared_path, 'env')
+        app_local = app
+        r = template ::File.join(app_local.shared_path, 'env')
         r.source 'env.erb'
         r.cookbook 'pushit'
         r.owner user_username
         r.group user_group
         r.mode '0644'
         r.variables(
-          :env => Pushit.escape_env(app.env_vars.sort)
+          :env => Pushit.escape_env(app_local.env_vars.sort)
         )
         r.action :nothing
         r
@@ -230,41 +232,44 @@ class Chef
       end
 
       def service_resource
+        app_local = app
         r = service new_resource.name
         r.provider Chef::Provider::Service::Upstart
         r.supports :status => true, :restart => false, :reload => false
-        r.only_if { ::File.exist? "/etc/init/#{app.name}.conf" }
+        r.only_if { ::File.exist? "/etc/init/#{app_local.name}.conf" }
         r.action :nothing
         r
       end
 
       def vhost_config_resource
+        app_local = app
         r = pushit_vhost new_resource.name
-        r.http_port app.http_port
-        r.https_port app.https_port
-        r.server_name app.server_name
-        r.upstream_port app.upstream_port
-        r.upstream_socket app.upstream_socket
-        r.use_ssl app.webserver_certificate?
-        r.ssl_certificate app.webserver_certificate
+        r.http_port app_local.http_port
+        r.https_port app_local.https_port
+        r.server_name app_local.server_name
+        r.upstream_port app_local.upstream_port
+        r.upstream_socket app_local.upstream_socket
+        r.use_ssl app_local.webserver_certificate?
+        r.ssl_certificate app_local.webserver_certificate
         r.config_cookbook new_resource.vhost_config_cookbook
         r.config_source new_resource.vhost_config_source || "nginx_#{new_resource.framework}.conf.erb"
         r.config_variables new_resource.vhost_config_variables || {}
         r.nginx_config_cookbook new_resource.nginx_config_cookbook
         r.nginx_config_source new_resource.nginx_config_source
         r.nginx_config_variables new_resource.nginx_config_variables || {}
-        r.root app.root
+        r.root app_local.root
         r.action :nothing
         r
       end
 
       def procfile_resource
-        r = file "#{app.name} Procfile"
-        r.path lazy { app.procfile }
+        app_local = app
+        r = file "#{app_local.name} Procfile"
+        r.path lazy { app_local.procfile }
         r.content app.procfile_default_entry(new_resource.framework)
         r.owner user_username
         r.group user_group
-        r.not_if { app.procfile? }
+        r.not_if { app_local.procfile? }
         r.action :nothing
         r
       end
