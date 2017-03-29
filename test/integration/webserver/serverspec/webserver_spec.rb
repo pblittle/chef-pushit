@@ -3,7 +3,7 @@ require 'spec_helper'
 context 'webserver tests' do
   let(:pushit_path) { ::File.join('', 'opt', 'pushit') }
 
-  let(:nginx_install_path) { ::File.join('', 'opt', 'nginx-1.4.4') }
+  let(:nginx_install_path) { ::File.join('', 'opt', 'nginx-1.10.3') }
 
   let(:webserver_path) { ::File.join(pushit_path, 'nginx') }
 

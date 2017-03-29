@@ -1,9 +1,14 @@
 0.14.x
 ===========
+
+0.14.10
+---------
+* upgrade nginx to 1.10.3
+* upgrade nginx openssl version to 1.1.0e
+
 0.14.8
 ---------
 * DEVOPS-1235 post error output when pre-compile or db:migrate fail
-
 
 0.14.6
 -------

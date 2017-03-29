@@ -34,6 +34,6 @@ context 'ruby 2.0 with ruby default bundler' do
     expect(command("#{ruby2_binary} -v").stdout).to contain('2.3.0')
   end
   it 'has installed the right bulder version' do
-    expect(command("#{ruby2_bundler} -v").stdout).to contain('1.13.6')
+    expect(command("#{ruby2_bundler} -v").stdout).to contain('1.14.6')
   end
 end

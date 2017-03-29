@@ -36,8 +36,6 @@ platforms:
       nginx:
         default_site_enabled: false
         install_method: 'source'
-        source:
-          version: '1.4.4'
 
 suites:
   - name: user
