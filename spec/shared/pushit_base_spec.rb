@@ -13,8 +13,4 @@ describe Chef::Provider::PushitBase do
   it 'installs build-essential' do
     expect(chef_run).to install_package('build-essential')
   end
-
-  it 'installs git' do
-    expect(chef_run).to install_package('git')
-  end
 end

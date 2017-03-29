@@ -4,7 +4,6 @@
 driver_plugin: vagrant
 
 driver_config:
-  require_chef_omnibus: true
   customize:
     cpus: 2
     memory: 1536
@@ -14,7 +13,7 @@ driver_config:
 
 provisioner:
   name: chef_zero
-  require_chef_omnibus: true
+  require_chef_omnibus: 'latest'
   chef_omnibus_url: https://www.getchef.com/chef/install.sh
   data_bags_path:
     'test/data_bags'
@@ -84,6 +83,9 @@ suites:
       box: <%= ENV['KITCHEN_NODE_BOX'] || opscode-ubuntu-12.04 %>
     run_list:
       - recipe[pushit_test::ruby]
+    # verifier:
+    #   name: shell
+    #   command: rspec -c -f d -I serverspec test/integration/rubies/serverspec/ruby_spec.rb
 
   - name: rails
     driver_config:

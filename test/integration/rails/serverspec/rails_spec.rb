@@ -1,9 +1,7 @@
 # encoding: utf-8
+require 'spec_helper'
 
-require 'minitest/autorun'
-require 'minitest/spec'
-
-describe 'pushit_test::rails' do
+context 'pushit_test::rails' do
   let(:pushit_path) { ::File.join('', 'opt', 'pushit') }
 
   let(:pushit_app) { 'rails-example' }
@@ -43,83 +41,75 @@ describe 'pushit_test::rails' do
   end
 
   it 'has created the base pushit directory' do
-    assert File.directory?(pushit_path)
+    expect(file(pushit_path)).to be_directory
   end
 
   it 'has created a rails app in pushit base' do
-    assert File.directory?(pushit_app_path)
+    expect(file(pushit_app_path)).to be_directory
   end
 
   it 'has created an upstart config file' do
-    assert File.file?(upstart_config_path)
+    expect(file(upstart_config_path)).to be_file
   end
 
   it 'has symlinked the current release' do
-    assert File.symlink?(pushit_app_current_path)
+    expect(file(pushit_app_current_path)).to be_symlink
   end
 
   it 'has symlinked the .env file' do
-    assert ::File.symlink?(dotenv_path)
+    expect(file(dotenv_path)).to be_symlink
   end
 
   it 'has included the ruby bin path in .env' do
-    assert ::File.read(dotenv_path).include?(ruby_bin_path)
+    expect(file(dotenv_path).content).to contain(ruby_bin_path)
   end
 
   it 'correctly merged multiple config hashes' do
-    assert ::File.read(dotenv_path).include?('TEST_VAL_2')
-    assert ::File.read(dotenv_path).include?('TEST_VAL_1="true"')
+    expect(file(dotenv_path).content).to contain('TEST_VAL_2')
+    expect(file(dotenv_path).content).to contain('TEST_VAL_1="true"')
   end
 
   it 'has created database.yml' do
-    assert File.file?(database_yaml_path)
+    expect(file(database_yaml_path)).to be_file
   end
 
   it 'has symlinked database.yml to current' do
-    assert File.symlink?(database_yaml_path)
+    expect(file(database_yaml_path)).to be_symlink
   end
 
   it 'has configured the database.yml host attribute' do
-    assert ::File.read(
-      database_yaml_path
-    ).include?('host: localhost')
+    expect(file(database_yaml_path).content).to contain('host: localhost')
   end
 
   it 'has configured the database.yml options attribute' do
-    assert ::File.read(
-      database_yaml_path
-    ).include?('foo: bar')
+    expect(file(database_yaml_path).content).to contain('foo: bar')
   end
 
   it 'has created bundler binstubs' do
-    assert File.directory?(bundler_binstubs_path)
+    expect(file(bundler_binstubs_path)).to be_directory
   end
 
   it 'has vendored the bundled gems' do
-    assert File.directory?(
-      ::File.join(pushit_app_current_path, 'vendor', 'bundle', 'ruby', '2.1.0', 'gems')
-    )
+    expect(
+      file(::File.join(pushit_app_current_path, 'vendor', 'bundle', 'ruby', '2.1.0', 'gems'))
+    ).to be_directory
   end
 
   it 'has created the shared app directories' do
     pushit_app_shared_dirs.each do |dir|
-      assert File.directory?(::File.join(pushit_app_shared_path, dir))
+      expect(file(::File.join(pushit_app_shared_path, dir))).to be_directory
     end
   end
 
   it 'has created a service config' do
-    assert File.file?(
-      ::File.join('', 'etc', 'init', "#{pushit_app}.conf")
-    )
+    expect(file(::File.join('', 'etc', 'init', "#{pushit_app}.conf"))).to be_file
   end
 
   it 'starts the unicorn workers after converge' do
-    assert File.file?(pushit_pid_path)
+    expect(file(pushit_pid_path)).to be_file
   end
 
   it 'starts the rails app service after converge' do
-    assert system(
-      "service #{pushit_app} status | grep -e 'start/running'"
-    )
+    expect(service(pushit_app)).to be_running
   end
 end

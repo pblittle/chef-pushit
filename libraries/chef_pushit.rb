@@ -59,7 +59,7 @@ class Chef
       def whyrun_supported
         @whyrun_supported ||= false
       end
-      alias_method :whyrun_supported?, :whyrun_supported
+      alias whyrun_supported? whyrun_supported
 
       def escape_env(vars = {})
         vars.each_with_object({}) do |(key, value), hash|

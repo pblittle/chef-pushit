@@ -14,8 +14,8 @@ describe "#{Chef::Provider::PushitRuby}.create" do
     stub_command(/chruby --version.*/).and_return false
   end
 
-  it 'installs ruby 1.9.3' do
-    expect(chef_run).to install_ruby_build_ruby('1.9.3-p448')
+  it 'installs ruby 2.3.0' do
+    expect(chef_run).to install_ruby_build_ruby('2.3.0')
   end
 
   it 'installs ruby 1.8.7' do

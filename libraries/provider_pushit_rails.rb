@@ -74,14 +74,21 @@ class Chef
       def add_post_deploy_resources
         if new_resource.precompile_assets
           app_local = app
+          username = user_username
           ruby_block 'precompile assests' do
             block do
               require 'bundler'
-              app = app_local
-              bundle_precompile_command = "sudo su - #{user_username} -c 'cd #{app.release_path} "\
-              "&& source ./.env && #{app.bundle_binary} exec rake #{new_resource.precompile_command}'"
-              Bundler.clean_system(bundle_precompile_command)
-              fail('Bundle pre-compile failed') unless $CHILD_STATUS.exitstatus == 0
+              bundle_precompile_command = "sudo su - #{username} -c 'cd #{app_local.release_path} "\
+              "&& source ./.env && #{app_local.bundle_binary} exec rake #{new_resource.precompile_command}'"
+
+              Bundler.with_clean_env do
+                _, stdout, stderr = Open3.popen3(bundle_precompile_command)
+                Chef::Log.info("\nPRECOMPILE OUTPUT:\nCOMMAND: #{bundle_precompile_command}\nOUTPUT:\n#{stdout}")
+                unless $CHILD_STATUS.exitstatus == 0
+                  Chef::Log.error(stderr)
+                  raise('Bundle pre-compile failed') unless $CHILD_STATUS.exitstatus == 0
+                end
+              end
             end
             action :nothing
             subscribes :run, "deploy_revision[#{new_resource.name}]", :immediate
@@ -106,7 +113,9 @@ class Chef
       def pushit_ruby_resource
         r = pushit_ruby ruby.version
         r.environment ruby.environment
-        r.user user_username
+        r.bundler_version ruby.bundler_version
+        r.prefix_path ruby.prefix_path
+        r.bin_path ruby.bin_path
         r.group user_group
         r.notifies :restart, "service[#{new_resource.name}]"
         r.action :nothing
@@ -198,14 +207,15 @@ class Chef
       end
 
       def worker_processes
-        if config['env'] && config['env']['UNICORN_WORKER_PROCESSES'].to_i > 0
-          worker_count = config['env']['UNICORN_WORKER_PROCESSES'].to_i
-        else
-          worker_count = new_resource.unicorn_worker_processes
-        end
+        worker_count =
+          if config['env'] && config['env']['UNICORN_WORKER_PROCESSES'].to_i > 0
+            config['env']['UNICORN_WORKER_PROCESSES'].to_i
+          else
+            new_resource.unicorn_worker_processes
+          end
 
         unless worker_count && worker_count > 0
-          fail StandardError, 'Unicorn worker count must be a positive integer'
+          raise StandardError, 'Unicorn worker count must be a positive integer'
         end
 
         worker_count
@@ -217,7 +227,7 @@ class Chef
 
         require 'bundler'
         Bundler.clean_system(install_command)
-        fail('Bundle install failed') unless $CHILD_STATUS.exitstatus == 0
+        raise('Bundle install failed') unless $CHILD_STATUS.exitstatus == 0
       end
     end
   end
