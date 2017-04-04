@@ -81,14 +81,8 @@ class Chef
               bundle_precompile_command = "sudo su - #{username} -c 'cd #{app_local.release_path} "\
               "&& source ./.env && #{app_local.bundle_binary} exec rake #{new_resource.precompile_command}'"
 
-              Bundler.with_clean_env do
-                _, stdout, stderr = Open3.popen3(bundle_precompile_command)
-                Chef::Log.info("\nPRECOMPILE OUTPUT:\nCOMMAND: #{bundle_precompile_command}\nOUTPUT:\n#{stdout}")
-                unless $CHILD_STATUS.exitstatus == 0
-                  Chef::Log.error(stderr)
-                  raise('Bundle pre-compile failed') unless $CHILD_STATUS.exitstatus == 0
-                end
-              end
+              Bundler.clean_system(bundle_precompile_command)
+              raise('Bundle pre-compile failed') unless $CHILD_STATUS.exitstatus.zero?
             end
             action :nothing
             subscribes :run, "deploy_revision[#{new_resource.name}]", :immediate
@@ -104,7 +98,7 @@ class Chef
           r.owner user_username
           r.group user_group
           r.recursive true
-          r.mode 00755
+          r.mode 0o0755
           r.action :nothing
           r
         end

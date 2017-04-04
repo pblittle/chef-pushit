@@ -1,6 +1,10 @@
 0.14.x
 ===========
 
+0.14.12
+-------
+* fix a regression where pre-compile assets are broken
+
 0.14.10
 ---------
 * upgrade nginx to 1.10.3
